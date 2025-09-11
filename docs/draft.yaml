@@ -1,0 +1,694 @@
+openapi: 3.1.0
+info:
+  title: BiteTrack API
+  version: 1.0.0
+  description: >
+    BiteTrack is a Dockerized Express.js RESTful API designed for small food
+    businesses to manage sellers, products, customers, and sales.
+    Authentication is JWT-based with role-based access control.
+servers:
+  - url: http://localhost:3000/bitetrack
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Seller:
+      type: object
+      properties:
+        id: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        dateOfBirth: { type: string, format: date }
+        role: { type: string, enum: [user, admin, superadmin] }
+        createdBy: { type: string }
+        activatedAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [firstName, lastName, email, dateOfBirth, role]
+
+    PendingSeller:
+      type: object
+      properties:
+        id: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        email: { type: string, format: email }
+        dateOfBirth: { type: string, format: date }
+        createdAt: { type: string, format: date-time }
+        createdBy: { type: string }
+        activatedAt: { type: string, format: date-time, nullable: true }
+      required: [firstName, lastName, email, dateOfBirth]
+
+    Customer:
+      type: object
+      properties:
+        id: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        phoneNumber: { type: string }
+        email: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        lastTransaction: { type: string, format: date-time, nullable: true }
+      required: [firstName, lastName, phoneNumber]
+
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        productName: { type: string }
+        description: { type: string, nullable: true }
+        count: { type: integer, minimum: 0 }
+        price: { type: number, minimum: 0 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [productName, count, price]
+
+    Sale:
+      type: object
+      properties:
+        id: { type: string }
+        customerId: { type: string }
+        sellerId: { type: string }
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId: { type: string }
+              quantity: { type: integer, minimum: 1 }
+              priceAtSale: { type: number, minimum: 0 }
+            required: [productId, quantity, priceAtSale]
+        totalAmount: { type: number, minimum: 0 }
+        amountPaid: { type: number, minimum: 0 }
+        settled: { type: boolean, description: "True if fully paid" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required: [customerId, sellerId, products, totalAmount, amountPaid, settled]
+
+    PasswordResetToken:
+      type: object
+      properties:
+        token: { type: string }
+        sellerId: { type: string }
+        expiresAt: { type: string, format: date-time }
+      required: [token, sellerId, expiresAt]
+
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        message: { type: string }
+        statusCode: { type: integer }
+      required: [error, message, statusCode]
+
+    ValidationError:
+      type: object
+      properties:
+        error: { type: string }
+        message: { type: string }
+        details: 
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }
+        statusCode: { type: integer }
+      required: [error, message, statusCode]
+
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8 }
+      required: [email, password]
+
+    ActivateRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        dateOfBirth: { type: string, format: date }
+        lastName: { type: string }
+        password: { type: string, minLength: 8, pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]" }
+      required: [email, dateOfBirth, lastName, password]
+
+    TokenResponse:
+      type: object
+      properties:
+        token: { type: string }
+        seller: { $ref: "#/components/schemas/Seller" }
+      required: [token, seller]
+
+paths:
+  # Authentication Endpoints
+  /auth/login:
+    post:
+      summary: Login as seller
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+      responses:
+        "200":
+          description: JWT token and seller info
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenResponse" }
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /auth/activate:
+    post:
+      summary: Activate pending seller account
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActivateRequest" }
+      responses:
+        "201":
+          description: Seller activated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Seller" }
+        "404":
+          description: Pending seller not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /auth/recover:
+    post:
+      summary: Initiate password recovery (superadmin only)
+      tags: [Authentication]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sellerId]
+              properties:
+                sellerId: { type: string }
+      responses:
+        "200":
+          description: Password reset token generated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PasswordResetToken" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/reset:
+    post:
+      summary: Reset password with token
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, email, dateOfBirth, newPassword]
+              properties:
+                token: { type: string }
+                email: { type: string, format: email }
+                dateOfBirth: { type: string, format: date }
+                newPassword: { type: string, minLength: 8 }
+      responses:
+        "200":
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+        "400":
+          description: Invalid token or validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # Seller Management Endpoints
+  /sellers:
+    get:
+      summary: List all sellers (admin/superadmin only)
+      tags: [Sellers]
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: List of sellers
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Seller" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /sellers/pending:
+    post:
+      summary: Create pending seller (admin/superadmin only)
+      tags: [Sellers]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [firstName, lastName, email, dateOfBirth]
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                email: { type: string, format: email }
+                dateOfBirth: { type: string, format: date }
+      responses:
+        "201":
+          description: Pending seller created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PendingSeller" }
+        "400":
+          description: Validation error or email already exists
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /sellers/{id}:
+    patch:
+      summary: Self-update seller information
+      tags: [Sellers]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                email: { type: string, format: email }
+                dateOfBirth: { type: string, format: date }
+                oldPassword: { type: string }
+                newPassword: { type: string, minLength: 8 }
+      responses:
+        "200":
+          description: Seller updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Seller" }
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "403":
+          description: Unauthorized or invalid old password
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    delete:
+      summary: Deactivate seller (superadmin only)
+      tags: [Sellers]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Seller deactivated
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /sellers/{id}/role:
+    patch:
+      summary: Promote/demote seller role (superadmin only)
+      tags: [Sellers]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { type: string, enum: [user, admin, superadmin] }
+      responses:
+        "200":
+          description: Role updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Seller" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # Customer Endpoints
+  /customers:
+    get:
+      summary: List all customers
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Customer" }
+    post:
+      summary: Create customer
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [firstName, lastName, phoneNumber]
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                phoneNumber: { type: string }
+                email: { type: string, format: email }
+      responses:
+        "201":
+          description: Customer created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /customers/{id}:
+    patch:
+      summary: Update customer
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName: { type: string }
+                lastName: { type: string }
+                phoneNumber: { type: string }
+                email: { type: string, format: email }
+      responses:
+        "200":
+          description: Customer updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Customer" }
+        "404":
+          description: Customer not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    delete:
+      summary: Remove customer
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Customer removed
+        "404":
+          description: Customer not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # Product Endpoints
+  /products:
+    get:
+      summary: List all products
+      tags: [Products]
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Product" }
+    post:
+      summary: Create product
+      tags: [Products]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productName, count, price]
+              properties:
+                productName: { type: string }
+                description: { type: string }
+                count: { type: integer, minimum: 0 }
+                price: { type: number, minimum: 0 }
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /products/{id}:
+    patch:
+      summary: Update product details or inventory
+      tags: [Products]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productName: { type: string }
+                description: { type: string }
+                count: { type: integer, minimum: 0 }
+                price: { type: number, minimum: 0 }
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    delete:
+      summary: Remove product
+      tags: [Products]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204":
+          description: Product removed
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # Sales Endpoints
+  /sales:
+    get:
+      summary: List sales (with optional filters)
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: customerId
+          in: query
+          schema: { type: string }
+        - name: sellerId
+          in: query
+          schema: { type: string }
+        - name: settled
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: List of sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Sale" }
+    post:
+      summary: Create a sale (transactional)
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customerId, products, amountPaid]
+              properties:
+                customerId: { type: string }
+                products:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      productId: { type: string }
+                      quantity: { type: integer, minimum: 1 }
+                amountPaid: { type: number, minimum: 0 }
+      responses:
+        "201":
+          description: Sale created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sale" }
+        "400":
+          description: Insufficient inventory or validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /sales/{id}:
+    get:
+      summary: Get sale details
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Sale details
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sale" }
+        "404":
+          description: Sale not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /sales/{id}/settle:
+    patch:
+      summary: Settle a sale (update payment)
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amountPaid]
+              properties:
+                amountPaid: { type: number, minimum: 0 }
+      responses:
+        "200":
+          description: Sale payment updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sale" }
+        "404":
+          description: Sale not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
