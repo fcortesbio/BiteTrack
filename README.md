@@ -115,21 +115,67 @@ EOF
 
 4. Build the Docker image
 ```bash
-DOCKER_BUILDKIT=1 docker build . -t your-name/bitetrack:1.0.1
+DOCKER_BUILDKIT=1 docker build . -t your-name/bitetrack:1.0.0
 ```
 
 5. Start the container on port 3000
 ```bash
-docker run -d -p 3000:3000 --env-file .env --name BiteTrack your-name/bitetrack:1.0.1
+docker run -d -p 3000:3000 --env-file .env --name BiteTrack your-name/bitetrack:1.0.0
 ```
 The API will be available at http://localhost:3000
 
----
-### **Roadmap**
-* Add frontend client (React/Vue/Angular)
-* Add reporting endpoints (weekly sales, unsettled accounts, top products).
-* Add MCP server layer for AI-assisted queries.
-* Add unit/integration tests.
+## **Minimal Endpoint List**
+### **Auth**
+
+* `POST bitetrack/auth/login` → login with email + password, return JWT.
+
+* `POST bitetrack/auth/activate` → pending seller activates account (email + dob + lastName + valid password).
+
+* `POST bitetrack/auth/recover` → initiate password recovery (superadmin generates password reset token).
+
+* `POST bitetrack/auth/reset` → reset password with token + new password.
+
+### ***Sellers***
+
+* `GET bitetrack/sellers` (admin/superadmin only) → list all sellers.
+
+* `POST bitetrack/sellers/pending` (admin/superadmin only) → create a pending seller.
+
+* `PATCH bitetrack/sellers/:id` → self-update (firstName, lastName, email, dob, password with checks).
+
+* `PATCH bitetrack/sellers/:id/role` (superadmin only) → promote/demote roles.
+
+* `DELETE bitetrack/sellers/:id` (superadmin only) → deactivate/remove seller.
+
+### **Customers**
+
+* `GET bitetrack/customers` → list all customers.
+
+* `POST bitetrack/customers` → create a customer.
+
+* `PATCH bitetrack/customers/:id` → update a customer.
+
+* `DELETE bitetrack/customers/:id` → remove a customer.
+
+### **Products**
+
+* `GET bitetrack/products` → list all products.
+
+* `POST bitetrack/products` → create a product.
+
+* `PATCH bitetrack/products/:id` → update product details or inventory.
+
+* `DELETE bitetrack/products/:id` → remove a product.
+
+### **Sales**
+
+* `GET bitetrack/sales` → list sales (filter by customer, seller, settled).
+
+* `POST bitetrack/sales` → create a sale (transactional, decrement stock).
+
+* `PATCH bitetrack/sales/:id/settle` → settle a sale (update amountPaid, mark settled if fully paid).
+
+* `GET bitetrack/sales/:id` → get sale details.
 
 ## Notes
 * API endpoint documentation available at docs/API.md
@@ -137,6 +183,14 @@ The API will be available at http://localhost:3000
 * Customers have no direct API access or an active application role
 * Sales are atomic -- either all related operations succeed, or the transaction is rolled back.
 * Inventory decrements automatically when sales are completed.
+* A valid password should be enforced and validated to include at least 8 characters, including at least 1 of each: lowers, uppers, numbers and symbols
+
+## **Future enhancements**
+* Add frontend client (React/Vue/Angular)
+* Add reporting endpoints (weekly sales, unsettled accounts, top products).
+* Add MCP server layer for AI-assisted queries.
+* Add unit/integration tests.
+
 
 ## License
 MIT License
