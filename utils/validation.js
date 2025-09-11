@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, query, validationResult } = require('express-validator');
 
 // Password validation regex
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -49,6 +49,13 @@ const validationRules = {
     body('newPassword')
       .matches(passwordRegex)
       .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols')
+  ],
+
+  getSellerByEmail: [
+    query('email')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email is required')
   ],
 
   // Seller validations

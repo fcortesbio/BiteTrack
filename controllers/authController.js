@@ -4,13 +4,51 @@ const PasswordResetToken = require('../models/PasswordResetToken');
 const { generateToken, generateResetToken } = require('../utils/jwt');
 const bcrypt = require('bcryptjs');
 
+const getSellerByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    // First, check for an active account in sellers collection
+    const activeSeller = await Seller.findOne({ email });
+    
+    if (activeSeller) {
+      return res.json({
+        email: activeSeller.email,
+        status: 'active'
+      });
+    }
+    
+    // If no active account, check for pending account
+    const pendingSeller = await PendingSeller.findOne({ 
+      email, 
+      activatedAt: null 
+    });
+    
+    if (pendingSeller) {
+      return res.json({
+        email: pendingSeller.email,
+        status: 'pending'
+      });
+    }
+    
+    // No account found in either collection
+    return res.status(404).json({
+      error: "Not Found",
+      message: "No account found for this email address",
+      statusCode: 404
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Find seller with password field included
     const seller = await Seller.findOne({ email }).select('+password');
-    
+
     if (!seller || !(await seller.comparePassword(password))) {
       return res.status(401).json({
         error: 'Unauthorized',
@@ -20,10 +58,10 @@ const login = async (req, res) => {
     }
 
     const token = generateToken({ id: seller._id, role: seller.role });
-    
+
     // Remove password from response
     const sellerResponse = seller.toJSON();
-    
+
     res.json({
       token,
       seller: sellerResponse
@@ -38,7 +76,7 @@ const activate = async (req, res) => {
     const { email, dateOfBirth, lastName, password } = req.body;
 
     // Find pending seller
-    const pendingSeller = await PendingSeller.findOne({ 
+    const pendingSeller = await PendingSeller.findOne({
       email,
       dateOfBirth: new Date(dateOfBirth),
       lastName,
@@ -161,5 +199,6 @@ module.exports = {
   login,
   activate,
   recover,
-  reset
+  reset,
+  getSellerByEmail
 };

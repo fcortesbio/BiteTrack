@@ -56,7 +56,7 @@ mongoose
   });
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/bitetrack/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),

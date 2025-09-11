@@ -6,13 +6,15 @@ const {
   login,
   activate,
   recover,
-  reset
+  reset,
+  getSellerByEmail
 } = require('../controllers/authController');
 
 // Public routes
 router.post('/login', validationRules.login, validate, login);
 router.post('/activate', validationRules.activate, validate, activate);
 router.post('/reset', validationRules.resetPassword, validate, reset);
+router.get('/seller-status', validationRules.getSellerByEmail, validate, getSellerByEmail);
 
 // Protected routes
 router.post('/recover', 
