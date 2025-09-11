@@ -132,6 +132,7 @@ const main = async () => {
   password: "${hashedPassword}",
   role: "superadmin",
   active: true,
+  createdBy: "Self",
   createdAt: new Date(),
   updatedAt: new Date()
 });`;
