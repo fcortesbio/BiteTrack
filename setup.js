@@ -121,7 +121,7 @@ const main = async () => {
   }
 
   console.log("Hashing password...");
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 12);
   console.log("Password successfully hashed!");
 
   const mongoCommand = `db.sellers.insertOne({
