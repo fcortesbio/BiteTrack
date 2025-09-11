@@ -1,7 +1,7 @@
 # **BiteTrack**
 BiteTrack is a Dockerized Express.js RESTful API designed to help small food businesses (starting with a sandwich shop), manage sellers, products, customers, and sales. It replaces messy spreadsheets with structured, persistent data stored in MongoDB.
 
-This project is built as a backend-only MBP -- no frontend client planned yet.
+This project is built as a backend-only MVP -- no frontend client planned yet.
 
 ## Folder structure
 This project follows a standard Model-View-Controller (MVC) pattern.
@@ -23,7 +23,7 @@ This project follows a standard Model-View-Controller (MVC) pattern.
 ---
 ## **Features (MVP)**
 * **RESTful API** built with Express.js and MongoDB (via mongoose)
-* **Dockerized deployment** for consistent set up
+* **Dockerized deployment** for consistent setup
 * **Persistent data models** for Sellers, Pending Sellers, Customers, Products and Sales.
 * **Authentication & Authorization** using JWT with role-based access control.
 * **Secure** account activation using security questions
@@ -34,16 +34,16 @@ This project follows a standard Model-View-Controller (MVC) pattern.
 ## **Database Schemas**
 ### **Sellers**
 * Manages active accounts for business operators
-* Fields: `firstName`, `lastName`, `email` (unique), `birthDay` (Date), `password` (hashed), `role` (`user` | `admin` | `superadmin`), `createdBy`, `activatedAt`, `updatedAt`.
+* Fields: `firstName`, `lastName`, `email` (unique), `dateOfBirth` (Date), `password` (hashed), `role` (`user` | `admin` | `superadmin`), `createdBy`, `activatedAt`, `updatedAt`.
 * Password is excluded from query results by default.
 * Roles define privileges:
-  * **user**: create/manage products, customers, and sales; self update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
-  * **admin**: create/manage products, customers, and sales; create pending Seller accounts; self update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
-  * **superadmin**: create/manage products, customers, and sales; create pending Seller accounts; promote/demote roles, allow password reset (if a Seller forgets their password); self update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate).
+  * **user**: create/manage products, customers, and sales; self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
+  * **admin**: create/manage products, customers, and sales; create pending Seller accounts; self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
+  * **superadmin**: create/manage products, customers, and sales; create pending Seller accounts; promote/demote roles, allow password reset (if a Seller forgets their password); self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate).
 
 ### **Pending sellers**
 * Stores pre-activation user accounts
-* Fields: `firstName`, `lastName`, `email` (unique), `birthDay`, `createdAt`, `createdBy`, `activatedAt` (added once account is activated).
+* Fields: `firstName`, `lastName`, `email` (unique), `dateOfBirth`, `createdAt`, `createdBy`, `activatedAt` (added once account is activated).
 * Activated by completing security questions (email, birth date, last name) and setting a valid password.
 * Activated accounts are promoted to the `user` role by default.
 
@@ -55,7 +55,7 @@ This project follows a standard Model-View-Controller (MVC) pattern.
 
 ### **Products**
 * Stores catalog of items sold.
-* Fields: `productName`, `description` (optional), `count` (inventory), `price`.
+* Fields: `productName`, `description` (optional), `count` (inventory), `price`, `createdAt`, `updatedAt`.
 
 ### **Sales**
 * Multi-product transactions linking to a `customerId`.
@@ -79,14 +79,14 @@ This project follows a standard Model-View-Controller (MVC) pattern.
 
 ## **Installation**
 ### **Prerequisites**
-* [Docker](https://www.docker.com/) and [BuiltKit](https://docs.docker.com/build/buildkit/)
+* [Docker](https://www.docker.com/) and [BuildKit](https://docs.docker.com/build/buildkit/)
 * A MongoDB Docker image running on port 27017: I'm using MongoDB: 6.0.26 (checkout an implementation example at [mongo-docker](https://github.com/fcortesbio/mongo-docker/blob/main/docker-compose.yml))
 
 ### **Steps**
 
 1. Confirm that your MongoDB instance is running on port 27017
 
-I use mongosh to ping the running container, this is effective either when using a local image or of MongoDB is running on a remote server (e.g. Atlas)
+I use mongosh to ping the running container, this is effective either when using a local image or if MongoDB is running on a remote server (e.g. Atlas)
 
 ```bash
 mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
@@ -106,20 +106,21 @@ cd BiteTrack
 
 3. Configure your environment variables
 ```bash
-echo "MONGO_URI=mongodb://admin:supersecret@mongo:27017/bitetrack \
-JWT_SECRET=supersecretjwt \
-PORT=3000" >> .env
-
+cat > .env << EOF
+MONGO_URI=mongodb://admin:supersecret@mongo:27017/bitetrack
+JWT_SECRET=supersecretjwt
+PORT=3000
+EOF
 ```
 
-3. Build the Docker image
+4. Build the Docker image
 ```bash
-DOCKER-BUILDKIT=1 docker build . -t your-name/bitetrack:1.0.1
+DOCKER_BUILDKIT=1 docker build . -t your-name/bitetrack:1.0.1
 ```
 
-4. Start the container on port 3000
+5. Start the container on port 3000
 ```bash
-docker run -d -p 3000:3000 --name BiteTrack your-name/bitetrack:1.0.1 --env-file .env
+docker run -d -p 3000:3000 --env-file .env --name BiteTrack your-name/bitetrack:1.0.1
 ```
 The API will be available at http://localhost:3000
 
@@ -131,10 +132,10 @@ The API will be available at http://localhost:3000
 * Add unit/integration tests.
 
 ## Notes
-* API endpoint documentation available at ./docs/API.md
-* All Dates and Timestamps (`createdAt`, `updatedAt`) parsed as the default Date Mongoose objects
+* API endpoint documentation available at docs/API.md
+* All Dates and Timestamps (`createdAt`, `updatedAt`) are parsed as default Mongoose Date objects
 * Customers have no direct API access or an active application role
-* Sales are atomic --either all related operations succeed, or the transaction is rolled back.
+* Sales are atomic -- either all related operations succeed, or the transaction is rolled back.
 * Inventory decrements automatically when sales are completed.
 
 ## License
