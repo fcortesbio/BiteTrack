@@ -159,6 +159,55 @@ Content-Type: application/json
 }
 ```
 
+### 🔍 Check Seller Account Status
+**Endpoint:** `GET /auth/seller-status`
+
+**Description:** Check if an email address has an active or pending seller account. Useful for client-side login flows to determine whether to show activation form or regular login.
+
+**Query Parameters:**
+- `email` (required): Email address to check
+
+**Example:** `GET /auth/seller-status?email=user@example.com`
+
+**Response (200 OK) - Active Account:**
+```json
+{
+  "email": "user@example.com",
+  "status": "active"
+}
+```
+
+**Response (200 OK) - Pending Account:**
+```json
+{
+  "email": "user@example.com",
+  "status": "pending"
+}
+```
+
+**Error Responses:**
+```json
+// 404 Not Found - No account exists
+{
+  "error": "Not Found",
+  "message": "No account found for this email address",
+  "statusCode": 404
+}
+
+// 400 Bad Request - Invalid email format
+{
+  "error": "Validation Error",
+  "message": "Invalid input data",
+  "details": [
+    {
+      "field": "email",
+      "message": "Valid email is required"
+    }
+  ],
+  "statusCode": 400
+}
+```
+
 ---
 
 ## Seller Management

@@ -256,6 +256,47 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  /auth/seller-status:
+    get:
+      summary: Check seller account status by email
+      tags: [Authentication]
+      description: |
+        Check if an email address has an active or pending seller account.
+        Useful for client-side login flows to determine whether to show 
+        activation form or regular login.
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+          description: Email address to check
+      responses:
+        "200":
+          description: Account status found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email: { type: string, format: email }
+                  status: 
+                    type: string
+                    enum: [active, pending]
+                    description: "'active' for existing sellers, 'pending' for unactivated accounts"
+                required: [email, status]
+        "404":
+          description: No account found for this email
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "400":
+          description: Validation error (invalid email format)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
   # Seller Management Endpoints
   /sellers:
     get:
