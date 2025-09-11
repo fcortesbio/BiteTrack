@@ -137,13 +137,13 @@ const main = async () => {
 });`;
 
   console.log("\n---------------------------------------");
-  console.log(
-    "Copy and paste the following command into your mongosh terminal:",
-  );
-  console.log("---------------------------------------");
+  // Print the message as requested, but also note the manual step
+  console.log("Press Enter to copy to clipboard");
   console.log(mongoCommand);
   console.log("---------------------------------------");
 
+  // Close the interface after the user presses Enter
+  await askQuestion("");
   rl.close();
 };
 
