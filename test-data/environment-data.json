@@ -1,7 +1,7 @@
 {
   "description": "Environment variables and common test values for BiteTrack API testing",
   "note": "Use these values in Postman environments or test automation scripts",
-  
+
   "apiConfiguration": {
     "baseUrl": "http://localhost:3000/bitetrack",
     "timeout": 30000,
@@ -17,7 +17,7 @@
       "lastName": "Admin"
     },
     "admin": {
-      "email": "manager@bitetrack.com", 
+      "email": "manager@bitetrack.com",
       "password": "AdminPass456@",
       "role": "admin",
       "firstName": "Store",
@@ -26,7 +26,7 @@
     "user": {
       "email": "employee@bitetrack.com",
       "password": "UserPass789#",
-      "role": "user", 
+      "role": "user",
       "firstName": "Store",
       "lastName": "Employee"
     }
@@ -48,7 +48,7 @@
 
   "testEmails": [
     "test1@bitetrack.com",
-    "test2@bitetrack.com", 
+    "test2@bitetrack.com",
     "test3@bitetrack.com",
     "nonexistent@nowhere.com",
     "invalid-email-format",
