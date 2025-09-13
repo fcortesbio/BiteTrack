@@ -1,196 +1,245 @@
-# **BiteTrack**
-BiteTrack is a Dockerized Express.js RESTful API designed to help small food businesses (starting with a sandwich shop), manage sellers, products, customers, and sales. It replaces messy spreadsheets with structured, persistent data stored in MongoDB.
+# 🍔 **BiteTrack**
 
-This project is built as a backend-only MVP -- no frontend client planned yet.
+> **Transform your food business from spreadsheet chaos to structured success**
 
-## Folder structure
-This project follows a standard Model-View-Controller (MVC) pattern.
-```bash
-.
-├── models/         # Mongoose schemas
-├── controllers/    # Route logic
-├── routes/         # Express route definitions
-├── middleware/     # Custom middleware (auth, validation, error handling)
-├── utils/          # Helper functions (e.g., token generation, hashing)
-├── docs/           # API documentation
-├── tests/          # Unit and integration tests
-├── Dockerfile      # Docker image definition
-├── index.js        # App entrypoint
-├── .gitignore
-├── .env            # environment variables ==> See: .env-example
-└── README.md
-```
----
-## **Features (MVP)**
-* **RESTful API** built with Express.js and MongoDB (via mongoose)
-* **Dockerized deployment** for consistent setup
-* **Persistent data models** for Sellers, Pending Sellers, Customers, Products and Sales.
-* **Authentication & Authorization** using JWT with role-based access control.
-* **Secure** account activation using security questions
-* **Transactional sales flow** -- product inventory and sales records update automatically.
-* **Middleware** for input validation, logging, password hashing, and rate limiting
+BiteTrack is a production-ready RESTful API that empowers small food businesses to **ditch the spreadsheets** and embrace professional inventory, sales, and customer management. Built with Express.js, MongoDB, and enterprise-grade security.
 
----
-## **Database Schemas**
-### **Sellers**
-* Manages active accounts for business operators
-* Fields: `firstName`, `lastName`, `email` (unique), `dateOfBirth` (Date), `password` (hashed), `role` (`user` | `admin` | `superadmin`), `createdBy`, `activatedAt`, `updatedAt`.
-* Password is excluded from query results by default.
-* Roles define privileges:
-  * **user**: create/manage products, customers, and sales; self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
-  * **admin**: create/manage products, customers, and sales; create pending Seller accounts; self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate)
-  * **superadmin**: create/manage products, customers, and sales; create pending Seller accounts; promote/demote roles, allow password reset (if a Seller forgets their password); self-update information: first and lastname, email, birthdate and password (require old password + 1 of email or birthdate).
+## 🎯 **Why BiteTrack?**
 
-### **Pending sellers**
-* Stores pre-activation user accounts
-* Fields: `firstName`, `lastName`, `email` (unique), `dateOfBirth`, `createdAt`, `createdBy`, `activatedAt` (added once account is activated).
-* Activated by completing security questions (email, birth date, last name) and setting a valid password.
-* Activated accounts are promoted to the `user` role by default.
+**The Problem:** Small food businesses struggle with:
+- 📊 Messy spreadsheets that break and get lost
+- 🤔 No real-time inventory tracking
+- 📱 Manual sales recording prone to errors
+- 👥 Unstructured customer data
+- 🔒 No secure multi-user access control
 
-### **Customers**
-* Stores customer contact information (no login access)
-* Fields: `firstName`, `lastName`, `phoneNumber`, `email`, `createdAt`, `updatedAt`, `lastTransaction`.
-* Used only for sales tracking, not an app role.
-* `email` is optional but unique+sparse (multiple customers can exist without email, but emails must be unique if present).
+**The Solution:** BiteTrack provides:
+- ✅ **Real-time inventory management** - Never oversell again
+- ✅ **Atomic sales transactions** - Complete data integrity
+- ✅ **Multi-user support** with role-based permissions
+- ✅ **Customer relationship tracking** - Build lasting connections
+- ✅ **Docker-ready deployment** - Get running in minutes
+- ✅ **JWT-secured API** - Enterprise-level security
 
-### **Products**
-* Stores catalog of items sold.
-* Fields: `productName`, `description` (optional), `count` (inventory), `price`, `createdAt`, `updatedAt`.
-
-### **Sales**
-* Multi-product transactions linking to a `customerId`.
-* Each sale contains `products[]` (with `productId` (referencing a product from `Products`), `quantity`, `priceAtSale`).
-* Tracks `totalAmount`, `amountPaid`, and `settled` (true if fully paid).
-* References `sellerId` for the operator who made the sale.
-* Use of [MongoDB Transactions](https://www.mongodb.com/docs/manual/core/transactions/) ensure atomicity: a sale is only saved if all product stock updates succeed.
-
-## **Authentication/Authorization**
-* **JWT-based authentication** for all Sellers.
-* **Signup flow**:
-  * Only admins/superadmins can create a pending seller account
-  * Sellers self-activate by providing **email**, **date of birth**, and **last name** + setting a secure password.
-  * Activated sellers default to role `user`
-* **Role management**:
-  * Only **superadmin** can promote `user ==> admin`.
-  * Only **superadmin** can enable password recovery for a Seller account when needed.
-  * Only **superadmin** and **admin** can create a pending account
-* **Account Recovery**:
-  * If password forgotten, a **superadmin** can enable a new endpoint by creating a temporary password reset token. A password reset request must include a valid reset token, the user’s email, date of birth, and a new password.
-
-## **Installation**
-### **Prerequisites**
-* [Docker](https://www.docker.com/) and [BuildKit](https://docs.docker.com/build/buildkit/)
-* A MongoDB Docker image running on port 27017: I'm using MongoDB: 6.0.26 (checkout an implementation example at [mongo-docker](https://github.com/fcortesbio/mongo-docker/blob/main/docker-compose.yml))
-
-### **Steps**
-
-1. Confirm that your MongoDB instance is running on port 27017
-
-I use mongosh to ping the running container, this is effective either when using a local image or if MongoDB is running on a remote server (e.g. Atlas)
+## 🚀 **Quick Start**
 
 ```bash
+# 1. Ensure MongoDB is running (port 27017)
 mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
-# Expected output: { ok: 1 }
-```
 
-If running locally, you can also:
-```bash
-docker ps
-```
-
-2. Clone the repository
-```bash
+# 2. Clone and setup
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
-```
 
-3. Configure your environment variables
-```bash
+# 3. Configure environment
 cat > .env << EOF
 MONGO_URI=mongodb://admin:supersecret@mongo:27017/bitetrack
 JWT_SECRET=supersecretjwt
 PORT=3000
 EOF
+
+# 4. Build and run
+DOCKER_BUILDKIT=1 docker build . -t bitetrack:latest
+docker run -d -p 3000:3000 --env-file .env --name BiteTrack bitetrack:latest
+
+# 🎉 API ready at http://localhost:3000
 ```
 
-4. Build the Docker image
+## 💼 **Perfect For**
+
+- 🥪 **Sandwich shops** - Track inventory, customers, and daily sales
+- ☕ **Coffee shops** - Manage products and customer loyalty
+- 🍕 **Small restaurants** - Multi-user staff access with role controls
+- 🚚 **Food trucks** - Mobile-friendly API for on-the-go management
+- 📦 **Any food business** ready to scale beyond spreadsheets
+
+## ⚡ **Core Features**
+
+### 🛡️ **Security & Access Control**
+- **JWT Authentication** - Industry-standard token-based auth
+- **Role-based permissions** - User, Admin, and SuperAdmin roles
+- **Secure account activation** - Multi-factor verification process
+- **Password recovery system** - Admin-controlled reset process
+- **Rate limiting & input validation** - Protection against abuse
+
+### 💰 **Sales & Inventory Management**
+- **Atomic transactions** - Sales and inventory update together or not at all
+- **Real-time stock tracking** - Never oversell products
+- **Multi-product sales** - Handle complex orders seamlessly
+- **Payment tracking** - Monitor settled vs. pending payments
+- **Sales history** - Complete transaction audit trail
+
+### 👥 **Multi-User Business Operations**
+- **Staff management** - Multiple sellers with different permission levels
+- **Customer database** - Track customer information and purchase history
+- **Product catalog** - Manage inventory, pricing, and descriptions
+- **Audit trails** - Know who did what and when
+
+### 🏗️ **Enterprise-Ready Architecture**
+- **Docker containerization** - Consistent deployment anywhere
+- **MongoDB integration** - Scalable document database
+- **Express.js foundation** - Battle-tested web framework
+- **Comprehensive logging** - Monitor API usage and performance
+- **Health check endpoints** - Monitor system status
+
+## 📋 **API Overview**
+
+**Base URL:** `http://localhost:3000/bitetrack`
+
+| Feature | Endpoints | Key Actions |
+|---------|-----------|-------------|
+| **🔐 Auth** | `/auth/*` | Login, activate accounts, password reset |
+| **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
+| **🏪 Customers** | `/customers/*` | Customer database and contact info |
+| **📦 Products** | `/products/*` | Inventory, pricing, and catalog |
+| **💳 Sales** | `/sales/*` | Process orders, track payments |
+
+> 📚 **Full API documentation:** [`docs/API.md`](docs/API.md) | **Postman Collection:** [`docs/BiteTrack.postman_collection.json`](docs/BiteTrack.postman_collection.json)
+
+## 📊 **Data Models & Business Logic**
+
+<details>
+<summary><strong>👤 User Management (Sellers)</strong></summary>
+
+**Three-tier access system:**
+- **User** - Basic operations (products, customers, sales, self-profile)
+- **Admin** - User permissions + create new seller accounts
+- **SuperAdmin** - Admin permissions + role management + password recovery
+
+**Secure onboarding flow:**
+1. Admin/SuperAdmin creates pending seller account
+2. New seller activates with email + DOB + last name + secure password
+3. Account becomes active with "user" role by default
+
+</details>
+
+<details>
+<summary><strong>💰 Sales & Transaction Logic</strong></summary>
+
+**Atomic transaction processing:**
+- Sales process multiple products in a single transaction
+- Inventory automatically decrements when sale is created
+- **All-or-nothing approach** - if any product is out of stock, entire sale fails
+- Payment tracking with settled/unsettled status
+- Complete audit trail with seller attribution
+
+</details>
+
+<details>
+<summary><strong>📦 Inventory & Customer Management</strong></summary>
+
+**Product catalog:**
+- Name, description, current stock count, pricing
+- Real-time inventory tracking with sales
+
+**Customer database:**
+- Contact information storage (no login access)
+- Transaction history tracking
+- Optional email field with uniqueness constraint
+
+</details>
+
+## 🔧 **Production Setup**
+
+### Prerequisites
+- **Docker** with BuildKit support
+- **MongoDB 6.0+** running on port 27017 ([mongo-docker example](https://github.com/fcortesbio/mongo-docker/blob/main/docker-compose.yml))
+
+### Environment Configuration
+
 ```bash
-DOCKER_BUILDKIT=1 docker build . -t your-name/bitetrack:1.0.0
+# Create production-ready .env file
+cat > .env << EOF
+MONGO_URI=mongodb://admin:your-secure-password@mongo:27017/bitetrack
+JWT_SECRET=your-super-secure-jwt-secret-here
+PORT=3000
+NODE_ENV=production
+EOF
 ```
 
-5. Start the container on port 3000
+### Health Check
 ```bash
-docker run -d -p 3000:3000 --env-file .env --name BiteTrack your-name/bitetrack:1.0.0
+# Verify MongoDB connection
+mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
+# Expected: { ok: 1 }
 ```
-The API will be available at http://localhost:3000
 
-## **Minimal Endpoint List**
-### **Auth**
+### Deployment
+```bash
+# Production build and run
+DOCKER_BUILDKIT=1 docker build . -t bitetrack:production
+docker run -d -p 3000:3000 --env-file .env \
+  --name bitetrack-api --restart unless-stopped \
+  bitetrack:production
 
-* `POST bitetrack/auth/login` → login with email + password, return JWT.
+# Verify health
+curl http://localhost:3000/bitetrack/health
+```
 
-* `POST bitetrack/auth/activate` → pending seller activates account (email + dob + lastName + valid password).
+## 🧪 **Development & Integration**
 
-* `POST bitetrack/auth/recover` → initiate password recovery (superadmin generates password reset token).
+### Project Structure
+```
+BiteTrack/
+├── 🧠 models/         # Mongoose schemas
+├── 🎮 controllers/    # Business logic
+├── 🛜️ routes/         # API endpoints
+├── 🔒 middleware/     # Auth, validation, error handling
+├── 📚 docs/           # API documentation & Postman collection
+└── 🐳 Dockerfile      # Container definition
+```
 
-* `POST bitetrack/auth/reset` → reset password with token + new password.
+### Development Mode
+```bash
+# Local development with auto-reload
+npm install
+npm run dev  # Uses nodemon for hot reload
+```
 
-### ***Sellers***
+### Testing the API
+```bash
+# Health check
+curl http://localhost:3000/bitetrack/health
 
-* `GET bitetrack/sellers` (admin/superadmin only) → list all sellers.
+# Import Postman collection for comprehensive testing
+# File: docs/BiteTrack.postman_collection.json
+```
 
-* `POST bitetrack/sellers/pending` (admin/superadmin only) → create a pending seller.
+## 🚀 **Roadmap**
 
-* `PATCH bitetrack/sellers/:id` → self-update (firstName, lastName, email, dob, password with checks).
+### Next Release (v2.0)
+- [ ] **Reporting Dashboard** - Weekly sales, inventory alerts, top products
+- [ ] **Advanced Analytics** - Customer behavior, sales trends
+- [ ] **Webhook System** - Real-time notifications for low stock, large sales
 
-* `PATCH bitetrack/sellers/:id/role` (superadmin only) → promote/demote roles.
+### Future Vision
+- [ ] **Frontend Client** - React/Vue dashboard for non-technical users  
+- [ ] **Mobile App** - Native iOS/Android point-of-sale interface
+- [ ] **AI Integration** - Smart inventory predictions and sales insights
+- [ ] **Multi-location Support** - Franchise and chain restaurant features
 
-* `DELETE bitetrack/sellers/:id` (superadmin only) → deactivate/remove seller.
+## 🤝 **Contributing**
 
-### **Customers**
+BiteTrack is open source and welcomes contributions!
 
-* `GET bitetrack/customers` → list all customers.
+1. **Found a bug?** [Open an issue](https://github.com/fcortesbio/BiteTrack/issues)
+2. **Have a feature idea?** [Start a discussion](https://github.com/fcortesbio/BiteTrack/discussions)
+3. **Want to contribute code?** Fork, branch, and submit a PR!
 
-* `POST bitetrack/customers` → create a customer.
+### Tech Stack
+- **Backend:** Node.js, Express.js, MongoDB, Mongoose
+- **Security:** JWT, bcrypt, Helmet, rate limiting
+- **DevOps:** Docker, Docker BuildKit
+- **Documentation:** Postman, Markdown
 
-* `PATCH bitetrack/customers/:id` → update a customer.
+---
 
-* `DELETE bitetrack/customers/:id` → remove a customer.
+## 📜 **License**
 
-### **Products**
+**MIT License** - Free for commercial and personal use.
 
-* `GET bitetrack/products` → list all products.
+---
 
-* `POST bitetrack/products` → create a product.
+**🌟 Star this repo** if BiteTrack helps your food business grow! 
 
-* `PATCH bitetrack/products/:id` → update product details or inventory.
-
-* `DELETE bitetrack/products/:id` → remove a product.
-
-### **Sales**
-
-* `GET bitetrack/sales` → list sales (filter by customer, seller, settled).
-
-* `POST bitetrack/sales` → create a sale (transactional, decrement stock).
-
-* `PATCH bitetrack/sales/:id/settle` → settle a sale (update amountPaid, mark settled if fully paid).
-
-* `GET bitetrack/sales/:id` → get sale details.
-
-## Notes
-* API endpoint documentation available at docs/API.md
-* All Dates and Timestamps (`createdAt`, `updatedAt`) are parsed as default Mongoose Date objects
-* Customers have no direct API access or an active application role
-* Sales are atomic -- either all related operations succeed, or the transaction is rolled back.
-* Inventory decrements automatically when sales are completed.
-* A valid password should be enforced and validated to include at least 8 characters, including at least 1 of each: lowers, uppers, numbers and symbols
-
-## **Future enhancements**
-* Add frontend client (React/Vue/Angular)
-* Add reporting endpoints (weekly sales, unsettled accounts, top products).
-* Add MCP server layer for AI-assisted queries.
-* Add unit/integration tests.
-
-
-## License
-MIT License
+**Questions?** Reach out via [GitHub Issues](https://github.com/fcortesbio/BiteTrack/issues) or check the [documentation](docs/API.md).
