@@ -1,0 +1,1392 @@
+{
+	"info": {
+		"_postman_id": "bitetrack-complete-2025",
+		"name": "BiteTrack API - Complete Collection",
+		"description": "Complete BiteTrack API collection matching the OpenAPI specification. BiteTrack is a Dockerized Express.js RESTful API designed to help small food businesses manage sellers, products, customers, and sales with JWT-based authentication and role-based access control.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set default content type",
+					"pm.request.headers.add({",
+					"    key: 'Content-Type',",
+					"    value: 'application/json'",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/bitetrack",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testEmail",
+			"value": "test@example.com",
+			"type": "string"
+		},
+		{
+			"key": "testSellerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testCustomerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testProductId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testSaleId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"description": "Authentication endpoints for login, account activation, and password recovery",
+			"item": [
+				{
+					"name": "Check Seller Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/seller-status?email={{testEmail}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "seller-status"],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{testEmail}}",
+									"description": "Email address to check"
+								}
+							]
+						},
+						"description": "Check if an email address has an active or pending seller account. Useful for client-side login flows to determine whether to show activation form or regular login."
+					},
+					"response": [
+						{
+							"name": "Active Seller",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/seller-status?email=active@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
+									"query": [
+										{
+											"key": "email",
+											"value": "active@example.com"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"email\": \"active@example.com\",\n    \"status\": \"active\"\n}"
+						},
+						{
+							"name": "Pending Seller",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/seller-status?email=pending@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
+									"query": [
+										{
+											"key": "email",
+											"value": "pending@example.com"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"email\": \"pending@example.com\",\n    \"status\": \"pending\"\n}"
+						},
+						{
+							"name": "No Account Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/seller-status?email=notfound@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
+									"query": [
+										{
+											"key": "email",
+											"value": "notfound@example.com"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"No account found for this email address\",\n    \"statusCode\": 404\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save JWT token from successful login",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.token) {",
+									"    pm.environment.set('authToken', responseData.token);",
+									"    pm.collectionVariables.set('authToken', responseData.token);",
+									"    if (responseData.seller && responseData.seller.id) {",
+									"        pm.collectionVariables.set('testSellerId', responseData.seller.id);",
+									"    }",
+									"    console.log('JWT token saved successfully');",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@bitetrack.com\",\n    \"password\": \"SecurePass123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as seller with email and password. Returns JWT token and seller information."
+					},
+					"response": [
+						{
+							"name": "Successful Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"admin@bitetrack.com\",\n    \"password\": \"SecurePass123!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "login"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"seller\": {\n        \"id\": \"60f4b2b3e8b2c4001f647123\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"email\": \"admin@bitetrack.com\",\n        \"role\": \"admin\",\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Activate Account",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"lastName\": \"Smith\",\n    \"password\": \"SecurePass123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/activate",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "activate"]
+						},
+						"description": "Activate a pending seller account by providing matching details and setting a password."
+					},
+					"response": [
+						{
+							"name": "Account Activated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"lastName\": \"Smith\",\n    \"password\": \"SecurePass123!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/activate",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "activate"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"user\",\n    \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T10:00:00.000Z\",\n    \"activatedAt\": \"2025-09-10T10:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Initiate Password Recovery",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sellerId\": \"{{testSellerId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/recover",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "recover"]
+						},
+						"description": "Generate a password reset token for a seller. Only superadmin users can access this endpoint."
+					},
+					"response": [
+						{
+							"name": "Reset Token Generated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/recover",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "recover"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"expiresAt\": \"2025-09-11T10:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"email\": \"user@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"newPassword\": \"NewSecurePass123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "reset"]
+						},
+						"description": "Reset password using a valid reset token and user verification details."
+					},
+					"response": [
+						{
+							"name": "Password Reset Successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"email\": \"user@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"newPassword\": \"NewSecurePass123!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/reset",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "reset"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"message\": \"Password reset successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sellers",
+			"description": "Seller management endpoints for CRUD operations and role management",
+			"item": [
+				{
+					"name": "List All Sellers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sellers",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers"]
+						},
+						"description": "List all sellers (admin/superadmin only). Requires appropriate permissions."
+					},
+					"response": [
+						{
+							"name": "Sellers List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sellers",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647123\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"email\": \"admin@bitetrack.com\",\n        \"dateOfBirth\": \"1985-05-15T00:00:00.000Z\",\n        \"role\": \"admin\",\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647124\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"email\": \"john@example.com\",\n        \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n        \"role\": \"user\",\n        \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T11:00:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Pending Seller",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save pending seller ID for testing activation",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testPendingSellerId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sellers/pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "pending"]
+						},
+						"description": "Create a pending seller account (admin/superadmin only). The seller will need to activate their account later."
+					},
+					"response": [
+						{
+							"name": "Pending Seller Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sellers/pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "pending"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647125\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20T00:00:00.000Z\",\n    \"createdBy\": \"60f4b2b3e8b2c4001f647123\",\n    \"activatedAt\": null,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Seller Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe Updated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}"]
+						},
+						"description": "Self-update seller information. Sellers can only update their own profile."
+					},
+					"response": [
+						{
+							"name": "Profile Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"John Updated\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"user\",\n    \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Deactivate Seller",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}"]
+						},
+						"description": "Deactivate a seller (superadmin only). This removes their access to the system."
+					},
+					"response": [
+						{
+							"name": "Seller Deactivated",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Update Seller Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}/role",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}", "role"]
+						},
+						"description": "Promote/demote seller role (superadmin only). Available roles: user, admin, superadmin."
+					},
+					"response": [
+						{
+							"name": "Role Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"role\": \"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124/role",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124", "role"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"admin\",\n    \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T14:00:00.000Z\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"description": "Customer management endpoints for CRUD operations",
+			"item": [
+				{
+					"name": "List All Customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"]
+						},
+						"description": "Retrieve a list of all customers in the system."
+					},
+					"response": [
+						{
+							"name": "Customers List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647201\",\n        \"firstName\": \"Alice\",\n        \"lastName\": \"Johnson\",\n        \"phoneNumber\": \"+1-555-0101\",\n        \"email\": \"alice@example.com\",\n        \"createdAt\": \"2025-09-10T09:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T09:00:00.000Z\",\n        \"lastTransaction\": \"2025-09-10T15:30:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647202\",\n        \"firstName\": \"Bob\",\n        \"lastName\": \"Wilson\",\n        \"phoneNumber\": \"+1-555-0102\",\n        \"email\": null,\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\",\n        \"lastTransaction\": null\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save customer ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testCustomerId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"]
+						},
+						"description": "Create a new customer. firstName, lastName, and phoneNumber are required. Email is optional."
+					},
+					"response": [
+						{
+							"name": "Customer Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647203\",\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\",\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\",\n    \"lastTransaction\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Charles\",\n    \"email\": \"charles.brown@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{testCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "{{testCustomerId}}"]
+						},
+						"description": "Update customer information. Only provided fields will be updated."
+					},
+					"response": [
+						{
+							"name": "Customer Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Charles\",\n    \"email\": \"charles.brown@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647203",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647203"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647203\",\n    \"firstName\": \"Charles\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charles.brown@example.com\",\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\",\n    \"lastTransaction\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{testCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "{{testCustomerId}}"]
+						},
+						"description": "Remove a customer from the system."
+					},
+					"response": [
+						{
+							"name": "Customer Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647203",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647203"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"description": "Product management endpoints for inventory and pricing",
+			"item": [
+				{
+					"name": "List All Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						},
+						"description": "Retrieve a list of all products in the inventory."
+					},
+					"response": [
+						{
+							"name": "Products List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["products"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647301\",\n        \"productName\": \"Turkey Sandwich\",\n        \"description\": \"Freshly sliced turkey with lettuce, tomato, and mayo on whole grain bread\",\n        \"count\": 15,\n        \"price\": 8.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647302\",\n        \"productName\": \"Ham & Cheese Sandwich\",\n        \"description\": \"Classic ham and swiss cheese sandwich with mustard\",\n        \"count\": 12,\n        \"price\": 7.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647303\",\n        \"productName\": \"Veggie Wrap\",\n        \"description\": null,\n        \"count\": 8,\n        \"price\": 6.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save product ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testProductId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						},
+						"description": "Create a new product. productName, count, and price are required. description is optional."
+					},
+					"response": [
+						{
+							"name": "Product Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["products"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647304\",\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"count\": 15,\n    \"price\": 10.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{testProductId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{testProductId}}"]
+						},
+						"description": "Update product details or inventory. Only provided fields will be updated."
+					},
+					"response": [
+						{
+							"name": "Product Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"count\": 15,\n    \"price\": 10.99\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products/60f4b2b3e8b2c4001f647304",
+									"host": ["{{baseUrl}}"],
+									"path": ["products", "60f4b2b3e8b2c4001f647304"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647304\",\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 15,\n    \"price\": 10.99,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{testProductId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{testProductId}}"]
+						},
+						"description": "Remove a product from the inventory."
+					},
+					"response": [
+						{
+							"name": "Product Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/60f4b2b3e8b2c4001f647304",
+									"host": ["{{baseUrl}}"],
+									"path": ["products", "60f4b2b3e8b2c4001f647304"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sales",
+			"description": "Sales management endpoints for creating and managing transactions",
+			"item": [
+				{
+					"name": "List Sales",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sales",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales"],
+							"query": [
+								{
+									"key": "customerId",
+									"value": "",
+									"description": "Filter by customer ID",
+									"disabled": true
+								},
+								{
+									"key": "sellerId",
+									"value": "",
+									"description": "Filter by seller ID",
+									"disabled": true
+								},
+								{
+									"key": "settled",
+									"value": "",
+									"description": "Filter by settlement status (true/false)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "List sales with optional filters for customerId, sellerId, or settled status."
+					},
+					"response": [
+						{
+							"name": "Sales List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sales",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647401\",\n        \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n        \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n        \"products\": [\n            {\n                \"productId\": \"60f4b2b3e8b2c4001f647301\",\n                \"quantity\": 2,\n                \"priceAtSale\": 8.99\n            },\n            {\n                \"productId\": \"60f4b2b3e8b2c4001f647302\",\n                \"quantity\": 1,\n                \"priceAtSale\": 7.99\n            }\n        ],\n        \"totalAmount\": 25.97,\n        \"amountPaid\": 25.97,\n        \"settled\": true,\n        \"createdAt\": \"2025-09-10T15:30:00.000Z\",\n        \"updatedAt\": \"2025-09-10T15:30:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Sale",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save sale ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testSaleId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\": \"{{testCustomerId}}\",\n    \"products\": [\n        {\n            \"productId\": \"{{testProductId}}\",\n            \"quantity\": 1\n        }\n    ],\n    \"amountPaid\": 10.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sales",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales"]
+						},
+						"description": "Create a new sale (transactional). This will automatically calculate total amount based on current product prices and update inventory counts."
+					},
+					"response": [
+						{
+							"name": "Sale Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2\n        }\n    ],\n    \"amountPaid\": 17.98\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sales",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 17.98,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Sale Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sales/{{testSaleId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales", "{{testSaleId}}"]
+						},
+						"description": "Get detailed information about a specific sale."
+					},
+					"response": [
+						{
+							"name": "Sale Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sales/60f4b2b3e8b2c4001f647402",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales", "60f4b2b3e8b2c4001f647402"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 17.98,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Settle Sale Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amountPaid\": 25.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sales/{{testSaleId}}/settle",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales", "{{testSaleId}}", "settle"]
+						},
+						"description": "Update payment amount for a sale. This can be used to handle partial payments or payment adjustments."
+					},
+					"response": [
+						{
+							"name": "Payment Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amountPaid\": 25.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sales/60f4b2b3e8b2c4001f647402/settle",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales", "60f4b2b3e8b2c4001f647402", "settle"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 25.00,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:30:00.000Z\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"description": "System health and status endpoints",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"description": "Check if the API is running and healthy."
+					},
+					"response": [
+						{
+							"name": "API Healthy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/health",
+									"host": ["{{baseUrl}}"],
+									"path": ["health"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"status\": \"healthy\",\n    \"timestamp\": \"2025-09-10T16:00:00.000Z\",\n    \"version\": \"1.0.0\"\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

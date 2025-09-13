@@ -89,7 +89,8 @@ components:
         settled: { type: boolean, description: "True if fully paid" }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
-      required: [customerId, sellerId, products, totalAmount, amountPaid, settled]
+      required:
+        [customerId, sellerId, products, totalAmount, amountPaid, settled]
 
     PasswordResetToken:
       type: object
@@ -112,7 +113,7 @@ components:
       properties:
         error: { type: string }
         message: { type: string }
-        details: 
+        details:
           type: array
           items:
             type: object
@@ -135,7 +136,12 @@ components:
         email: { type: string, format: email }
         dateOfBirth: { type: string, format: date }
         lastName: { type: string }
-        password: { type: string, minLength: 8, pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]" }
+        password:
+          {
+            type: string,
+            minLength: 8,
+            pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]",
+          }
       required: [email, dateOfBirth, lastName, password]
 
     TokenResponse:
@@ -262,7 +268,7 @@ paths:
       tags: [Authentication]
       description: |
         Check if an email address has an active or pending seller account.
-        Useful for client-side login flows to determine whether to show 
+        Useful for client-side login flows to determine whether to show
         activation form or regular login.
       parameters:
         - name: email
@@ -281,7 +287,7 @@ paths:
                 type: object
                 properties:
                   email: { type: string, format: email }
-                  status: 
+                  status:
                     type: string
                     enum: [active, pending]
                     description: "'active' for existing sellers, 'pending' for unactivated accounts"
