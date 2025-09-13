@@ -1,437 +1,215 @@
 {
 	"info": {
-		"_postman_id": "569d3b99-30e5-426d-87e5-3d7d545caf59",
-		"name": "BiteTrack",
-		"description": "BiteTrack is a Dockerized Express.js RESTful API designed to help small food businesses (starting with a sandwich shop), manage sellers, products, customers, and sales. It replaces messy spreadsheets with structured, persistent data stored in MongoDB.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40346055",
-		"_collection_link": "https://www.postman.com/joint-operations-geologist-86977872/workspace/my-workspace/collection/40346055-569d3b99-30e5-426d-87e5-3d7d545caf59?action=share&source=collection_link&creator=40346055"
+		"_postman_id": "bitetrack-complete-2025",
+		"name": "BiteTrack API - Complete Collection",
+		"description": "Complete BiteTrack API collection matching the OpenAPI specification. BiteTrack is a Dockerized Express.js RESTful API designed to help small food businesses manage sellers, products, customers, and sales with JWT-based authentication and role-based access control.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set default content type",
+					"pm.request.headers.add({",
+					"    key: 'Content-Type',",
+					"    value: 'application/json'",
+					"});"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/bitetrack",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testEmail",
+			"value": "test@example.com",
+			"type": "string"
+		},
+		{
+			"key": "testSellerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testCustomerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testProductId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "testSaleId",
+			"value": "",
+			"type": "string"
+		}
+	],
 	"item": [
 		{
-			"name": "auth",
+			"name": "Authentication",
+			"description": "Authentication endpoints for login, account activation, and password recovery",
 			"item": [
 				{
-					"name": "Login",
-					"item": [
+					"name": "Check Seller Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/seller-status?email={{testEmail}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "seller-status"],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{testEmail}}",
+									"description": "Email address to check"
+								}
+							]
+						},
+						"description": "Check if an email address has an active or pending seller account. Useful for client-side login flows to determine whether to show activation form or regular login."
+					},
+					"response": [
 						{
-							"name": "Seller status (GET by email)",
-							"request": {
+							"name": "Active Seller",
+							"originalRequest": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{baseUrl}}/auth/seller-status?email=fcortesbio@gmail.com",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"auth",
-										"seller-status"
-									],
+									"raw": "{{baseUrl}}/auth/seller-status?email=active@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
 									"query": [
 										{
 											"key": "email",
-											"value": "fcortesbio@gmail.com"
+											"value": "active@example.com"
 										}
 									]
 								}
 							},
-							"response": [
-								{
-									"name": "Active Seller found",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "/auth/seller-status?email=shellydoeb@gmail.com",
-											"path": [
-												"auth",
-												"seller-status"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "shellydoeb@gmail.com"
-												}
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": null,
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "93"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 22:22:23 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757629916"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "50"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"32-hAjBKuB9tUbj7C1JCqBFxPAhkc4\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"email\": \"shellydoeb@gmail.com\",\n    \"status\": \"active\"\n}"
-								},
-								{
-									"name": "Pending Seller found",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/auth/seller-status?email=nathalia@camaradas.com",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"auth",
-												"seller-status"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "nathalia@camaradas.com"
-												}
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": null,
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "94"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 22:20:54 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757629916"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "53"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"35-0aTlkeiFc+0oAbQbv5SnVBBZj14\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"email\": \"nathalia@camaradas.com\",\n    \"status\": \"pending\"\n}"
-								},
-								{
-									"name": "Seller Account not found - 404 Not Found",
-									"originalRequest": {
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{baseUrl}}/auth/seller-status?email=noman@rupatrupa.com",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"auth",
-												"seller-status"
-											],
-											"query": [
-												{
-													"key": "email",
-													"value": "noman@rupatrupa.com"
-												}
-											]
-										}
-									},
-									"status": "Not Found",
-									"code": 404,
-									"_postman_previewlanguage": null,
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "92"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 22:23:22 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757629916"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "90"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"5a-iW8gFW6SsVJUIR2kMVD3GhwrJws\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"No account found for this email address\",\n    \"statusCode\": 404\n}"
-								}
-							]
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"email\": \"active@example.com\",\n    \"status\": \"active\"\n}"
 						},
 						{
-							"name": "Login",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// parse the response body as JSON",
-											"",
-											"const responseData = pm.response.json();",
-											"",
-											"",
-											"",
-											"// check for an existing jwt in the response",
-											"",
-											"if (responseData && responseData.token) {",
-											"",
-											"// set the environment variable 'jwt_login' with the token value",
-											"",
-											"pm.environment.set(\"jwt_login\", responseData.token)",
-											"",
-											"console.log(pm.environment.get(\"jwt_login\"))",
-											"",
-											"console.log(\"JWT token saved succesfully\")",
-											"",
-											"} else {",
-											"",
-											"console.error(\"No token found in the response\")",
-											"",
-											"}"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
+							"name": "Pending Seller",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/seller-status?email=pending@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
+									"query": [
+										{
+											"key": "email",
+											"value": "pending@example.com"
+										}
+									]
 								}
-							],
-							"request": {
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"email\": \"pending@example.com\",\n    \"status\": \"pending\"\n}"
+						},
+						{
+							"name": "No Account Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/auth/seller-status?email=notfound@example.com",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "seller-status"],
+									"query": [
+										{
+											"key": "email",
+											"value": "notfound@example.com"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"No account found for this email address\",\n    \"statusCode\": 404\n}"
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save JWT token from successful login",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.token) {",
+									"    pm.environment.set('authToken', responseData.token);",
+									"    pm.collectionVariables.set('authToken', responseData.token);",
+									"    if (responseData.seller && responseData.seller.id) {",
+									"        pm.collectionVariables.set('testSellerId', responseData.seller.id);",
+									"    }",
+									"    console.log('JWT token saved successfully');",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@bitetrack.com\",\n    \"password\": \"SecurePass123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login as seller with email and password. Returns JWT token and seller information."
+					},
+					"response": [
+						{
+							"name": "Successful Login",
+							"originalRequest": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"email\": \"fcortesbio@gmail.com\",\n    \"password\": \"Mandarina25!!!\"\n}",
+									"raw": "{\n    \"email\": \"admin@bitetrack.com\",\n    \"password\": \"SecurePass123!\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -440,1227 +218,25 @@
 								},
 								"url": {
 									"raw": "{{baseUrl}}/auth/login",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"auth",
-										"login"
-									]
-								}
-							},
-							"response": [
-								{
-									"name": "Superadmin Login: Andrés Cortés - 200 OK",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"fcortesbio@gmail.com\",\n    \"password\": \"Mandarina25!!!\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "/auth/login",
-											"path": [
-												"auth",
-												"login"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "Text",
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "93"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 18:31:22 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757615986"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "520"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"208-S7wZZzS+NweoYs51v8X//zJcp60\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"token\": \"{{vault:json-web-token}}\",\n    \"seller\": {\n        \"firstName\": \"Andrés\",\n        \"lastName\": \"Cortés\",\n        \"email\": \"fcortesbio@gmail.com\",\n        \"dateOfBirth\": \"1997-04-03T00:00:00.000Z\",\n        \"role\": \"superadmin\",\n        \"active\": true,\n        \"createdAt\": \"2025-09-11T08:12:11.202Z\",\n        \"updatedAt\": \"2025-09-11T08:12:11.202Z\",\n        \"activatedAt\": \"2025-09-11T18:31:22.487Z\",\n        \"id\": \"68c2845bed9ee3fc62ce5f47\"\n    }\n}"
-								},
-								{
-									"name": "Admin Login: Isabella Doebler - 200 OK",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"email\": \"shellydoeb@gmail.com\",\n    \"password\": \"Mandarina25!!!\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/auth/login",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"auth",
-												"login"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "Text",
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "98"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 17:18:19 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757611828"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "549"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"225-O6xB0y2ijXcRygDD+aA7iLNtv30\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"token\": \"{{vault:json-web-token}}\",\n    \"seller\": {\n        \"firstName\": \"Isabella\",\n        \"lastName\": \"Doebler\",\n        \"email\": \"shellydoeb@gmail.com\",\n        \"dateOfBirth\": \"1997-09-12T00:00:00.000Z\",\n        \"role\": \"admin\",\n        \"active\": true,\n        \"createdBy\": \"68c2845bed9ee3fc62ce5f47\",\n        \"createdAt\": \"2025-09-11T08:28:47.562Z\",\n        \"updatedAt\": \"2025-09-11T08:28:47.562Z\",\n        \"activatedAt\": \"2025-09-11T17:18:19.225Z\",\n        \"id\": \"68c2883fed9ee3fc62ce5f48\"\n    }\n}"
-								},
-								{
-									"name": "User Login: John Doe - 200 OK",
-									"originalRequest": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePass123!\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{baseUrl}}/auth/login",
-											"host": [
-												"{{baseUrl}}"
-											],
-											"path": [
-												"auth",
-												"login"
-											]
-										}
-									},
-									"status": "OK",
-									"code": 200,
-									"_postman_previewlanguage": "Text",
-									"header": [
-										{
-											"key": "Content-Security-Policy",
-											"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-										},
-										{
-											"key": "Cross-Origin-Opener-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Cross-Origin-Resource-Policy",
-											"value": "same-origin"
-										},
-										{
-											"key": "Origin-Agent-Cluster",
-											"value": "?1"
-										},
-										{
-											"key": "Referrer-Policy",
-											"value": "no-referrer"
-										},
-										{
-											"key": "Strict-Transport-Security",
-											"value": "max-age=15552000; includeSubDomains"
-										},
-										{
-											"key": "X-Content-Type-Options",
-											"value": "nosniff"
-										},
-										{
-											"key": "X-DNS-Prefetch-Control",
-											"value": "off"
-										},
-										{
-											"key": "X-Download-Options",
-											"value": "noopen"
-										},
-										{
-											"key": "X-Frame-Options",
-											"value": "SAMEORIGIN"
-										},
-										{
-											"key": "X-Permitted-Cross-Domain-Policies",
-											"value": "none"
-										},
-										{
-											"key": "X-XSS-Protection",
-											"value": "0"
-										},
-										{
-											"key": "Access-Control-Allow-Origin",
-											"value": "*"
-										},
-										{
-											"key": "X-RateLimit-Limit",
-											"value": "100"
-										},
-										{
-											"key": "X-RateLimit-Remaining",
-											"value": "94"
-										},
-										{
-											"key": "Date",
-											"value": "Thu, 11 Sep 2025 17:28:17 GMT"
-										},
-										{
-											"key": "X-RateLimit-Reset",
-											"value": "1757611828"
-										},
-										{
-											"key": "Content-Type",
-											"value": "application/json; charset=utf-8"
-										},
-										{
-											"key": "Content-Length",
-											"value": "524"
-										},
-										{
-											"key": "ETag",
-											"value": "W/\"20c-MJ3xytkv7aZtw825pFa3f3NccCg\""
-										},
-										{
-											"key": "Connection",
-											"value": "keep-alive"
-										},
-										{
-											"key": "Keep-Alive",
-											"value": "timeout=5"
-										}
-									],
-									"cookie": [],
-									"body": "{\n    \"token\": \"{{vault:json-web-token}}\",\n    \"seller\": {\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n        \"role\": \"user\",\n        \"createdBy\": \"68c2883fed9ee3fc62ce5f48\",\n        \"activatedAt\": \"2025-09-11T17:24:17.179Z\",\n        \"createdAt\": \"2025-09-11T17:24:17.180Z\",\n        \"updatedAt\": \"2025-09-11T17:24:17.180Z\",\n        \"id\": \"68c305c1ed2bc28f267cd094\"\n    }\n}"
-								}
-							]
-						}
-					]
-				},
-				{
-					"name": "Password Recovery",
-					"item": [
-						{
-							"name": "Generate Token",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{jwt_login}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"sellerId\": \"68c2883fed9ee3fc62ce5f48\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/auth/recover",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"auth",
-										"recover"
-									]
-								},
-								"description": "# Password recovery initiation: Generate Password Reset Token\n\n**Who can initiate**: Only **superadmin** users can initiate password recovery for other users.\n\n**Requirements:**\n\n- Authorization: Bearer\n    \n- Body expects an existing sellerId\n    \n\n**Steps:**\n\n1. Authorization Check: Only superadmin users can access this endpoint\n    \n2. Seller Verification: Confirms the seller ID exists in the database\n    \n3. Token Generation: Creates a unique reset token using generateResetToken()\n    \n4. Token Storage: Saves the token in the database with a 24-hour expiration\n    \n5. Response: Returns the token, seller ID, and expiration time\n    \n\n**Token generation details:**\n\n• Generates a 26-character token (6-char prefix + 20 random chars)  \n• Uses alphanumeric characters only  \n• Prefixed with \"reset_\" for easy identification\n\n**Features:**\n\n• 24-hour expiration by default  \n• Auto-cleanup of expired tokens via MongoDB TTL index  \n• Unique tokens to prevent collisions  \n• Reference to seller for validation"
-							},
-							"response": []
-						},
-						{
-							"name": "New Request",
-							"request": {
-								"method": "GET",
-								"header": []
-							},
-							"response": []
-						}
-					],
-					"description": "The password recovery system in BiteTrack is a two-step process that involves token generation and password reset.\n\n  \n\n1. Authorization Check: Only superadmin users can access this endpoint\n    \n2. Seller Verification: Confirms the seller ID exists in the database\n    \n3. Token Generation: Creates a unique reset token using generateResetToken()\n    \n4. Token Storage: Saves the token in the database with a 24-hour expiration\n    \n5. Response: Returns the token, seller ID, and expiration time"
-				}
-			]
-		},
-		{
-			"name": "Sellers",
-			"item": [
-				{
-					"name": "Test Authorization - List Sellers",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_login}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/sellers",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"sellers"
-							]
-						},
-						"description": "Retrieves a list of sellers. Requires \"Bearer <jwt_login>\" as Authorization header. Should fail if the logged in Seller role is different than \"superadmin\"."
-					},
-					"response": [
-						{
-							"name": "Isabella Doebler - 200 OK",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/bitetrack/sellers",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"sellers"
-									]
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "login"]
 								}
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": "Text",
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "96"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 18:26:18 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757615986"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "954"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"3ba-ccv6sKzkj1ycxKb2ZMeAxOT/1Y0\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "[\n    {\n        \"firstName\": \"Andrés\",\n        \"lastName\": \"Cortés\",\n        \"email\": \"fcortesbio@gmail.com\",\n        \"dateOfBirth\": \"1997-04-03T00:00:00.000Z\",\n        \"role\": \"superadmin\",\n        \"active\": true,\n        \"createdAt\": \"2025-09-11T08:12:11.202Z\",\n        \"updatedAt\": \"2025-09-11T08:12:11.202Z\",\n        \"activatedAt\": \"2025-09-11T18:26:18.943Z\",\n        \"id\": \"68c2845bed9ee3fc62ce5f47\"\n    },\n    {\n        \"firstName\": \"Isabella\",\n        \"lastName\": \"Doebler\",\n        \"email\": \"shellydoeb@gmail.com\",\n        \"dateOfBirth\": \"1997-09-12T00:00:00.000Z\",\n        \"role\": \"admin\",\n        \"active\": true,\n        \"createdBy\": \"68c2845bed9ee3fc62ce5f47\",\n        \"createdAt\": \"2025-09-11T08:28:47.562Z\",\n        \"updatedAt\": \"2025-09-11T08:28:47.562Z\",\n        \"activatedAt\": \"2025-09-11T18:26:18.944Z\",\n        \"id\": \"68c2883fed9ee3fc62ce5f48\"\n    },\n    {\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"email\": \"john.doe@example.com\",\n        \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n        \"role\": \"user\",\n        \"createdBy\": \"68c2883fed9ee3fc62ce5f48\",\n        \"activatedAt\": \"2025-09-11T17:24:17.179Z\",\n        \"createdAt\": \"2025-09-11T17:24:17.180Z\",\n        \"updatedAt\": \"2025-09-11T17:24:17.180Z\",\n        \"id\": \"68c305c1ed2bc28f267cd094\"\n    }\n]"
-						},
-						{
-							"name": "John Doe - 403 Forbidden",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:3000/bitetrack/sellers",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"sellers"
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": "Text",
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "99"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 18:24:45 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757615986"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "75"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"4b-UDMBnh6B0RgKlklaxRdscUCGxYg\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Forbidden\",\n    \"message\": \"Insufficient permissions\",\n    \"statusCode\": 403\n}"
-						},
-						{
-							"name": "Test missing token - 401 Unauthorized",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/sellers",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"sellers"
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": null,
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "99"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 21:25:19 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757626820"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "78"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"4e-DJ7PRbYflcpn9zdyQPQygP4q5MA\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Unauthorized\",\n    \"message\": \"Access token is required\",\n    \"statusCode\": 401\n}"
-						},
-						{
-							"name": "Test arbitrary invalid token - 401 Unauthorized",
-							"originalRequest": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/sellers",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"sellers"
-									]
-								}
-							},
-							"status": "Unauthorized",
-							"code": 401,
-							"_postman_previewlanguage": null,
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "98"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 21:26:15 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757626820"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "67"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"43-BKQTaJ1TP8T0uJ69WSvobqsLDpk\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Unauthorized\",\n    \"message\": \"Invalid token\",\n    \"statusCode\": 401\n}"
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"seller\": {\n        \"id\": \"60f4b2b3e8b2c4001f647123\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"email\": \"admin@bitetrack.com\",\n        \"role\": \"admin\",\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\"\n    }\n}"
 						}
 					]
 				},
 				{
-					"name": "Test Account Creation - Pending Sellers",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_login}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{vault:authorization-secret}}",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Valeria\",\n  \"lastName\": \"Casas\",\n  \"email\": \"valjaus@artnrebelion.com\",\n  \"dateOfBirth\": \"1996-04-04\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/sellers/pending/",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"sellers",
-								"pending",
-								""
-							]
-						}
-					},
-					"response": [
-						{
-							"name": "Created Nathalia Cruz",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{vault:authorization-secret}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"firstName\": \"Nathalia\",\n  \"lastName\": \"Cruz\",\n  \"email\": \"nathalia@camaradas.com\",\n  \"dateOfBirth\": \"1996-04-04\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:3000/bitetrack/sellers/pending",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"sellers",
-										"pending"
-									]
-								}
-							},
-							"status": "Created",
-							"code": 201,
-							"_postman_previewlanguage": "Text",
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "96"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 17:21:11 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757611828"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "284"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"11c-TTayutAX0I7RUTM/B31Ry/G3qg4\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"firstName\": \"Nathalia\",\n    \"lastName\": \"Cruz\",\n    \"email\": \"nathalia@camaradas.com\",\n    \"dateOfBirth\": \"1996-04-04T00:00:00.000Z\",\n    \"createdBy\": \"68c2883fed9ee3fc62ce5f48\",\n    \"activatedAt\": null,\n    \"createdAt\": \"2025-09-11T17:21:11.160Z\",\n    \"updatedAt\": \"2025-09-11T17:21:11.160Z\",\n    \"id\": \"68c30507ed2bc28f267cd091\"\n}"
-						},
-						{
-							"name": "Create Pending Seller",
-							"originalRequest": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Authorization",
-										"value": "{{vault:authorization-secret}}",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"firstName\": \"Valeria\",\n  \"lastName\": \"Casas\",\n  \"email\": \"valjaus@artnrebelion.com\",\n  \"dateOfBirth\": \"1996-04-04\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "localhost:3000/bitetrack/sellers/pending",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"sellers",
-										"pending"
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": "Text",
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "87"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 18:19:25 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757615012"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "75"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"4b-UDMBnh6B0RgKlklaxRdscUCGxYg\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Forbidden\",\n    \"message\": \"Insufficient permissions\",\n    \"statusCode\": 403\n}"
-						}
-					]
-				},
-				{
-					"name": "Test Self-activation - Create Seller",
+					"name": "Activate Account",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"valjaus@artnrebelion.com\",\n  \"lastName\": \"Casas\",\n  \"dateOfBirth\": \"1996-04-04\",\n  \"password\": \"SecurePass123!\"\n}",
+							"raw": "{\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"lastName\": \"Smith\",\n    \"password\": \"SecurePass123!\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1669,24 +245,20 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/activate",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"auth",
-								"activate"
-							]
-						}
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "activate"]
+						},
+						"description": "Activate a pending seller account by providing matching details and setting a password."
 					},
 					"response": [
 						{
-							"name": "Pending account not found",
+							"name": "Account Activated",
 							"originalRequest": {
 								"method": "POST",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"email\": \"valjaus@artnrebelion.com\",\n  \"lastName\": \"Casas\",\n  \"dateOfBirth\": \"1996-04-04\",\n  \"password\": \"SecurePass123!\"\n}",
+									"raw": "{\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"lastName\": \"Smith\",\n    \"password\": \"SecurePass123!\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1694,250 +266,256 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:3000/bitetrack/auth/activate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"auth",
-										"activate"
-									]
-								}
-							},
-							"status": "Not Found",
-							"code": 404,
-							"_postman_previewlanguage": null,
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "98"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 19:12:52 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757618830"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "96"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"60-N/SmBjJYdiYqozGipShezjNk7O8\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"Pending seller not found or already activated\",\n    \"statusCode\": 404\n}"
-						},
-						{
-							"name": "Activated John Doe",
-							"originalRequest": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"lastName\": \"Doe\",\n  \"dateOfBirth\": \"1990-05-15\",\n  \"password\": \"SecurePass123!\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:3000/bitetrack/auth/activate",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"bitetrack",
-										"auth",
-										"activate"
-									]
+									"raw": "{{baseUrl}}/auth/activate",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "activate"]
 								}
 							},
 							"status": "Created",
 							"code": 201,
-							"_postman_previewlanguage": "Text",
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "95"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 17:24:17 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757611828"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "313"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"139-QvPtGjZmA3C+w7NcQmyFtD5xuyY\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"dateOfBirth\": \"1990-05-15T00:00:00.000Z\",\n    \"role\": \"user\",\n    \"createdBy\": \"68c2883fed9ee3fc62ce5f48\",\n    \"activatedAt\": \"2025-09-11T17:24:17.179Z\",\n    \"createdAt\": \"2025-09-11T17:24:17.180Z\",\n    \"updatedAt\": \"2025-09-11T17:24:17.180Z\",\n    \"id\": \"68c305c1ed2bc28f267cd094\"\n}"
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Smith\",\n    \"email\": \"pending@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"user\",\n    \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T10:00:00.000Z\",\n    \"activatedAt\": \"2025-09-10T10:00:00.000Z\"\n}"
 						}
 					]
 				},
 				{
-					"name": "Test Self-Update - Andrés Cortés",
+					"name": "Initiate Password Recovery",
 					"request": {
 						"auth": {
 							"type": "bearer",
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{jwt_login}}",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"sellerId\": \"{{testSellerId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/recover",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "recover"]
+						},
+						"description": "Generate a password reset token for a seller. Only superadmin users can access this endpoint."
+					},
+					"response": [
+						{
+							"name": "Reset Token Generated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/recover",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "recover"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"expiresAt\": \"2025-09-11T10:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"email\": \"user@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"newPassword\": \"NewSecurePass123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "reset"]
+						},
+						"description": "Reset password using a valid reset token and user verification details."
+					},
+					"response": [
+						{
+							"name": "Password Reset Successful",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"token\": \"reset_1a2b3c4d5e6f7g8h9i0j\",\n    \"email\": \"user@example.com\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"newPassword\": \"NewSecurePass123!\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/reset",
+									"host": ["{{baseUrl}}"],
+									"path": ["auth", "reset"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"message\": \"Password reset successfully\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sellers",
+			"description": "Seller management endpoints for CRUD operations and role management",
+			"item": [
+				{
+					"name": "List All Sellers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sellers",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers"]
+						},
+						"description": "List all sellers (admin/superadmin only). Requires appropriate permissions."
+					},
+					"response": [
+						{
+							"name": "Sellers List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sellers",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647123\",\n        \"firstName\": \"Admin\",\n        \"lastName\": \"User\",\n        \"email\": \"admin@bitetrack.com\",\n        \"dateOfBirth\": \"1985-05-15T00:00:00.000Z\",\n        \"role\": \"admin\",\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647124\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"email\": \"john@example.com\",\n        \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n        \"role\": \"user\",\n        \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T11:00:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Pending Seller",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save pending seller ID for testing activation",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testPendingSellerId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sellers/pending",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "pending"]
+						},
+						"description": "Create a pending seller account (admin/superadmin only). The seller will need to activate their account later."
+					},
+					"response": [
+						{
+							"name": "Pending Seller Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sellers/pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "pending"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647125\",\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"dateOfBirth\": \"1992-03-20T00:00:00.000Z\",\n    \"createdBy\": \"60f4b2b3e8b2c4001f647123\",\n    \"activatedAt\": null,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Seller Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
 									"type": "string"
 								}
 							]
@@ -1946,7 +524,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"firstName\": \"Fabián Andrés\"\n}",
+							"raw": "{\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe Updated\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1954,25 +532,21 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/sellers/68c2845bed9ee3fc62ce5f47",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"sellers",
-								"68c2845bed9ee3fc62ce5f47"
-							]
-						}
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}"]
+						},
+						"description": "Self-update seller information. Sellers can only update their own profile."
 					},
 					"response": [
 						{
-							"name": "Different User: 403 Forbidden",
+							"name": "Profile Updated",
 							"originalRequest": {
 								"method": "PATCH",
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"firstName\": \"Fabián Andrés\"\n}",
+									"raw": "{\n    \"firstName\": \"John Updated\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1980,253 +554,839 @@
 									}
 								},
 								"url": {
-									"raw": "/sellers/68c2845bed9ee3fc62ce5f47",
-									"path": [
-										"sellers",
-										"68c2845bed9ee3fc62ce5f47"
-									]
-								}
-							},
-							"status": "Forbidden",
-							"code": 403,
-							"_postman_previewlanguage": null,
-							"header": [
-								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "95"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 20:22:11 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757622971"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "87"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"57-7AKdg4Ewd7F5mFubS0GBzPazFfc\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
-								}
-							],
-							"cookie": [],
-							"body": "{\n    \"error\": \"Forbidden\",\n    \"message\": \"You can only update your own profile\",\n    \"statusCode\": 403\n}"
-						},
-						{
-							"name": "Same User - 200 OK",
-							"originalRequest": {
-								"method": "PATCH",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"firstName\": \"Fabián Andrés\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{baseUrl}}/sellers/68c2845bed9ee3fc62ce5f47",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"sellers",
-										"68c2845bed9ee3fc62ce5f47"
-									]
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124"]
 								}
 							},
 							"status": "OK",
 							"code": 200,
-							"_postman_previewlanguage": null,
-							"header": [
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"user\",\n    \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Deactivate Seller",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "Content-Security-Policy",
-									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-								},
-								{
-									"key": "Cross-Origin-Opener-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Cross-Origin-Resource-Policy",
-									"value": "same-origin"
-								},
-								{
-									"key": "Origin-Agent-Cluster",
-									"value": "?1"
-								},
-								{
-									"key": "Referrer-Policy",
-									"value": "no-referrer"
-								},
-								{
-									"key": "Strict-Transport-Security",
-									"value": "max-age=15552000; includeSubDomains"
-								},
-								{
-									"key": "X-Content-Type-Options",
-									"value": "nosniff"
-								},
-								{
-									"key": "X-DNS-Prefetch-Control",
-									"value": "off"
-								},
-								{
-									"key": "X-Download-Options",
-									"value": "noopen"
-								},
-								{
-									"key": "X-Frame-Options",
-									"value": "SAMEORIGIN"
-								},
-								{
-									"key": "X-Permitted-Cross-Domain-Policies",
-									"value": "none"
-								},
-								{
-									"key": "X-XSS-Protection",
-									"value": "0"
-								},
-								{
-									"key": "Access-Control-Allow-Origin",
-									"value": "*"
-								},
-								{
-									"key": "X-RateLimit-Limit",
-									"value": "100"
-								},
-								{
-									"key": "X-RateLimit-Remaining",
-									"value": "98"
-								},
-								{
-									"key": "Date",
-									"value": "Thu, 11 Sep 2025 20:39:02 GMT"
-								},
-								{
-									"key": "X-RateLimit-Reset",
-									"value": "1757623974"
-								},
-								{
-									"key": "Content-Type",
-									"value": "application/json; charset=utf-8"
-								},
-								{
-									"key": "Content-Length",
-									"value": "328"
-								},
-								{
-									"key": "ETag",
-									"value": "W/\"148-oRbDEb8HECROhjqNsUY8xPBnDaI\""
-								},
-								{
-									"key": "Connection",
-									"value": "keep-alive"
-								},
-								{
-									"key": "Keep-Alive",
-									"value": "timeout=5"
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
 								}
-							],
-							"cookie": [],
-							"body": "{\n    \"firstName\": \"Fabián Andrés\",\n    \"lastName\": \"Cortés\",\n    \"email\": \"fcortesbio@gmail.com\",\n    \"dateOfBirth\": \"1997-04-03T00:00:00.000Z\",\n    \"role\": \"superadmin\",\n    \"active\": true,\n    \"createdBy\": \"Self\",\n    \"createdAt\": \"2025-09-11T08:12:11.202Z\",\n    \"updatedAt\": \"2025-09-11T20:39:02.379Z\",\n    \"activatedAt\": \"2025-09-11T20:39:02.375Z\",\n    \"id\": \"68c2845bed9ee3fc62ce5f47\"\n}"
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}"]
+						},
+						"description": "Deactivate a seller (superadmin only). This removes their access to the system."
+					},
+					"response": [
+						{
+							"name": "Seller Deactivated",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Update Seller Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sellers/{{testSellerId}}/role",
+							"host": ["{{baseUrl}}"],
+							"path": ["sellers", "{{testSellerId}}", "role"]
+						},
+						"description": "Promote/demote seller role (superadmin only). Available roles: user, admin, superadmin."
+					},
+					"response": [
+						{
+							"name": "Role Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"role\": \"admin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sellers/60f4b2b3e8b2c4001f647124/role",
+									"host": ["{{baseUrl}}"],
+									"path": ["sellers", "60f4b2b3e8b2c4001f647124", "role"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647124\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"role\": \"admin\",\n    \"createdAt\": \"2025-09-10T11:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T14:00:00.000Z\"\n}"
 						}
 					]
 				}
 			]
 		},
 		{
-			"name": "Health",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/bitetrack/health",
-					"protocol": "http",
-					"host": [
-						"localhost"
+			"name": "Customers",
+			"description": "Customer management endpoints for CRUD operations",
+			"item": [
+				{
+					"name": "List All Customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"]
+						},
+						"description": "Retrieve a list of all customers in the system."
+					},
+					"response": [
+						{
+							"name": "Customers List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647201\",\n        \"firstName\": \"Alice\",\n        \"lastName\": \"Johnson\",\n        \"phoneNumber\": \"+1-555-0101\",\n        \"email\": \"alice@example.com\",\n        \"createdAt\": \"2025-09-10T09:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T09:00:00.000Z\",\n        \"lastTransaction\": \"2025-09-10T15:30:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647202\",\n        \"firstName\": \"Bob\",\n        \"lastName\": \"Wilson\",\n        \"phoneNumber\": \"+1-555-0102\",\n        \"email\": null,\n        \"createdAt\": \"2025-09-10T10:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T10:00:00.000Z\",\n        \"lastTransaction\": null\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save customer ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testCustomerId', responseData.id);",
+									"}"
+								]
+							}
+						}
 					],
-					"port": "3000",
-					"path": [
-						"bitetrack",
-						"health"
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"]
+						},
+						"description": "Create a new customer. firstName, lastName, and phoneNumber are required. Email is optional."
+					},
+					"response": [
+						{
+							"name": "Customer Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/customers",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647203\",\n    \"firstName\": \"Charlie\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charlie@example.com\",\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\",\n    \"lastTransaction\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Charles\",\n    \"email\": \"charles.brown@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{testCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "{{testCustomerId}}"]
+						},
+						"description": "Update customer information. Only provided fields will be updated."
+					},
+					"response": [
+						{
+							"name": "Customer Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"firstName\": \"Charles\",\n    \"email\": \"charles.brown@example.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647203",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647203"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647203\",\n    \"firstName\": \"Charles\",\n    \"lastName\": \"Brown\",\n    \"phoneNumber\": \"+1-555-0103\",\n    \"email\": \"charles.brown@example.com\",\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\",\n    \"lastTransaction\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{testCustomerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "{{testCustomerId}}"]
+						},
+						"description": "Remove a customer from the system."
+					},
+					"response": [
+						{
+							"name": "Customer Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647203",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647203"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
 					]
 				}
-			},
-			"response": []
+			]
+		},
+		{
+			"name": "Products",
+			"description": "Product management endpoints for inventory and pricing",
+			"item": [
+				{
+					"name": "List All Products",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						},
+						"description": "Retrieve a list of all products in the inventory."
+					},
+					"response": [
+						{
+							"name": "Products List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["products"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647301\",\n        \"productName\": \"Turkey Sandwich\",\n        \"description\": \"Freshly sliced turkey with lettuce, tomato, and mayo on whole grain bread\",\n        \"count\": 15,\n        \"price\": 8.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647302\",\n        \"productName\": \"Ham & Cheese Sandwich\",\n        \"description\": \"Classic ham and swiss cheese sandwich with mustard\",\n        \"count\": 12,\n        \"price\": 7.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    },\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647303\",\n        \"productName\": \"Veggie Wrap\",\n        \"description\": null,\n        \"count\": 8,\n        \"price\": 6.99,\n        \"createdAt\": \"2025-09-10T08:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T08:00:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Product",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save product ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testProductId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["products"]
+						},
+						"description": "Create a new product. productName, count, and price are required. description is optional."
+					},
+					"response": [
+						{
+							"name": "Product Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["products"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647304\",\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 10,\n    \"price\": 9.99,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T12:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"count\": 15,\n    \"price\": 10.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/products/{{testProductId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{testProductId}}"]
+						},
+						"description": "Update product details or inventory. Only provided fields will be updated."
+					},
+					"response": [
+						{
+							"name": "Product Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"count\": 15,\n    \"price\": 10.99\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/products/60f4b2b3e8b2c4001f647304",
+									"host": ["{{baseUrl}}"],
+									"path": ["products", "60f4b2b3e8b2c4001f647304"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647304\",\n    \"productName\": \"Chicken Caesar Wrap\",\n    \"description\": \"Grilled chicken with romaine lettuce, caesar dressing, and parmesan in a flour tortilla\",\n    \"count\": 15,\n    \"price\": 10.99,\n    \"createdAt\": \"2025-09-10T12:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T13:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/products/{{testProductId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["products", "{{testProductId}}"]
+						},
+						"description": "Remove a product from the inventory."
+					},
+					"response": [
+						{
+							"name": "Product Deleted",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/products/60f4b2b3e8b2c4001f647304",
+									"host": ["{{baseUrl}}"],
+									"path": ["products", "60f4b2b3e8b2c4001f647304"]
+								}
+							},
+							"status": "No Content",
+							"code": 204,
+							"_postman_previewlanguage": null,
+							"body": null
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Sales",
+			"description": "Sales management endpoints for creating and managing transactions",
+			"item": [
+				{
+					"name": "List Sales",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sales",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales"],
+							"query": [
+								{
+									"key": "customerId",
+									"value": "",
+									"description": "Filter by customer ID",
+									"disabled": true
+								},
+								{
+									"key": "sellerId",
+									"value": "",
+									"description": "Filter by seller ID",
+									"disabled": true
+								},
+								{
+									"key": "settled",
+									"value": "",
+									"description": "Filter by settlement status (true/false)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "List sales with optional filters for customerId, sellerId, or settled status."
+					},
+					"response": [
+						{
+							"name": "Sales List",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sales",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "[\n    {\n        \"id\": \"60f4b2b3e8b2c4001f647401\",\n        \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n        \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n        \"products\": [\n            {\n                \"productId\": \"60f4b2b3e8b2c4001f647301\",\n                \"quantity\": 2,\n                \"priceAtSale\": 8.99\n            },\n            {\n                \"productId\": \"60f4b2b3e8b2c4001f647302\",\n                \"quantity\": 1,\n                \"priceAtSale\": 7.99\n            }\n        ],\n        \"totalAmount\": 25.97,\n        \"amountPaid\": 25.97,\n        \"settled\": true,\n        \"createdAt\": \"2025-09-10T15:30:00.000Z\",\n        \"updatedAt\": \"2025-09-10T15:30:00.000Z\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Create Sale",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"// Save sale ID for other tests",
+									"const responseData = pm.response.json();",
+									"if (responseData && responseData.id) {",
+									"    pm.collectionVariables.set('testSaleId', responseData.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customerId\": \"{{testCustomerId}}\",\n    \"products\": [\n        {\n            \"productId\": \"{{testProductId}}\",\n            \"quantity\": 1\n        }\n    ],\n    \"amountPaid\": 10.99\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sales",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales"]
+						},
+						"description": "Create a new sale (transactional). This will automatically calculate total amount based on current product prices and update inventory counts."
+					},
+					"response": [
+						{
+							"name": "Sale Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2\n        }\n    ],\n    \"amountPaid\": 17.98\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sales",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales"]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 17.98,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Sale Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/sales/{{testSaleId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales", "{{testSaleId}}"]
+						},
+						"description": "Get detailed information about a specific sale."
+					},
+					"response": [
+						{
+							"name": "Sale Details",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/sales/60f4b2b3e8b2c4001f647402",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales", "60f4b2b3e8b2c4001f647402"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 17.98,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:00:00.000Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Settle Sale Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amountPaid\": 25.00\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/sales/{{testSaleId}}/settle",
+							"host": ["{{baseUrl}}"],
+							"path": ["sales", "{{testSaleId}}", "settle"]
+						},
+						"description": "Update payment amount for a sale. This can be used to handle partial payments or payment adjustments."
+					},
+					"response": [
+						{
+							"name": "Payment Updated",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"amountPaid\": 25.00\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/sales/60f4b2b3e8b2c4001f647402/settle",
+									"host": ["{{baseUrl}}"],
+									"path": ["sales", "60f4b2b3e8b2c4001f647402", "settle"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"id\": \"60f4b2b3e8b2c4001f647402\",\n    \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n    \"sellerId\": \"60f4b2b3e8b2c4001f647124\",\n    \"products\": [\n        {\n            \"productId\": \"60f4b2b3e8b2c4001f647301\",\n            \"quantity\": 2,\n            \"priceAtSale\": 8.99\n        }\n    ],\n    \"totalAmount\": 17.98,\n    \"amountPaid\": 25.00,\n    \"settled\": true,\n    \"createdAt\": \"2025-09-10T16:00:00.000Z\",\n    \"updatedAt\": \"2025-09-10T16:30:00.000Z\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"description": "System health and status endpoints",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": ["{{baseUrl}}"],
+							"path": ["health"]
+						},
+						"description": "Check if the API is running and healthy."
+					},
+					"response": [
+						{
+							"name": "API Healthy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/health",
+									"host": ["{{baseUrl}}"],
+									"path": ["health"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"status\": \"healthy\",\n    \"timestamp\": \"2025-09-10T16:00:00.000Z\",\n    \"version\": \"1.0.0\"\n}"
+						}
+					]
+				}
+			]
 		}
 	]
 }
