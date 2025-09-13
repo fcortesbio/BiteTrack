@@ -1,0 +1,80 @@
+{
+  "description": "Pending sellers for testing account creation and activation workflows",
+  "note": "These should be created by admin/superadmin users first, then activated via /auth/activate",
+  "pendingSellers": [
+    {
+      "firstName": "Maria",
+      "lastName": "Rodriguez",
+      "email": "maria.rodriguez@foodhub.com",
+      "dateOfBirth": "1992-03-15"
+    },
+    {
+      "firstName": "James",
+      "lastName": "Wilson",
+      "email": "james.wilson@bitetrack.com",
+      "dateOfBirth": "1988-07-22"
+    },
+    {
+      "firstName": "Sarah",
+      "lastName": "Chen",
+      "email": "sarah.chen@example.com",
+      "dateOfBirth": "1995-11-08"
+    },
+    {
+      "firstName": "Michael",
+      "lastName": "Johnson",
+      "email": "mike.johnson@foodservice.com",
+      "dateOfBirth": "1990-01-30"
+    },
+    {
+      "firstName": "Elena",
+      "lastName": "Vasquez",
+      "email": "elena.vasquez@catering.com",
+      "dateOfBirth": "1987-09-12"
+    },
+    {
+      "firstName": "David",
+      "lastName": "Kim",
+      "email": "david.kim@sandwichco.com",
+      "dateOfBirth": "1993-05-03"
+    },
+    {
+      "firstName": "Lisa",
+      "lastName": "Thompson",
+      "email": "lisa.thompson@quickbites.com",
+      "dateOfBirth": "1991-12-18"
+    },
+    {
+      "firstName": "Carlos",
+      "lastName": "Mendez",
+      "email": "carlos.mendez@delicious.com",
+      "dateOfBirth": "1989-06-25"
+    }
+  ],
+  "activationData": [
+    {
+      "email": "maria.rodriguez@foodhub.com",
+      "lastName": "Rodriguez",
+      "dateOfBirth": "1992-03-15",
+      "password": "SecurePass123!"
+    },
+    {
+      "email": "james.wilson@bitetrack.com",
+      "lastName": "Wilson",
+      "dateOfBirth": "1988-07-22",
+      "password": "StrongPass456@"
+    },
+    {
+      "email": "sarah.chen@example.com",
+      "lastName": "Chen",
+      "dateOfBirth": "1995-11-08",
+      "password": "MyPassword789#"
+    },
+    {
+      "email": "mike.johnson@foodservice.com",
+      "lastName": "Johnson",
+      "dateOfBirth": "1990-01-30",
+      "password": "TestPass321$"
+    }
+  ]
+}

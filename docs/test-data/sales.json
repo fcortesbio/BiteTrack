@@ -1,0 +1,304 @@
+{
+  "description": "Sales transaction test data for various business scenarios",
+  "note": "Replace customerId, sellerId, and productId with actual IDs from your database. These are template structures.",
+  "salesTemplates": [
+    {
+      "description": "Simple single-item sale",
+      "customerId": "CUSTOMER_ID_1",
+      "products": [
+        {
+          "productId": "TURKEY_CLUB_SANDWICH_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 12.99
+    },
+    {
+      "description": "Combo meal order",
+      "customerId": "CUSTOMER_ID_2", 
+      "products": [
+        {
+          "productId": "PHILLY_CHEESESTEAK_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "KETTLE_CHIPS_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "FRESH_BREWED_COFFEE_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 20.47
+    },
+    {
+      "description": "Large family order",
+      "customerId": "CUSTOMER_ID_3",
+      "products": [
+        {
+          "productId": "ITALIAN_SUB_ID",
+          "quantity": 2
+        },
+        {
+          "productId": "VEGGIE_DELUXE_SANDWICH_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "BBQ_PULLED_PORK_SANDWICH_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "KETTLE_CHIPS_ID",
+          "quantity": 3
+        },
+        {
+          "productId": "CRAFT_SODA_ASSORTMENT_ID",
+          "quantity": 4
+        }
+      ],
+      "amountPaid": 58.93
+    },
+    {
+      "description": "Office catering order",
+      "customerId": "CORPORATE_CUSTOMER_ID",
+      "products": [
+        {
+          "productId": "TURKEY_CLUB_SANDWICH_ID",
+          "quantity": 5
+        },
+        {
+          "productId": "ITALIAN_SUB_ID",
+          "quantity": 3
+        },
+        {
+          "productId": "VEGGIE_DELUXE_SANDWICH_ID",
+          "quantity": 4
+        },
+        {
+          "productId": "SIDE_GARDEN_SALAD_ID",
+          "quantity": 6
+        },
+        {
+          "productId": "FRESH_BREWED_COFFEE_ID",
+          "quantity": 10
+        },
+        {
+          "productId": "CHOCOLATE_CHIP_COOKIE_ID",
+          "quantity": 12
+        }
+      ],
+      "amountPaid": 189.35
+    },
+    {
+      "description": "Quick breakfast order",
+      "customerId": "CUSTOMER_ID_4",
+      "products": [
+        {
+          "productId": "PREMIUM_LATTE_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "CHOCOLATE_CHIP_COOKIE_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 7.98
+    },
+    {
+      "description": "Healthy lunch combo",
+      "customerId": "CUSTOMER_ID_5",
+      "products": [
+        {
+          "productId": "VEGGIE_DELUXE_SANDWICH_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "GREEN_SMOOTHIE_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "FRESH_FRUIT_CUP_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 20.97
+    }
+  ],
+  "partialPaymentScenarios": [
+    {
+      "description": "Customer pays partial amount (will need settlement later)",
+      "customerId": "CUSTOMER_ID_6",
+      "products": [
+        {
+          "productId": "PHILLY_CHEESESTEAK_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "SWEET_POTATO_FRIES_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 15.00,
+      "note": "Total would be $19.98, customer paid $15.00"
+    },
+    {
+      "description": "Customer overpays (includes tip)",
+      "customerId": "CUSTOMER_ID_7",
+      "products": [
+        {
+          "productId": "TURKEY_CLUB_SANDWICH_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "ICED_TEA_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 18.00,
+      "note": "Total is $15.98, customer paid $18.00 (includes tip)"
+    }
+  ],
+  "settlementUpdates": [
+    {
+      "description": "Update partial payment to full amount",
+      "saleId": "PARTIAL_PAYMENT_SALE_ID",
+      "amountPaid": 19.98
+    },
+    {
+      "description": "Additional payment on existing sale",
+      "saleId": "EXISTING_SALE_ID", 
+      "amountPaid": 25.00
+    }
+  ],
+  "bulkTestSales": [
+    {
+      "description": "Simple test sale for automation",
+      "customerId": "TEST_CUSTOMER_ID_1",
+      "products": [
+        {
+          "productId": "TEST_SANDWICH_A_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 5.00
+    },
+    {
+      "description": "Multi-item test sale",
+      "customerId": "TEST_CUSTOMER_ID_2",
+      "products": [
+        {
+          "productId": "TEST_SANDWICH_A_ID",
+          "quantity": 2
+        },
+        {
+          "productId": "TEST_BEVERAGE_B_ID",
+          "quantity": 2
+        },
+        {
+          "productId": "TEST_SIDE_C_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 17.00
+    },
+    {
+      "description": "High-value test sale",
+      "customerId": "VIP_CUSTOMER_ID",
+      "products": [
+        {
+          "productId": "EXPENSIVE_ITEM_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "PREMIUM_LATTE_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 104.98
+    }
+  ],
+  "edgeCaseScenarios": [
+    {
+      "description": "Single low-cost item",
+      "customerId": "CUSTOMER_ID_8",
+      "products": [
+        {
+          "productId": "PICKLE_SPEAR_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 1.49
+    },
+    {
+      "description": "Large quantity single item",
+      "customerId": "BULK_CUSTOMER_ID",
+      "products": [
+        {
+          "productId": "BOTTLED_WATER_ID",
+          "quantity": 20
+        }
+      ],
+      "amountPaid": 39.80
+    },
+    {
+      "description": "Mixed price range items",
+      "customerId": "CUSTOMER_ID_9",
+      "products": [
+        {
+          "productId": "PICKLE_SPEAR_ID",
+          "quantity": 2
+        },
+        {
+          "productId": "PHILLY_CHEESESTEAK_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "CHEESECAKE_SLICE_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 24.47
+    }
+  ],
+  "seasonalSales": [
+    {
+      "description": "Fall seasonal order",
+      "customerId": "SEASONAL_CUSTOMER_ID",
+      "products": [
+        {
+          "productId": "PUMPKIN_SPICE_LATTE_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "TURKEY_CRANBERRY_SANDWICH_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "APPLE_PIE_SLICE_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 25.47
+    },
+    {
+      "description": "Summer refreshing order",
+      "customerId": "SUMMER_CUSTOMER_ID",
+      "products": [
+        {
+          "productId": "GREEN_SMOOTHIE_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "SUMMER_BERRY_PARFAIT_ID",
+          "quantity": 1
+        },
+        {
+          "productId": "ICED_TEA_ID",
+          "quantity": 1
+        }
+      ],
+      "amountPaid": 16.47
+    }
+  ]
+}

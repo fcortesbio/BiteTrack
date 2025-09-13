@@ -1,0 +1,216 @@
+{
+  "description": "Environment variables and common test values for BiteTrack API testing",
+  "note": "Use these values in Postman environments or test automation scripts",
+  
+  "apiConfiguration": {
+    "baseUrl": "http://localhost:3000/bitetrack",
+    "timeout": 30000,
+    "retries": 3
+  },
+
+  "testCredentials": {
+    "superadmin": {
+      "email": "admin@bitetrack.com",
+      "password": "SuperAdmin123!",
+      "role": "superadmin",
+      "firstName": "Super",
+      "lastName": "Admin"
+    },
+    "admin": {
+      "email": "manager@bitetrack.com", 
+      "password": "AdminPass456@",
+      "role": "admin",
+      "firstName": "Store",
+      "lastName": "Manager"
+    },
+    "user": {
+      "email": "employee@bitetrack.com",
+      "password": "UserPass789#",
+      "role": "user", 
+      "firstName": "Store",
+      "lastName": "Employee"
+    }
+  },
+
+  "testAccounts": {
+    "pendingActivation": {
+      "email": "pending@bitetrack.com",
+      "lastName": "Pending",
+      "dateOfBirth": "1990-05-15",
+      "activationPassword": "NewPass123!"
+    },
+    "passwordReset": {
+      "email": "reset@bitetrack.com",
+      "currentPassword": "OldPass123!",
+      "newPassword": "NewPass456@"
+    }
+  },
+
+  "testEmails": [
+    "test1@bitetrack.com",
+    "test2@bitetrack.com", 
+    "test3@bitetrack.com",
+    "nonexistent@nowhere.com",
+    "invalid-email-format",
+    "user+tag@domain.co.uk",
+    "very.long.email.address@subdomain.domain.org"
+  ],
+
+  "commonPasswords": {
+    "valid": [
+      "SecurePass123!",
+      "StrongPassword456@",
+      "ValidPass789#",
+      "ComplexPass321$"
+    ],
+    "invalid": [
+      "short",
+      "nouppercase123!",
+      "NOLOWERCASE123!",
+      "NoNumbers!",
+      "NoSpecialChars123",
+      "password123",
+      "123456789"
+    ]
+  },
+
+  "phoneNumbers": {
+    "valid": [
+      "+1-555-0123",
+      "(555) 123-4567",
+      "555.234.5678",
+      "+1 (555) 345-6789",
+      "555-456-7890"
+    ],
+    "edge_cases": [
+      "555-BITETRACK",
+      "+1-800-FOOD-NOW",
+      "1234567890",
+      "+44-20-7946-0958",
+      "+33-1-42-86-83-26"
+    ]
+  },
+
+  "testDates": {
+    "dateOfBirth": {
+      "valid": [
+        "1990-01-15",
+        "1985-12-31",
+        "1992-06-15",
+        "1988-03-22"
+      ],
+      "edge_cases": [
+        "2000-02-29",
+        "1980-01-01",
+        "2005-12-31"
+      ],
+      "invalid": [
+        "2030-01-01",
+        "1900-01-01",
+        "invalid-date",
+        "12/31/1990"
+      ]
+    }
+  },
+
+  "priceRanges": {
+    "low": {
+      "min": 0.99,
+      "max": 4.99
+    },
+    "medium": {
+      "min": 5.00,
+      "max": 14.99
+    },
+    "high": {
+      "min": 15.00,
+      "max": 50.00
+    },
+    "premium": {
+      "min": 50.01,
+      "max": 999.99
+    }
+  },
+
+  "inventoryLevels": {
+    "out_of_stock": 0,
+    "low_stock": 5,
+    "normal_stock": 25,
+    "high_stock": 100,
+    "bulk_stock": 500
+  },
+
+  "paymentScenarios": {
+    "exact_payment": 12.99,
+    "overpayment": 15.00,
+    "underpayment": 10.00,
+    "large_order": 159.99,
+    "small_order": 1.99,
+    "zero_payment": 0.00,
+    "negative_payment": -5.00
+  },
+
+  "commonSearchTerms": [
+    "turkey",
+    "chicken",
+    "veggie",
+    "sandwich",
+    "wrap",
+    "coffee",
+    "soda",
+    "salad"
+  ],
+
+  "testFilters": {
+    "customers": {
+      "with_email": true,
+      "without_email": true,
+      "recent_transactions": true,
+      "no_transactions": true
+    },
+    "sales": {
+      "settled": true,
+      "unsettled": false,
+      "date_ranges": [
+        "today",
+        "this_week",
+        "this_month",
+        "last_30_days"
+      ]
+    },
+    "products": {
+      "in_stock": true,
+      "out_of_stock": false,
+      "low_stock": true,
+      "price_ranges": ["low", "medium", "high"]
+    }
+  },
+
+  "loadTestingData": {
+    "concurrent_users": [1, 5, 10, 25, 50],
+    "requests_per_minute": [10, 50, 100, 500, 1000],
+    "test_duration_minutes": [1, 5, 15, 30, 60]
+  },
+
+  "errorTestCases": {
+    "authentication": {
+      "missing_token": null,
+      "invalid_token": "invalid.jwt.token",
+      "expired_token": "expired.jwt.token"
+    },
+    "validation": {
+      "empty_strings": "",
+      "null_values": null,
+      "extremely_long_string": "a".repeat(1000),
+      "special_characters": "!@#$%^&*()_+{}[]|\\:;\"'<>?,./",
+      "sql_injection": "'; DROP TABLE users; --",
+      "xss_attempt": "<script>alert('xss')</script>"
+    },
+    "business_logic": {
+      "negative_quantities": -1,
+      "zero_quantities": 0,
+      "excessive_quantities": 999999,
+      "invalid_ids": "non-existent-id"
+    }
+  }
+}

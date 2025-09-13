@@ -1,0 +1,272 @@
+{
+  "description": "Comprehensive product catalog for food business testing",
+  "note": "Includes sandwiches, beverages, sides, and seasonal items with realistic pricing and inventory",
+  "categories": {
+    "sandwiches": [
+      {
+        "productName": "Turkey Club Sandwich",
+        "description": "Freshly sliced turkey breast, crispy bacon, lettuce, tomato, and mayo on toasted sourdough bread",
+        "count": 25,
+        "price": 12.99
+      },
+      {
+        "productName": "Italian Sub",
+        "description": "Salami, ham, provolone cheese, lettuce, tomato, onions, and Italian dressing on a sub roll",
+        "count": 20,
+        "price": 11.49
+      },
+      {
+        "productName": "Grilled Chicken Caesar Wrap",
+        "description": "Grilled chicken breast, romaine lettuce, parmesan cheese, and caesar dressing in a flour tortilla",
+        "count": 30,
+        "price": 10.99
+      },
+      {
+        "productName": "Veggie Deluxe Sandwich",
+        "description": "Avocado, cucumber, sprouts, tomato, lettuce, and hummus on whole grain bread",
+        "count": 15,
+        "price": 9.99
+      },
+      {
+        "productName": "BBQ Pulled Pork Sandwich",
+        "description": "Slow-cooked pulled pork with tangy BBQ sauce, coleslaw, and pickles on a brioche bun",
+        "count": 18,
+        "price": 13.49
+      },
+      {
+        "productName": "Tuna Melt",
+        "description": "House-made tuna salad with melted cheddar cheese on grilled sourdough",
+        "count": 12,
+        "price": 10.49
+      },
+      {
+        "productName": "Philly Cheesesteak",
+        "description": "Sliced ribeye steak, sautéed onions and peppers, provolone cheese on a hoagie roll",
+        "count": 22,
+        "price": 14.99
+      },
+      {
+        "productName": "BLT Classic",
+        "description": "Crispy bacon, fresh lettuce, ripe tomatoes, and mayo on toasted white bread",
+        "count": 28,
+        "price": 8.99
+      },
+      {
+        "productName": "Reuben Sandwich",
+        "description": "Corned beef, swiss cheese, sauerkraut, and thousand island dressing on rye bread",
+        "count": 16,
+        "price": 12.49
+      },
+      {
+        "productName": "Buffalo Chicken Wrap",
+        "description": "Crispy buffalo chicken, lettuce, tomato, and ranch dressing in a spinach tortilla",
+        "count": 24,
+        "price": 11.99
+      }
+    ],
+    "beverages": [
+      {
+        "productName": "Fresh Brewed Coffee",
+        "description": "House blend coffee, hot or iced",
+        "count": 50,
+        "price": 2.49
+      },
+      {
+        "productName": "Premium Latte",
+        "description": "Espresso with steamed milk and foam, choice of syrup flavors",
+        "count": 35,
+        "price": 4.99
+      },
+      {
+        "productName": "Fresh Orange Juice",
+        "description": "100% pure orange juice, freshly squeezed",
+        "count": 25,
+        "price": 3.99
+      },
+      {
+        "productName": "Craft Soda Assortment",
+        "description": "Selection of craft sodas including cola, ginger ale, and root beer",
+        "count": 40,
+        "price": 2.99
+      },
+      {
+        "productName": "Green Smoothie",
+        "description": "Spinach, kale, apple, banana, and coconut water blend",
+        "count": 20,
+        "price": 6.49
+      },
+      {
+        "productName": "Iced Tea",
+        "description": "House-brewed iced tea, sweet or unsweetened",
+        "count": 45,
+        "price": 2.99
+      },
+      {
+        "productName": "Bottled Water",
+        "description": "Premium spring water",
+        "count": 60,
+        "price": 1.99
+      },
+      {
+        "productName": "Energy Drink",
+        "description": "Natural energy drink with vitamins and caffeine",
+        "count": 30,
+        "price": 3.49
+      }
+    ],
+    "sides": [
+      {
+        "productName": "Kettle Chips",
+        "description": "Crispy kettle-cooked potato chips, sea salt flavor",
+        "count": 35,
+        "price": 2.99
+      },
+      {
+        "productName": "Fresh Fruit Cup",
+        "description": "Seasonal fresh fruit medley",
+        "count": 20,
+        "price": 4.49
+      },
+      {
+        "productName": "Coleslaw",
+        "description": "Creamy coleslaw made with fresh cabbage and carrots",
+        "count": 25,
+        "price": 3.49
+      },
+      {
+        "productName": "Potato Salad",
+        "description": "Classic potato salad with herbs and light mayo dressing",
+        "count": 18,
+        "price": 3.99
+      },
+      {
+        "productName": "Pickle Spear",
+        "description": "House-made dill pickle spear",
+        "count": 50,
+        "price": 1.49
+      },
+      {
+        "productName": "Side Garden Salad",
+        "description": "Mixed greens with tomatoes, cucumbers, and choice of dressing",
+        "count": 22,
+        "price": 4.99
+      },
+      {
+        "productName": "Onion Rings",
+        "description": "Beer-battered onion rings served hot",
+        "count": 15,
+        "price": 5.49
+      },
+      {
+        "productName": "Sweet Potato Fries",
+        "description": "Crispy sweet potato fries with sea salt",
+        "count": 20,
+        "price": 4.99
+      }
+    ],
+    "desserts": [
+      {
+        "productName": "Chocolate Chip Cookie",
+        "description": "Freshly baked chocolate chip cookie",
+        "count": 40,
+        "price": 2.99
+      },
+      {
+        "productName": "Apple Pie Slice",
+        "description": "Classic apple pie with cinnamon and flaky crust",
+        "count": 12,
+        "price": 5.99
+      },
+      {
+        "productName": "Brownie",
+        "description": "Rich chocolate brownie with walnuts",
+        "count": 24,
+        "price": 3.99
+      },
+      {
+        "productName": "Cheesecake Slice",
+        "description": "New York style cheesecake with berry compote",
+        "count": 10,
+        "price": 6.49
+      }
+    ],
+    "seasonal": [
+      {
+        "productName": "Pumpkin Spice Latte",
+        "description": "Seasonal pumpkin spice flavored latte with whipped cream",
+        "count": 25,
+        "price": 5.49
+      },
+      {
+        "productName": "Turkey Cranberry Sandwich",
+        "description": "Roasted turkey with cranberry sauce, stuffing, and gravy on artisan bread",
+        "count": 15,
+        "price": 13.99
+      },
+      {
+        "productName": "Hot Chocolate",
+        "description": "Rich hot chocolate with marshmallows",
+        "count": 30,
+        "price": 3.99
+      },
+      {
+        "productName": "Summer Berry Parfait",
+        "description": "Greek yogurt layered with fresh berries and granola",
+        "count": 18,
+        "price": 6.99
+      }
+    ]
+  },
+  "bulkProducts": [
+    {
+      "productName": "Test Sandwich A",
+      "description": "Basic test sandwich for automated testing",
+      "count": 100,
+      "price": 5.00
+    },
+    {
+      "productName": "Test Beverage B",
+      "description": "Basic test beverage for automated testing",
+      "count": 100,
+      "price": 2.00
+    },
+    {
+      "productName": "Test Side C",
+      "description": "Basic test side for automated testing",
+      "count": 100,
+      "price": 3.00
+    },
+    {
+      "productName": "Expensive Item",
+      "description": "High-priced item for testing payment scenarios",
+      "count": 5,
+      "price": 99.99
+    },
+    {
+      "productName": "Out of Stock Item",
+      "description": "Item with zero inventory for testing stock scenarios",
+      "count": 0,
+      "price": 10.00
+    }
+  ],
+  "lowStockItems": [
+    {
+      "productName": "Limited Edition Burger",
+      "description": "Special burger with only a few left",
+      "count": 3,
+      "price": 15.99
+    },
+    {
+      "productName": "Artisan Coffee Beans",
+      "description": "Premium coffee beans, almost sold out",
+      "count": 2,
+      "price": 24.99
+    },
+    {
+      "productName": "Specialty Sauce",
+      "description": "House-made specialty sauce, limited quantity",
+      "count": 1,
+      "price": 4.99
+    }
+  ]
+}
