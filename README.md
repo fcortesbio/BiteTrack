@@ -45,6 +45,47 @@ docker run -d -p 3000:3000 --env-file .env --name BiteTrack bitetrack:latest
 # 🎉 API ready at http://localhost:3000
 ```
 
+## 🔑 **First-Time Setup** (CRITICAL)
+
+**⚠️ All API routes require authentication - you need a SuperAdmin account first!**
+
+### Step 1: Create Your First SuperAdmin
+```bash
+# Run the interactive setup script
+node create-superadmin.js
+
+# Follow prompts to enter:
+# - First name, Last name, Email
+# - Date of birth (YYYY-MM-DD format) 
+# - Secure password (8+ chars, mixed case, numbers, symbols)
+```
+
+### Step 2: Insert SuperAdmin into Database
+```bash
+# Copy the generated MongoDB command and run it in mongosh
+mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
+# Paste and execute the generated db.sellers.insertOne() command
+```
+
+### Step 3: Get Your JWT Token
+```bash
+# Login to get your authentication token
+curl -X POST http://localhost:3000/bitetrack/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"your-email@example.com","password":"YourPassword123!"}'
+
+# Save the returned token - you'll need it for all API calls!
+```
+
+### Step 4: Verify Setup
+```bash
+# Test authenticated endpoint (replace YOUR_JWT_TOKEN)
+curl -X GET http://localhost:3000/bitetrack/sellers \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+> 💡 **Pro tip:** The API includes a public route to check if an email exists: `GET /auth/seller-status?email=test@example.com` - perfect for client-side login flows!
+
 ## 💼 **Perfect For**
 
 - 🥪 **Sandwich shops** - Track inventory, customers, and daily sales
@@ -89,6 +130,7 @@ docker run -d -p 3000:3000 --env-file .env --name BiteTrack bitetrack:latest
 | Feature | Endpoints | Key Actions |
 |---------|-----------|-------------|
 | **🔐 Auth** | `/auth/*` | Login, activate accounts, password reset |
+| **🔎 Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
 | **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
 | **🏪 Customers** | `/customers/*` | Customer database and contact info |
 | **📦 Products** | `/products/*` | Inventory, pricing, and catalog |
@@ -181,12 +223,13 @@ curl http://localhost:3000/bitetrack/health
 ### Project Structure
 ```
 BiteTrack/
-├── 🧠 models/         # Mongoose schemas
-├── 🎮 controllers/    # Business logic
-├── 🛜️ routes/         # API endpoints
-├── 🔒 middleware/     # Auth, validation, error handling
-├── 📚 docs/           # API documentation & Postman collection
-└── 🐳 Dockerfile      # Container definition
+├── 🧠 models/              # Mongoose schemas
+├── 🎮 controllers/       # Business logic
+├── 🛜️ routes/            # API endpoints
+├── 🔒 middleware/        # Auth, validation, error handling
+├── 📚 docs/              # API documentation & Postman collection
+├── 🔑 create-superadmin.js # First-time setup script (IMPORTANT!)
+└── 🐳 Dockerfile         # Container definition
 ```
 
 ### Development Mode
