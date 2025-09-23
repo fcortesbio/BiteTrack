@@ -453,6 +453,103 @@ Content-Type: application/json
 }
 ```
 
+### 📈 Get Customer Transaction History
+**Endpoint:** `GET /customers/{id}/transactions`
+
+**Description:** Retrieve a customer's transaction history with pagination and filtering options.
+
+**Request Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Query Parameters:**
+- `page` (optional, default: 1): Page number for pagination
+- `limit` (optional, default: 10, max: 100): Number of transactions per page
+- `settled` (optional): Filter by settlement status (true/false)
+
+**Examples:**
+```bash
+# Get first 10 transactions
+GET /customers/507f1f77bcf86cd799439020/transactions
+
+# Get page 2 with 5 transactions per page
+GET /customers/507f1f77bcf86cd799439020/transactions?page=2&limit=5
+
+# Get only settled transactions
+GET /customers/507f1f77bcf86cd799439020/transactions?settled=true
+
+# Get only pending transactions
+GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
+```
+
+**Response (200 OK):**
+```json
+{
+  "customer": {
+    "id": "507f1f77bcf86cd799439020",
+    "firstName": "Maria",
+    "lastName": "Garcia",
+    "phoneNumber": "+1-555-0123",
+    "email": "maria.garcia@email.com",
+    "createdAt": "2024-01-10T12:00:00.000Z",
+    "updatedAt": "2024-01-15T14:30:00.000Z",
+    "lastTransaction": "2024-01-15T14:30:00.000Z"
+  },
+  "transactions": [
+    {
+      "id": "507f1f77bcf86cd799439040",
+      "customerId": "507f1f77bcf86cd799439020",
+      "sellerId": {
+        "id": "507f1f77bcf86cd799439011",
+        "firstName": "John",
+        "lastName": "Doe"
+      },
+      "products": [
+        {
+          "productId": {
+            "id": "507f1f77bcf86cd799439030",
+            "productName": "Club Sandwich"
+          },
+          "quantity": 2,
+          "priceAtSale": 12.99
+        }
+      ],
+      "totalAmount": 25.98,
+      "amountPaid": 25.98,
+      "settled": true,
+      "createdAt": "2024-01-15T15:30:00.000Z",
+      "updatedAt": "2024-01-15T22:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 3,
+    "totalTransactions": 25,
+    "limit": 10,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  }
+}
+```
+
+**Error Responses:**
+```json
+// 404 Not Found - Customer doesn't exist
+{
+  "error": "Not Found",
+  "message": "Customer not found",
+  "statusCode": 404
+}
+
+// 400 Bad Request - Invalid pagination parameters
+{
+  "error": "Bad Request",
+  "message": "Limit must be between 1 and 100",
+  "statusCode": 400
+}
+```
+
 ### ❌ Remove Customer
 **Endpoint:** `DELETE /customers/{id}`
 
