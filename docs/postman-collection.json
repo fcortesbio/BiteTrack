@@ -886,6 +886,113 @@
 							"body": null
 						}
 					]
+				},
+				{
+					"name": "Get Customer Transaction History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers/{{testCustomerId}}/transactions?page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "{{testCustomerId}}", "transactions"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number for pagination"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Number of transactions per page (max 100)"
+								},
+								{
+									"key": "settled",
+									"value": "true",
+									"disabled": true,
+									"description": "Filter by settlement status (true for paid, false for unpaid)"
+								}
+							]
+						},
+						"description": "Retrieve a customer's transaction history with pagination and filtering options. Returns customer information along with a paginated list of their transactions."
+					},
+					"response": [
+						{
+							"name": "Customer Transactions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647201/transactions?page=1&limit=5",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647201", "transactions"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "limit",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"customer\": {\n        \"id\": \"60f4b2b3e8b2c4001f647201\",\n        \"firstName\": \"Alice\",\n        \"lastName\": \"Johnson\",\n        \"phoneNumber\": \"+1-555-0101\",\n        \"email\": \"alice@example.com\",\n        \"createdAt\": \"2025-09-10T09:00:00.000Z\",\n        \"updatedAt\": \"2025-09-10T09:00:00.000Z\",\n        \"lastTransaction\": \"2025-09-10T15:30:00.000Z\"\n    },\n    \"transactions\": [\n        {\n            \"id\": \"60f4b2b3e8b2c4001f647301\",\n            \"customerId\": \"60f4b2b3e8b2c4001f647201\",\n            \"sellerId\": {\n                \"id\": \"60f4b2b3e8b2c4001f647101\",\n                \"firstName\": \"John\",\n                \"lastName\": \"Doe\"\n            },\n            \"products\": [\n                {\n                    \"productId\": {\n                        \"id\": \"60f4b2b3e8b2c4001f647401\",\n                        \"productName\": \"Club Sandwich\"\n                    },\n                    \"quantity\": 2,\n                    \"priceAtSale\": 12.99\n                }\n            ],\n            \"totalAmount\": 25.98,\n            \"amountPaid\": 25.98,\n            \"settled\": true,\n            \"createdAt\": \"2025-09-10T15:30:00.000Z\",\n            \"updatedAt\": \"2025-09-10T15:30:00.000Z\"\n        }\n    ],\n    \"pagination\": {\n        \"currentPage\": 1,\n        \"totalPages\": 3,\n        \"totalTransactions\": 12,\n        \"limit\": 5,\n        \"hasNextPage\": true,\n        \"hasPrevPage\": false\n    }\n}"
+						},
+						{
+							"name": "Customer Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647999/transactions",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647999", "transactions"]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"error\": \"Not Found\",\n    \"message\": \"Customer not found\",\n    \"statusCode\": 404\n}"
+						},
+						{
+							"name": "Invalid Pagination",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/customers/60f4b2b3e8b2c4001f647201/transactions?limit=999",
+									"host": ["{{baseUrl}}"],
+									"path": ["customers", "60f4b2b3e8b2c4001f647201", "transactions"],
+									"query": [
+										{
+											"key": "limit",
+											"value": "999"
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"body": "{\n    \"error\": \"Bad Request\",\n    \"message\": \"Limit must be between 1 and 100\",\n    \"statusCode\": 400\n}"
+						}
+					]
 				}
 			]
 		},

@@ -92,6 +92,61 @@ components:
       required:
         [customerId, sellerId, products, totalAmount, amountPaid, settled]
 
+    SaleWithPopulatedFields:
+      type: object
+      properties:
+        id: { type: string }
+        customerId: { type: string }
+        sellerId:
+          type: object
+          properties:
+            id: { type: string }
+            firstName: { type: string }
+            lastName: { type: string }
+          required: [id, firstName, lastName]
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: object
+                properties:
+                  id: { type: string }
+                  productName: { type: string }
+                required: [id, productName]
+              quantity: { type: integer, minimum: 1 }
+              priceAtSale: { type: number, minimum: 0 }
+            required: [productId, quantity, priceAtSale]
+        totalAmount: { type: number, minimum: 0 }
+        amountPaid: { type: number, minimum: 0 }
+        settled: { type: boolean, description: "True if fully paid" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required:
+        [customerId, sellerId, products, totalAmount, amountPaid, settled]
+
+    PaginationMetadata:
+      type: object
+      properties:
+        currentPage: { type: integer, minimum: 1 }
+        totalPages: { type: integer, minimum: 0 }
+        totalTransactions: { type: integer, minimum: 0 }
+        limit: { type: integer, minimum: 1, maximum: 100 }
+        hasNextPage: { type: boolean }
+        hasPrevPage: { type: boolean }
+      required: [currentPage, totalPages, totalTransactions, limit, hasNextPage, hasPrevPage]
+
+    CustomerTransactionsResponse:
+      type: object
+      properties:
+        customer: { $ref: "#/components/schemas/Customer" }
+        transactions:
+          type: array
+          items: { $ref: "#/components/schemas/SaleWithPopulatedFields" }
+        pagination: { $ref: "#/components/schemas/PaginationMetadata" }
+      required: [customer, transactions, pagination]
+
     PasswordResetToken:
       type: object
       properties:
@@ -531,6 +586,49 @@ paths:
       responses:
         "204":
           description: Customer removed
+        "404":
+          description: Customer not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /customers/{id}/transactions:
+    get:
+      summary: Get customer transaction history
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Retrieve a customer's transaction history with pagination and filtering options.
+        Returns customer information along with a paginated list of their transactions.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: Customer ID
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+          description: Number of transactions per page
+        - name: settled
+          in: query
+          schema: { type: boolean }
+          description: Filter by settlement status (true for paid, false for unpaid)
+      responses:
+        "200":
+          description: Customer transaction history
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CustomerTransactionsResponse" }
+        "400":
+          description: Invalid pagination parameters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Customer not found
           content:
