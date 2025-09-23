@@ -80,6 +80,7 @@ const deleteCustomer = async (req, res) => {
 
 const getCustomerTransactions = async (req, res) => {
   try {
+    // Parameter extraction & Setup
     const { id } = req.params;
     const { limit = 10, page = 1, settled } = req.query;
 
