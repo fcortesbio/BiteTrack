@@ -29,7 +29,7 @@ git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
 # 2. Setup MongoDB keyfile (for replica set authentication)
-./scripts/setup-keyfile.sh
+./scripts/01-setup-keyfile.sh
 
 # 3. Copy development environment template
 cp .env.example .env.development
@@ -45,6 +45,26 @@ curl http://localhost:3000/bitetrack/health
 # 🎉 API ready at http://localhost:3000
 # 🍃 MongoDB available at localhost:27017
 ```
+
+### 📋 **Complete Setup Workflow**
+
+For a full development environment with test data, follow these numbered scripts in order:
+
+```bash
+# Phase 1: Environment Setup
+./scripts/01-setup-keyfile.sh          # MongoDB keyfile setup
+./scripts/02-quick-persistence-test.sh # Verify stack health
+
+# Phase 2: System Initialization  
+./scripts/03-create-superadmin.sh       # Create admin user (REQUIRED)
+./scripts/04-populate-test-data.js      # Add sample data
+
+# Phase 3: Testing & Validation
+./scripts/05-test-data-persistence.sh   # Comprehensive testing
+./scripts/06-test-sales-filtering.js    # API feature validation
+```
+
+> 💡 **Scripts are numbered in logical workflow order** - follow the sequence for best results!
 
 ## ⚙️ **Environment Configuration**
 
@@ -115,13 +135,13 @@ npm run dev:watch    # Same as above but with nodemon
 ### 🚀 **Streamlined Setup (Recommended)**
 ```bash
 # One-step superadmin creation (interactive prompts)
-./scripts/create-superadmin.sh
+./scripts/03-create-superadmin.sh
 
 # Or automated setup (perfect for CI/deployment)
 ADMIN_FIRST_NAME="John" ADMIN_LAST_NAME="Doe" \
 ADMIN_EMAIL="admin@yourcompany.com" ADMIN_DOB="1990-01-01" \
 ADMIN_PASSWORD="SecurePass123!" \
-./scripts/create-superadmin.sh --non-interactive
+./scripts/03-create-superadmin.sh --non-interactive
 
 # 🎉 Done! User created and ready to login
 ```
@@ -418,16 +438,16 @@ curl http://localhost:3000/bitetrack/health
 ### Data Persistence Testing
 ```bash
 # Run comprehensive data persistence tests
-./scripts/test-data-persistence.sh
+./scripts/05-test-data-persistence.sh
 
 # Run with verbose output
-./scripts/test-data-persistence.sh --verbose
+./scripts/05-test-data-persistence.sh --verbose
 
 # Quick persistence check (for CI/automation)
-./scripts/quick-persistence-test.sh
+./scripts/02-quick-persistence-test.sh
 
 # Clean up test data only
-./scripts/test-data-persistence.sh --clean
+./scripts/05-test-data-persistence.sh --clean
 ```
 
 **What the persistence tests verify:**

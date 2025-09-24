@@ -1,46 +1,76 @@
 # BiteTrack Scripts
 
-This directory contains utility and testing scripts for BiteTrack.
+This directory contains utility and testing scripts for BiteTrack, **organized in logical workflow order** for easy project setup and maintenance.
 
-## Available Scripts
+## 📋 Script Workflow Order
 
-### `create-superadmin.sh`
-**Purpose:** Streamlined superadmin user creation directly in MongoDB  
-**Usage:** `./scripts/create-superadmin.sh [--non-interactive] [--help]`  
+The scripts are numbered to follow a logical development and deployment workflow:
+
+### **Phase 1: Environment Setup** 🔧
+
+### `01-setup-keyfile.sh`
+**Purpose:** MongoDB keyfile setup for replica set authentication  
+**Usage:** `./scripts/01-setup-keyfile.sh`  
+**Duration:** ~2 seconds  
+**What it does:** Creates or copies MongoDB keyfile with proper permissions
+
+**Features:**
+- Copies from keyfile.example if available
+- Generates new keyfile if no example exists
+- Sets proper file permissions (600)
+- Development-only usage (production should have unique keyfiles)
+
+**Use cases:**
+- Initial project setup
+- New developer onboarding
+- Fresh development environment setup
+
+### `02-quick-persistence-test.sh`
+**Purpose:** Quick system health and data persistence verification  
+**Usage:** `./scripts/02-quick-persistence-test.sh`  
+**Duration:** ~5 seconds  
+**What it tests:** Basic MongoDB connectivity and data operations
+
+**Features:**
+- **Production-ready environment detection** - Auto-detects .env.production vs .env.development
+- **Flexible credential handling** - Supports multiple credential formats
+- Quick database write/read/delete test cycle
+- Perfect for CI/CD pipeline validation
+
+**Use cases:**
+- Verify stack is running correctly
+- CI/CD pipeline health checks
+- Pre-deployment validation
+- Quick troubleshooting
+
+### **Phase 2: System Initialization** 🚀
+
+### `03-create-superadmin.sh`
+**Purpose:** Create initial SuperAdmin user account  
+**Usage:** `./scripts/03-create-superadmin.sh [--non-interactive] [--help]`  
 **Duration:** ~10-20 seconds  
 **What it does:** Creates and validates superadmin user in one step
 
 **Features:**
-- Interactive prompts with input validation
-- Non-interactive mode for CI/automation
-- Duplicate email detection
+- **Production-ready environment support** - Works with any environment configuration
+- Interactive prompts with comprehensive input validation
+- Non-interactive mode for automation (CI/CD)
+- Duplicate email detection and prevention
 - Secure password hashing (bcrypt compatible)
 - Direct MongoDB insertion and verification
-- No manual copy/paste required
+- No manual copy/paste steps required
 
 **Use cases:**
-- Initial system setup
+- Initial system setup (CRITICAL - required for API access)
 - Automated deployments
 - CI/CD pipeline user creation
-- Replace the legacy create-superadmin.js workflow
+- Production environment initialization
 
-### `quick-persistence-test.sh`
-**Purpose:** Quick data persistence verification for CI/automation  
-**Usage:** `./scripts/quick-persistence-test.sh`  
-**Duration:** ~5 seconds  
-**What it tests:** Basic data write/read/delete operations
-
-**Use cases:**
-- Continuous Integration pipelines
-- Quick health checks
-- Automated deployment verification
-- Pre-production validation
-
-### `populate-test-data.js`
-**Purpose:** Populate database with comprehensive test data from /test-data JSON files  
-**Usage:** `node scripts/populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`  
-**Duration:** ~10-30 seconds depending on preset  
-**What it does:** Creates realistic customers, products, sales, and pending sellers with proper ID relationships
+### `04-populate-test-data.js`
+**Purpose:** Populate database with realistic test data  
+**Usage:** `node scripts/04-populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`  
+**Duration:** ~10-30 seconds (depending on preset)  
+**What it does:** Creates customers, products, sales with proper relationships
 
 **Presets:**
 - `minimal` - Essential data (5 customers, 7 products, 3 sales)
@@ -49,58 +79,66 @@ This directory contains utility and testing scripts for BiteTrack.
 - `bulk` - Large dataset for performance testing
 
 **Features:**
-- Resolves placeholder IDs in sales templates to real MongoDB ObjectIds
-- Validates all data against current schemas
-- Generates summary report with statistics and sample IDs
+- Resolves placeholder IDs to real MongoDB ObjectIds
+- Schema validation against current models
+- Detailed summary report with statistics
 - Preserves existing seller accounts during cleanup
+- Multiple data presets for different use cases
 
 **Use cases:**
 - Development environment setup
 - API testing with realistic data
-- Performance testing with bulk datasets
-- Consistent test data across team members
+- Performance testing scenarios
+- Demo environment preparation
 
-### `test-sales-filtering.js`
-**Purpose:** Test suite for advanced sales filtering features (pagination, sorting, date ranges)  
-**Usage:** `node scripts/test-sales-filtering.js [--auth-token=<token>] [--verbose]`  
-**Duration:** ~15-30 seconds  
-**What it tests:** All new sales filtering parameters and response structures
+### **Phase 3: Testing & Validation** 🧪
 
-**Tests performed:**
-- Pagination functionality and metadata accuracy
-- Sorting by various fields (ascending/descending)
-- Date range filtering with startDate/endDate
-- Settlement status filtering (settled/unsettled)
-- Populated references (customer, seller, product data)
-- Combined filtering scenarios
-- Error handling for invalid parameters
-
-**Use cases:**
-- Validate advanced filtering features after changes
-- Regression testing for sales API
-- Performance validation for complex queries
-- Continuous integration testing
-
-### `test-data-persistence.sh`
-**Purpose:** Comprehensive data persistence testing across all failure scenarios  
-**Usage:** `./scripts/test-data-persistence.sh [--verbose] [--clean]`  
+### `05-test-data-persistence.sh`
+**Purpose:** Comprehensive data persistence testing across failure scenarios  
+**Usage:** `./scripts/05-test-data-persistence.sh [--verbose] [--clean]`  
 **Duration:** ~2-3 minutes  
-**What it tests:** 
-- MongoDB container restarts
-- API container restarts  
-- Full stack restarts
-- Volume integrity verification
+**What it tests:** Enterprise-grade persistence validation
 
-**Options:**
-- `--verbose`: Enable detailed output
-- `--clean`: Only cleanup test data and exit
-- `--help`: Show usage information
+**Comprehensive Test Suite:**
+- MongoDB container restarts → Data survives ✅
+- API container restarts → Data survives ✅
+- Full stack restarts → Data survives ✅
+- Volume integrity verification → Data preserved ✅
+
+**Features:**
+- **Production environment support** - Works with production credentials
+- Automated test data creation and cleanup
+- Detailed logging with verbose mode
+- Container orchestration testing
+- Docker volume integrity validation
 
 **Use cases:**
 - Production deployment verification
-- Infrastructure changes validation
+- Infrastructure change validation
 - Disaster recovery testing
-- Development environment verification
+- Development environment validation
+
+### `06-test-sales-filtering.js`
+**Purpose:** Advanced API feature testing (sales filtering, pagination, sorting)  
+**Usage:** `node scripts/06-test-sales-filtering.js [--auth-token=<token>] [--verbose]`  
+**Duration:** ~15-30 seconds  
+**What it tests:** Complex API functionality and performance
+
+**Comprehensive API Tests:**
+- Pagination functionality and metadata accuracy
+- Multi-field sorting (ascending/descending)
+- Date range filtering with edge cases
+- Settlement status filtering
+- Population of nested references (customer, seller, product data)
+- Combined filtering scenarios
+- Error handling for invalid parameters
+- Response structure validation
+
+**Use cases:**
+- Feature validation after API changes
+- Regression testing for sales endpoints
+- Performance validation for complex queries
+- CI/CD integration testing
 
 ---
 
@@ -137,16 +175,16 @@ When adding new scripts to this directory:
 ### Manual Override:
 ```bash
 # Override credentials for a single run
-MONGO_ROOT_USERNAME=myuser MONGO_ROOT_PASSWORD=mypass ./scripts/quick-persistence-test.sh
+MONGO_ROOT_USERNAME=myuser MONGO_ROOT_PASSWORD=mypass ./scripts/02-quick-persistence-test.sh
 
 # Set in current shell session
 export MONGO_ROOT_USERNAME=myuser
 export MONGO_ROOT_PASSWORD=mypass
-./test-data-persistence.sh
+./scripts/05-test-data-persistence.sh
 ```
 
 ### Non-Interactive Mode Variables:
-For `create-superadmin.sh --non-interactive`, set these environment variables:
+For `03-create-superadmin.sh --non-interactive`, set these environment variables:
 ```bash
 ADMIN_FIRST_NAME="John"              # First name (required)
 ADMIN_LAST_NAME="Doe"               # Last name (required)
