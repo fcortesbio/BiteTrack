@@ -48,7 +48,15 @@ curl http://localhost:3000/bitetrack/health
 
 ### 📋 **Complete Setup Workflow**
 
-For a full development environment with test data, follow these numbered scripts in order:
+**🎯 Option 1: Interactive Production Setup (Recommended)**
+```bash
+# One-command production setup wizard
+./scripts/00-init-production-setup.sh
+```
+This interactive script guides you through the complete production setup process, including Docker cleanup, environment configuration, and all setup steps.
+
+**🔧 Option 2: Manual Step-by-Step Setup**  
+For development or manual control, follow these numbered scripts in order:
 
 ```bash
 # Phase 1: Environment Setup

@@ -2,7 +2,41 @@
 
 This directory contains utility and testing scripts for BiteTrack, **organized in logical workflow order** for easy project setup and maintenance.
 
-## 📋 Script Workflow Order
+## 🎆 Master Setup Script
+
+### `00-init-production-setup.sh`
+**Purpose:** Interactive master setup wizard for complete production deployment  
+**Usage:** `./scripts/00-init-production-setup.sh`  
+**Duration:** ~5-10 minutes (depends on user input and options selected)  
+**What it does:** Orchestrates all numbered scripts in sequence for complete setup
+
+**Complete Setup Process:**
+- 🧹 Docker cleanup (optional) - Fresh environment
+- ⚙️ Environment configuration - Interactive prompts for all settings
+- 🔐 MongoDB keyfile generation - Secure replica set auth
+- 🐳 Container startup - Production-ready Docker stack
+- ✅ Health verification - System status validation
+- 👤 SuperAdmin creation - Administrative user setup
+- 📊 Test data population - Sample data (optional)
+- 🧪 Comprehensive testing - Full system validation
+
+**Features:**
+- **Interactive prompts** - User-friendly configuration wizard
+- **Secure defaults** - Auto-generates strong passwords and secrets
+- **Environment detection** - Automatically configures for production
+- **Docker integration** - Complete container lifecycle management
+- **Validation checks** - Prerequisites and health verification
+- **Comprehensive summary** - Complete setup report and next steps
+
+**Use cases:**
+- **Production deployments** - Complete production environment setup
+- **Fresh installations** - New server or clean environment setup  
+- **Team onboarding** - Guided setup for new team members
+- **Demo environments** - Quick professional environment creation
+
+---
+
+## 📋 Individual Script Workflow Order
 
 The scripts are numbered to follow a logical development and deployment workflow:
 
