@@ -14,8 +14,15 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Load shared environment functions
+if [ -f "$(dirname "$0")/lib/env-loader.sh" ]; then
+    source "$(dirname "$0")/lib/env-loader.sh"
+else
+    echo "ERROR: env-loader.sh not found" >&2
+    exit 1
+fi
+
 # Configuration
-COMPOSE_ENV_FILE=".env.development"
 TEST_DB="bitetrack"
 NON_INTERACTIVE=false
 
@@ -74,27 +81,16 @@ log_step() {
     echo -e "${CYAN}[STEP]${NC} $1"
 }
 
-# Load environment variables (reuse from persistence test script)
-load_environment() {
-    # Load from .env.development file if environment variables are not already set
-    if [ -z "$MONGO_ROOT_USERNAME" ] || [ -z "$MONGO_ROOT_PASSWORD" ]; then
-        if [ -f "$COMPOSE_ENV_FILE" ]; then
-            log_info "Loading MongoDB credentials from $COMPOSE_ENV_FILE"
-            set -a  # automatically export all variables
-            source <(grep -v '^#' "$COMPOSE_ENV_FILE" | grep -v '^$')
-            set +a  # stop automatically exporting
-        fi
-    fi
+# Setup production-ready environment (uses shared library)
+setup_environment() {
+    log_info "Setting up environment for $(detect_environment_type) deployment..."
     
-    # Set MongoDB credentials
-    MONGO_USER="${MONGO_ROOT_USERNAME:-admin}"
-    MONGO_PASS="${MONGO_ROOT_PASSWORD:-supersecret}"
-    
-    if [ -z "$MONGO_USER" ] || [ -z "$MONGO_PASS" ]; then
-        log_error "MongoDB credentials not found"
-        log_error "Please set MONGO_ROOT_USERNAME and MONGO_ROOT_PASSWORD in $COMPOSE_ENV_FILE"
+    if ! setup_bitetrack_environment false; then
+        log_error "Failed to setup environment"
         exit 1
     fi
+    
+    log_success "Environment setup complete"
 }
 
 # Check prerequisites
@@ -475,7 +471,7 @@ main() {
     
     # Run all steps
     check_prerequisites
-    load_environment
+    setup_environment
     collect_user_data
     check_existing_user
     create_superadmin
