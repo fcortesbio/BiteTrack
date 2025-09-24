@@ -241,11 +241,15 @@ NODE_ENV=production
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
-# 2. Update production secrets (IMPORTANT!)
-# Edit .env.docker with secure passwords
+# 2. Configure environment for production
+cp .env.production.template .env.production
+# Edit .env.production with your actual values:
+# - Update MONGO_URI with production database
+# - Change JWT_SECRET to a secure random string
+# - Set FRONTEND_URLS to your frontend domain(s)
 
 # 3. Deploy complete stack
-docker compose --env-file .env.docker up -d
+docker compose --env-file .env.production up -d
 
 # 4. Verify deployment
 docker compose ps
@@ -254,6 +258,60 @@ curl http://localhost:3000/bitetrack/health
 # 5. Monitor logs
 docker compose logs -f
 ```
+
+### Reverse Proxy Configuration
+
+**BiteTrack is reverse-proxy ready!** It includes proper proxy trust configuration for Nginx, Traefik, and other reverse proxies.
+
+#### **Nginx Configuration Example:**
+```nginx
+server {
+    listen 80;
+    server_name your-api-domain.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+#### **Traefik Configuration Example:**
+```yaml
+# docker-compose.yml
+services:
+  bitetrack-api:
+    # ... your existing config
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bitetrack.rule=Host(`your-api-domain.com`)"
+      - "traefik.http.services.bitetrack.loadbalancer.server.port=3000"
+```
+
+### CORS and Frontend Integration
+
+**For Remote Frontend Deployment:**
+
+1. **Update your production environment:**
+```bash
+# In .env.production
+FRONTEND_URLS=https://your-frontend-domain.com,https://admin.your-domain.com
+```
+
+2. **Multiple frontend domains supported:**
+```bash
+# Examples of valid configurations:
+FRONTEND_URLS=https://myapp.com
+FRONTEND_URLS=https://app.restaurant.com,https://admin.restaurant.com
+FRONTEND_URLS=https://pos.foodbiz.com,https://dashboard.foodbiz.com,https://reports.foodbiz.com
+```
+
+3. **Development vs Production:**
+- **Development**: Automatically allows localhost with common ports (3000, 3001, 5173)
+- **Production**: Only allows domains specified in `FRONTEND_URLS`
 
 ### Health Monitoring
 ```bash

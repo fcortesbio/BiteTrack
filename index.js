@@ -20,9 +20,23 @@ const errorHandler = require("./middleware/errorHandler");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy for reverse proxy deployments (Nginx, Traefik, etc.)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet());
-app.use(cors());
+
+// CORS configuration - environment-specific origins
+const corsOptions = {
+  origin: process.env.FRONTEND_URLS ? 
+    process.env.FRONTEND_URLS.split(',').map(url => url.trim()) : 
+    ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+app.use(cors(corsOptions));
 
 // Rate limiting
 const limiter = rateLimit({
