@@ -4,6 +4,26 @@ This directory contains utility and testing scripts for BiteTrack.
 
 ## Available Scripts
 
+### `create-superadmin.sh`
+**Purpose:** Streamlined superadmin user creation directly in MongoDB  
+**Usage:** `./scripts/create-superadmin.sh [--non-interactive] [--help]`  
+**Duration:** ~10-20 seconds  
+**What it does:** Creates and validates superadmin user in one step
+
+**Features:**
+- Interactive prompts with input validation
+- Non-interactive mode for CI/automation
+- Duplicate email detection
+- Secure password hashing (bcrypt compatible)
+- Direct MongoDB insertion and verification
+- No manual copy/paste required
+
+**Use cases:**
+- Initial system setup
+- Automated deployments
+- CI/CD pipeline user creation
+- Replace the legacy create-superadmin.js workflow
+
 ### `quick-persistence-test.sh`
 **Purpose:** Quick data persistence verification for CI/automation  
 **Usage:** `./scripts/quick-persistence-test.sh`  
@@ -82,6 +102,16 @@ MONGO_ROOT_USERNAME=myuser MONGO_ROOT_PASSWORD=mypass ./scripts/quick-persistenc
 export MONGO_ROOT_USERNAME=myuser
 export MONGO_ROOT_PASSWORD=mypass
 ./test-data-persistence.sh
+```
+
+### Non-Interactive Mode Variables:
+For `create-superadmin.sh --non-interactive`, set these environment variables:
+```bash
+ADMIN_FIRST_NAME="John"              # First name (required)
+ADMIN_LAST_NAME="Doe"               # Last name (required)
+ADMIN_EMAIL="admin@company.com"     # Email address (required, must be unique)
+ADMIN_DOB="1990-01-01"             # Date of birth in YYYY-MM-DD format (required)
+ADMIN_PASSWORD="SecurePass123!"     # Password meeting complexity requirements (required)
 ```
 
 ## Script Dependencies
