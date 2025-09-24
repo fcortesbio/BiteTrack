@@ -36,6 +36,51 @@ This directory contains utility and testing scripts for BiteTrack.
 - Automated deployment verification
 - Pre-production validation
 
+### `populate-test-data.js`
+**Purpose:** Populate database with comprehensive test data from /test-data JSON files  
+**Usage:** `node scripts/populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`  
+**Duration:** ~10-30 seconds depending on preset  
+**What it does:** Creates realistic customers, products, sales, and pending sellers with proper ID relationships
+
+**Presets:**
+- `minimal` - Essential data (5 customers, 7 products, 3 sales)
+- `dev` - Development dataset (10 customers, 14 products, 7 sales) 
+- `full` - Complete realistic dataset (~20 customers, ~35 products)
+- `bulk` - Large dataset for performance testing
+
+**Features:**
+- Resolves placeholder IDs in sales templates to real MongoDB ObjectIds
+- Validates all data against current schemas
+- Generates summary report with statistics and sample IDs
+- Preserves existing seller accounts during cleanup
+
+**Use cases:**
+- Development environment setup
+- API testing with realistic data
+- Performance testing with bulk datasets
+- Consistent test data across team members
+
+### `test-sales-filtering.js`
+**Purpose:** Test suite for advanced sales filtering features (pagination, sorting, date ranges)  
+**Usage:** `node scripts/test-sales-filtering.js [--auth-token=<token>] [--verbose]`  
+**Duration:** ~15-30 seconds  
+**What it tests:** All new sales filtering parameters and response structures
+
+**Tests performed:**
+- Pagination functionality and metadata accuracy
+- Sorting by various fields (ascending/descending)
+- Date range filtering with startDate/endDate
+- Settlement status filtering (settled/unsettled)
+- Populated references (customer, seller, product data)
+- Combined filtering scenarios
+- Error handling for invalid parameters
+
+**Use cases:**
+- Validate advanced filtering features after changes
+- Regression testing for sales API
+- Performance validation for complex queries
+- Continuous integration testing
+
 ---
 
 ## Root Level Scripts

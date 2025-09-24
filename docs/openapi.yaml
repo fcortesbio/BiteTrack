@@ -885,6 +885,251 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  # Test Data Management Endpoints (Development/Testing Only)
+  /test-data/status:
+    get:
+      summary: Get test data statistics and counts
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Get comprehensive statistics about current test data in the database.
+        Only available in non-production environments.
+      responses:
+        "200":
+          description: Test data statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  environment: { type: string }
+                  timestamp: { type: string, format: date-time }
+                  counts:
+                    type: object
+                    properties:
+                      customers: { type: integer }
+                      products: { type: integer }
+                      sales: { type: integer }
+                      pendingSellers: { type: integer }
+                  salesStatistics:
+                    type: object
+                    properties:
+                      totalSalesValue: { type: number }
+                      averageOrderValue: { type: number }
+                      settledSales: { type: integer }
+                      unsettledSales: { type: integer }
+                  recentSales:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        customer: { type: string }
+                        seller: { type: string }
+                        totalAmount: { type: number }
+                        settled: { type: boolean }
+                        createdAt: { type: string, format: date-time }
+        "403":
+          description: Forbidden (disabled in production or insufficient permissions)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /test-data/populate:
+    post:
+      summary: Populate database with test data
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Populate the database with realistic test data from JSON templates.
+        Supports different presets and optional cleanup before population.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preset:
+                  type: string
+                  enum: [minimal, dev, full, bulk]
+                  default: minimal
+                  description: Size of the test dataset
+                cleanBefore:
+                  type: boolean
+                  default: false
+                  description: Clean existing data before populating
+                verbose:
+                  type: boolean
+                  default: false
+                  description: Enable detailed logging
+      responses:
+        "201":
+          description: Test data populated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      preset: { type: string }
+                      timestamp: { type: string, format: date-time }
+                      requestedBy: { type: string }
+                      requestedByUser: { type: string }
+                      counts:
+                        type: object
+                        properties:
+                          customers: { type: integer }
+                          products: { type: integer }
+                          sales: { type: integer }
+                          pendingSellers: { type: integer }
+                      sampleIds:
+                        type: object
+                        properties:
+                          firstCustomer: { type: string }
+                          firstProduct: { type: string }
+                          firstSale: { type: string }
+                      statistics:
+                        type: object
+                        properties:
+                          totalSalesValue: { type: number }
+                          averageOrderValue: { type: number }
+                          settledSales: { type: integer }
+                          unsettledSales: { type: integer }
+        "400":
+          description: Invalid preset or validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "403":
+          description: Forbidden (disabled in production or insufficient permissions)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /test-data/clean:
+    delete:
+      summary: Clean/remove test data from database
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Selectively remove test data from the database with preservation options.
+        Requires explicit confirmation for safety.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirmClean]
+              properties:
+                confirmClean:
+                  type: boolean
+                  description: Must be true to proceed (safety measure)
+                preserveData:
+                  type: array
+                  items:
+                    type: string
+                    enum: [customers, products, sales, pendingSellers]
+                  description: Array of data types to preserve
+      responses:
+        "200":
+          description: Test data cleaned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      timestamp: { type: string, format: date-time }
+                      requestedBy: { type: string }
+                      requestedByUser: { type: string }
+                      deletedCounts:
+                        type: object
+                        properties:
+                          sales: { type: integer }
+                          customers: { type: integer }
+                          products: { type: integer }
+                          pendingSellers: { type: integer }
+                      preserved:
+                        type: array
+                        items: { type: string }
+        "400":
+          description: Missing confirmation or validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          description: Forbidden (disabled in production or insufficient permissions)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /test-data/reset:
+    post:
+      summary: Reset database to specific test scenario (SuperAdmin only)
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Reset the entire database to a specific test scenario.
+        This is the most destructive operation and requires SuperAdmin privileges.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirmReset]
+              properties:
+                scenario:
+                  type: string
+                  enum: [clean, minimal, dev, full]
+                  default: clean
+                  description: Target scenario for reset
+                confirmReset:
+                  type: boolean
+                  description: Must be true to proceed (safety measure)
+      responses:
+        "200":
+          description: Database reset completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      scenario: { type: string }
+                      message: { type: string }
+                      timestamp: { type: string, format: date-time }
+                      requestedBy: { type: string }
+                      requestedByUser: { type: string }
+                      counts:
+                        type: object
+                        properties:
+                          customers: { type: integer }
+                          products: { type: integer }
+                          sales: { type: integer }
+                          pendingSellers: { type: integer }
+        "400":
+          description: Missing confirmation or validation error
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          description: Forbidden (disabled in production, insufficient permissions, or not SuperAdmin)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
   /sales/{id}/settle:
     patch:
       summary: Settle a sale (update payment)
