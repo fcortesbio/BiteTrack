@@ -81,13 +81,9 @@ This directory contains utility and testing scripts for BiteTrack.
 - Performance validation for complex queries
 - Continuous integration testing
 
----
-
-## Root Level Scripts
-
-### `test-data-persistence.sh` (in project root)
+### `test-data-persistence.sh`
 **Purpose:** Comprehensive data persistence testing across all failure scenarios  
-**Usage:** `./test-data-persistence.sh [--verbose] [--clean]`  
+**Usage:** `./scripts/test-data-persistence.sh [--verbose] [--clean]`  
 **Duration:** ~2-3 minutes  
 **What it tests:** 
 - MongoDB container restarts

@@ -394,7 +394,6 @@ BiteTrack/
 ├── 🔑 create-superadmin.js # First-time setup script (IMPORTANT!)
 ├── 🐳 Dockerfile         # Container definition
 ├── 📦 docker-compose.yml # Complete stack orchestration
-├── 🧪 test-data-persistence.sh # Comprehensive data persistence tests
 ├── ⚙️ .env.development    # Development environment configuration
 ├── 📋 .env.production.template # Production deployment template
 └── 🔐 keyfile            # MongoDB replica set authentication
@@ -419,16 +418,16 @@ curl http://localhost:3000/bitetrack/health
 ### Data Persistence Testing
 ```bash
 # Run comprehensive data persistence tests
-./test-data-persistence.sh
+./scripts/test-data-persistence.sh
 
 # Run with verbose output
-./test-data-persistence.sh --verbose
+./scripts/test-data-persistence.sh --verbose
 
 # Quick persistence check (for CI/automation)
 ./scripts/quick-persistence-test.sh
 
 # Clean up test data only
-./test-data-persistence.sh --clean
+./scripts/test-data-persistence.sh --clean
 ```
 
 **What the persistence tests verify:**
