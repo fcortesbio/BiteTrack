@@ -1,0 +1,84 @@
+services:
+  # MongoDB Service (with replica set)
+  mongodb:
+    image: mongo:8.0-noble
+    container_name: bitetrack-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-supersecret}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./keyfile:/etc/mongodb-keyfile:ro
+    networks:
+      - bitetrack-network
+    entrypoint: >
+      bash -c "
+        cp /etc/mongodb-keyfile /tmp/keyfile &&
+        chmod 400 /tmp/keyfile &&
+        chown mongodb:mongodb /tmp/keyfile &&
+        exec docker-entrypoint.sh mongod --replSet rs0 --bind_ip_all --keyFile /tmp/keyfile
+      "
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # MongoDB Replica Set Initialization
+  mongodb-init:
+    image: mongo:8.0-noble
+    container_name: bitetrack-mongodb-init
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - bitetrack-network
+    entrypoint: >
+      bash -c "sleep 5 &&
+      mongosh --host mongodb:27017
+      -u ${MONGO_ROOT_USERNAME:-admin} -p ${MONGO_ROOT_PASSWORD:-supersecret}
+      --authenticationDatabase admin
+      --eval '
+        rs.initiate({
+          _id: \"rs0\",
+          members: [{ _id: 0, host: \"mongodb:27017\" }]
+        })
+      ' || true"
+    restart: "no"
+
+  # BiteTrack API Service
+  bitetrack-api:
+    build: .
+    container_name: bitetrack-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-supersecret}@mongodb:27017/bitetrack?authSource=admin&directConnection=true
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwt}
+      PORT: 3000
+      NODE_ENV: ${NODE_ENV:-production}
+    networks:
+      - bitetrack-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mongodb-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/bitetrack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  bitetrack-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:

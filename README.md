@@ -21,28 +21,53 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 - ✅ **Docker-ready deployment** - Get running in minutes
 - ✅ **JWT-secured API** - Enterprise-level security
 
-## 🚀 **Quick Start**
+## 🚀 **Quick Start (Docker Compose)**
 
 ```bash
-# 1. Ensure MongoDB is running (port 27017)
-mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
-
-# 2. Clone and setup
+# 1. Clone and setup
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
-# 3. Configure environment
-cat > .env << EOF
-MONGO_URI=mongodb://admin:supersecret@mongo:27017/bitetrack
-JWT_SECRET=supersecretjwt
-PORT=3000
-EOF
+# 2. Start complete stack (MongoDB + BiteTrack API)
+docker compose --env-file .env.docker up -d
 
-# 4. Build and run
-DOCKER_BUILDKIT=1 docker build . -t bitetrack:latest
-docker run -d -p 3000:3000 --env-file .env --name BiteTrack bitetrack:latest
+# 3. Verify everything is running
+docker compose ps
+curl http://localhost:3000/bitetrack/health
 
 # 🎉 API ready at http://localhost:3000
+# 🍃 MongoDB available at localhost:27017
+```
+
+## 🛠️ **Development Workflow**
+
+### **Container Deployment (Recommended)**
+```bash
+# Start full stack
+docker compose --env-file .env.docker up -d
+
+# View logs
+docker compose logs -f bitetrack-api
+docker compose logs -f mongodb
+
+# Stop everything
+docker compose down
+
+# Stop and remove all data (fresh start)
+docker compose down -v
+```
+
+### **Local Development**
+```bash
+# Start only MongoDB in container
+docker compose --env-file .env.docker up mongodb -d
+
+# Run BiteTrack locally for development
+npm install
+npm run dev  # Uses nodemon, connects to containerized MongoDB
+
+# The containerized MongoDB is accessible at localhost:27017
+# Perfect for development - get MongoDB benefits without local install!
 ```
 
 ## 🔑 **First-Time Setup** (CRITICAL)
@@ -184,38 +209,70 @@ curl -X GET http://localhost:3000/bitetrack/sellers \
 ## 🔧 **Production Setup**
 
 ### Prerequisites
-- **Docker** with BuildKit support
-- **MongoDB 6.0+** running on port 27017 ([mongo-docker example](https://github.com/fcortesbio/mongo-docker/blob/main/docker-compose.yml))
+- **Docker** with Docker Compose support
+- **Git** for cloning the repository
 
 ### Environment Configuration
 
+The included `.env.docker` file has production-ready defaults:
 ```bash
-# Create production-ready .env file
-cat > .env << EOF
-MONGO_URI=mongodb://admin:your-secure-password@mongo:27017/bitetrack
-JWT_SECRET=your-super-secure-jwt-secret-here
-PORT=3000
+MONGO_ROOT_USERNAME=admin
+MONGO_ROOT_PASSWORD=supersecret  # Change this in production!
+JWT_SECRET=supersecretjwt        # Change this in production!
 NODE_ENV=production
-EOF
 ```
 
-### Health Check
-```bash
-# Verify MongoDB connection
-mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
-# Expected: { ok: 1 }
-```
+**⚠️ For production**: Update passwords and secrets in `.env.docker`!
 
-### Deployment
-```bash
-# Production build and run
-DOCKER_BUILDKIT=1 docker build . -t bitetrack:production
-docker run -d -p 3000:3000 --env-file .env \
-  --name bitetrack-api --restart unless-stopped \
-  bitetrack:production
+### Complete Stack Deployment
 
-# Verify health
+```bash
+# 1. Clone and setup
+git clone https://github.com/fcortesbio/BiteTrack
+cd BiteTrack
+
+# 2. Update production secrets (IMPORTANT!)
+# Edit .env.docker with secure passwords
+
+# 3. Deploy complete stack
+docker compose --env-file .env.docker up -d
+
+# 4. Verify deployment
+docker compose ps
 curl http://localhost:3000/bitetrack/health
+
+# 5. Monitor logs
+docker compose logs -f
+```
+
+### Health Monitoring
+```bash
+# Check service status
+docker compose ps
+
+# API health check
+curl http://localhost:3000/bitetrack/health
+
+# MongoDB connection test
+curl localhost:27017  # Should return MongoDB HTTP message
+
+# View real-time logs
+docker compose logs -f bitetrack-api
+docker compose logs -f mongodb
+```
+
+### Scaling & Updates
+```bash
+# Update to latest code
+git pull
+docker compose build
+docker compose up -d
+
+# Scale API instances (behind a load balancer)
+docker compose up -d --scale bitetrack-api=3
+
+# Backup database
+docker compose exec mongodb mongodump --out /data/backup
 ```
 
 ## 🧪 **Development & Integration**
@@ -229,7 +286,10 @@ BiteTrack/
 ├── 🔒 middleware/        # Auth, validation, error handling
 ├── 📚 docs/              # API documentation & Postman collection
 ├── 🔑 create-superadmin.js # First-time setup script (IMPORTANT!)
-└── 🐳 Dockerfile         # Container definition
+├── 🐳 Dockerfile         # Container definition
+├── 📦 docker-compose.yml # Complete stack orchestration
+├── ⚙️ .env.docker        # Docker environment configuration
+└── 🔐 keyfile            # MongoDB replica set authentication
 ```
 
 ### Development Mode
