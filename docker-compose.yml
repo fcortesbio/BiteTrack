@@ -1,3 +1,5 @@
+# Load environment variables from .env.development for local Docker development
+# For production, create a .env.production file based on .env.production.template
 services:
   # MongoDB Service (with replica set)
   mongodb:

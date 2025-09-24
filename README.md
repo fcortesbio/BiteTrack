@@ -28,10 +28,14 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
-# 2. Start complete stack (MongoDB + BiteTrack API)
-docker compose --env-file .env.docker up -d
+# 2. Copy development environment template
+cp .env.example .env.development
+# Edit .env.development with your settings if needed
 
-# 3. Verify everything is running
+# 3. Start complete stack (MongoDB + BiteTrack API)
+docker compose up -d
+
+# 4. Verify everything is running
 docker compose ps
 curl http://localhost:3000/bitetrack/health
 
@@ -39,12 +43,42 @@ curl http://localhost:3000/bitetrack/health
 # 🍃 MongoDB available at localhost:27017
 ```
 
+## ⚙️ **Environment Configuration**
+
+BiteTrack uses different environment files for different deployment scenarios:
+
+| File | Purpose | Tracked in Git |
+|------|---------|----------------|
+| `.env.example` | 📝 Template for developers | ✅ Yes (safe defaults) |
+| `.env.development` | 👨‍💻 Local development config | ❌ No (contains secrets) |
+| `.env.production.template` | 🏗️ Production deployment guide | ✅ Yes (template only) |
+
+### **Setup Your Environment**
+```bash
+# For development (recommended)
+cp .env.example .env.development
+# Edit .env.development with your actual values
+
+# For production deployment
+cp .env.production.template .env.production
+# Update .env.production with secure production values
+```
+
+### **NPM Scripts**
+```bash
+npm run dev          # Development mode with .env.development
+npm run dev:watch    # Development with file watching (nodemon)
+npm run start        # Production mode (uses .env or environment variables)
+```
+
+> 🔒 **Security Note:** Environment files with actual credentials (`.env.development`, `.env.production`) are automatically excluded from Git. Only templates and examples are tracked.
+
 ## 🛠️ **Development Workflow**
 
 ### **Container Deployment (Recommended)**
 ```bash
 # Start full stack
-docker compose --env-file .env.docker up -d
+docker compose up -d
 
 # View logs
 docker compose logs -f bitetrack-api
@@ -60,11 +94,12 @@ docker compose down -v
 ### **Local Development**
 ```bash
 # Start only MongoDB in container
-docker compose --env-file .env.docker up mongodb -d
+docker compose up mongodb -d
 
 # Run BiteTrack locally for development
 npm install
-npm run dev  # Uses nodemon, connects to containerized MongoDB
+npm run dev          # Uses .env.development
+npm run dev:watch    # Same as above but with nodemon
 
 # The containerized MongoDB is accessible at localhost:27017
 # Perfect for development - get MongoDB benefits without local install!

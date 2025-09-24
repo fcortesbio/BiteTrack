@@ -1,2 +1,6 @@
 node_modules/
-.env
+
+# Environment files (ignore all except templates and examples)
+.env*
+!.env.example
+!.env.*.template

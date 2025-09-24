@@ -26,7 +26,9 @@
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "node -r dotenv/config index.js dotenv_config_path=.env.development",
+    "dev:watch": "nodemon -r dotenv/config index.js dotenv_config_path=.env.development",
+    "start:production": "NODE_ENV=production node index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
