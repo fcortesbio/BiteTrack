@@ -141,6 +141,8 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 - **Multi-product sales** - Handle complex orders seamlessly
 - **Payment tracking** - Monitor settled vs. pending payments
 - **Sales history** - Complete transaction audit trail
+- **Advanced sales filtering** - Date ranges, pagination, sorting, and search
+- **Customer transaction history** - Detailed purchase tracking per customer
 
 ### 👥 **Multi-User Business Operations**
 - **Staff management** - Multiple sellers with different permission levels
@@ -166,7 +168,7 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 | **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
 | **🏪 Customers** | `/customers/*` | Customer database and contact info |
 | **📦 Products** | `/products/*` | Inventory, pricing, and catalog |
-| **💳 Sales** | `/sales/*` | Process orders, track payments |
+|| **💳 Sales** | `/sales/*` | Process orders, advanced filtering, payment tracking |
 
 > 📚 **Full API documentation:** [`docs/API.md`](docs/API.md) | **Postman Collection:** [`docs/BiteTrack.postman_collection.json`](docs/BiteTrack.postman_collection.json)
 
