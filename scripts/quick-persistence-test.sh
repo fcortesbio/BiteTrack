@@ -5,34 +5,14 @@
 
 set -e
 
+# Load shared environment functions
+source "$(dirname "$0")/lib/env-loader.sh"
+
 # Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m'
-
-# Load environment variables
-load_environment() {
-    # Load from .env.development file if environment variables are not already set
-    if [ -z "$MONGO_ROOT_USERNAME" ] || [ -z "$MONGO_ROOT_PASSWORD" ]; then
-        if [ -f ".env.development" ]; then
-            # Export variables from .env.development (avoiding comments and empty lines)
-            set -a  # automatically export all variables
-            source <(grep -v '^#' ".env.development" | grep -v '^$')
-            set +a  # stop automatically exporting
-        fi
-    fi
-    
-    # Set MongoDB credentials from environment or use defaults
-    MONGO_USER="${MONGO_ROOT_USERNAME:-admin}"
-    MONGO_PASS="${MONGO_ROOT_PASSWORD:-supersecret}"
-    
-    if [ -z "$MONGO_USER" ] || [ -z "$MONGO_PASS" ]; then
-        log_error "MongoDB credentials not found in environment variables"
-        log_error "Please set MONGO_ROOT_USERNAME and MONGO_ROOT_PASSWORD"
-        exit 1
-    fi
-}
 
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -50,10 +30,14 @@ log_error() {
 quick_persistence_test() {
     local test_id="quick-test-$(date +%s)"
     
-    # Load environment variables
-    load_environment
+    # Setup BiteTrack environment (auto-detects production vs development)
+    if ! setup_bitetrack_environment false; then
+        log_error "Failed to setup environment"
+        exit 1
+    fi
     
-    log_info "Running quick persistence test..."
+    local env_type=$(detect_environment_type)
+    log_info "Running quick persistence test [$env_type environment]..."
     
     # Insert test data
     docker compose exec -T mongodb mongosh -u "$MONGO_USER" -p "$MONGO_PASS" --authenticationDatabase admin bitetrack --eval "
