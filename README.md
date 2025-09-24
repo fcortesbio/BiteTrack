@@ -259,15 +259,14 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 
 ### Environment Configuration
 
-The included `.env.docker` file has production-ready defaults:
+For production deployment, use the production template:
 ```bash
-MONGO_ROOT_USERNAME=admin
-MONGO_ROOT_PASSWORD=supersecret  # Change this in production!
-JWT_SECRET=supersecretjwt        # Change this in production!
-NODE_ENV=production
+# Copy and configure production environment
+cp .env.production.template .env.production
+# Edit .env.production with your secure values
 ```
 
-**⚠️ For production**: Update passwords and secrets in `.env.docker`!
+**⚠️ For production**: Always use secure passwords and secrets in `.env.production`!
 
 ### Complete Stack Deployment
 
@@ -393,7 +392,8 @@ BiteTrack/
 ├── 🐳 Dockerfile         # Container definition
 ├── 📦 docker-compose.yml # Complete stack orchestration
 ├── 🧪 test-data-persistence.sh # Comprehensive data persistence tests
-├── ⚙️ .env.docker        # Docker environment configuration
+├── ⚙️ .env.development    # Development environment configuration
+├── 📋 .env.production.template # Production deployment template
 └── 🔐 keyfile            # MongoDB replica set authentication
 ```
 
@@ -436,7 +436,7 @@ curl http://localhost:3000/bitetrack/health
 
 **Security Features:**
 - 🔒 **No hardcoded credentials** - Tests read MongoDB credentials from environment variables
-- 📁 **Automatic environment loading** - Loads from `.env.docker` file  
+- 📁 **Automatic environment loading** - Loads from `.env.development` file  
 - 🛡️ **Credential override** - Can override with `MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD`
 - 🧹 **Automatic cleanup** - Test data is always cleaned up after tests
 

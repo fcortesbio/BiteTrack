@@ -13,12 +13,12 @@ NC='\033[0m'
 
 # Load environment variables
 load_environment() {
-    # Load from .env.docker file if environment variables are not already set
+    # Load from .env.development file if environment variables are not already set
     if [ -z "$MONGO_ROOT_USERNAME" ] || [ -z "$MONGO_ROOT_PASSWORD" ]; then
-        if [ -f ".env.docker" ]; then
-            # Export variables from .env.docker (avoiding comments and empty lines)
+        if [ -f ".env.development" ]; then
+            # Export variables from .env.development (avoiding comments and empty lines)
             set -a  # automatically export all variables
-            source <(grep -v '^#' ".env.docker" | grep -v '^$')
+            source <(grep -v '^#' ".env.development" | grep -v '^$')
             set +a  # stop automatically exporting
         fi
     fi

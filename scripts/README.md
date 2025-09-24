@@ -128,7 +128,7 @@ When adding new scripts to this directory:
    - `MONGO_ROOT_USERNAME`
    - `MONGO_ROOT_PASSWORD`
 
-2. **From .env.docker file** (automatically loaded):
+2. **From .env.development file** (automatically loaded):
    ```bash
    MONGO_ROOT_USERNAME=admin
    MONGO_ROOT_PASSWORD=supersecret
@@ -164,5 +164,5 @@ ADMIN_PASSWORD="SecurePass123!"     # Password meeting complexity requirements (
 All scripts assume:
 - Docker and Docker Compose are installed
 - BiteTrack stack is available (docker-compose.yml exists)
-- Environment file (.env.docker) is configured with MongoDB credentials
+- Environment file (.env.development) is configured with MongoDB credentials
 - Network connectivity to MongoDB container

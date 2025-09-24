@@ -15,7 +15,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-COMPOSE_ENV_FILE=".env.docker"
+COMPOSE_ENV_FILE=".env.development"
 TEST_DB="bitetrack"
 NON_INTERACTIVE=false
 
@@ -76,7 +76,7 @@ log_step() {
 
 # Load environment variables (reuse from persistence test script)
 load_environment() {
-    # Load from .env.docker file if environment variables are not already set
+    # Load from .env.development file if environment variables are not already set
     if [ -z "$MONGO_ROOT_USERNAME" ] || [ -z "$MONGO_ROOT_PASSWORD" ]; then
         if [ -f "$COMPOSE_ENV_FILE" ]; then
             log_info "Loading MongoDB credentials from $COMPOSE_ENV_FILE"
@@ -115,7 +115,7 @@ check_prerequisites() {
     # Check if MongoDB is running
     if ! docker compose ps mongodb | grep -q "Up.*healthy"; then
         log_error "MongoDB container is not running or not healthy"
-        log_info "Please start the stack with: docker compose --env-file .env.docker up -d"
+        log_info "Please start the stack with: docker compose up -d"
         exit 1
     fi
     

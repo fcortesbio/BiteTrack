@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 TEST_ID="persistence-test-$(date +%s)"
 TEST_DB="bitetrack"
-COMPOSE_ENV_FILE=".env.docker"
+COMPOSE_ENV_FILE=".env.development"
 VERBOSE=false
 CLEAN_ONLY=false
 
@@ -82,7 +82,7 @@ verbose_log() {
 load_environment() {
     log_info "Loading environment variables..."
     
-    # Load from .env.docker file if environment variables are not already set
+    # Load from .env.development file if environment variables are not already set
     if [ -z "$MONGO_ROOT_USERNAME" ] || [ -z "$MONGO_ROOT_PASSWORD" ]; then
         if [ -f "$COMPOSE_ENV_FILE" ]; then
             verbose_log "Loading environment from $COMPOSE_ENV_FILE"
@@ -95,7 +95,7 @@ load_environment() {
         verbose_log "Using MongoDB credentials from shell environment"
     fi
     
-    # Set MongoDB credentials with proper precedence: shell env > .env.docker > defaults
+    # Set MongoDB credentials with proper precedence: shell env > .env.development > defaults
     MONGO_USER="${MONGO_ROOT_USERNAME:-admin}"
     MONGO_PASS="${MONGO_ROOT_PASSWORD:-supersecret}"
     
