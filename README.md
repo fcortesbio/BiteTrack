@@ -28,14 +28,17 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
-# 2. Copy development environment template
+# 2. Setup MongoDB keyfile (for replica set authentication)
+./scripts/setup-keyfile.sh
+
+# 3. Copy development environment template
 cp .env.example .env.development
 # Edit .env.development with your settings if needed
 
-# 3. Start complete stack (MongoDB + BiteTrack API)
+# 4. Start complete stack (MongoDB + BiteTrack API)
 docker compose up -d
 
-# 4. Verify everything is running
+# 5. Verify everything is running
 docker compose ps
 curl http://localhost:3000/bitetrack/health
 

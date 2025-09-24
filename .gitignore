@@ -4,3 +4,7 @@ node_modules/
 .env*
 !.env.example
 !.env.*.template
+
+# MongoDB keyfile (ignore actual keyfile, keep template)
+keyfile
+!keyfile.example
