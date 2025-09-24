@@ -285,9 +285,11 @@ BiteTrack/
 ├── 🛜️ routes/            # API endpoints
 ├── 🔒 middleware/        # Auth, validation, error handling
 ├── 📚 docs/              # API documentation & Postman collection
+├── 🧪 scripts/           # Testing and utility scripts
 ├── 🔑 create-superadmin.js # First-time setup script (IMPORTANT!)
 ├── 🐳 Dockerfile         # Container definition
 ├── 📦 docker-compose.yml # Complete stack orchestration
+├── 🧪 test-data-persistence.sh # Comprehensive data persistence tests
 ├── ⚙️ .env.docker        # Docker environment configuration
 └── 🔐 keyfile            # MongoDB replica set authentication
 ```
@@ -307,6 +309,33 @@ curl http://localhost:3000/bitetrack/health
 # Import Postman collection for comprehensive testing
 # File: docs/BiteTrack.postman_collection.json
 ```
+
+### Data Persistence Testing
+```bash
+# Run comprehensive data persistence tests
+./test-data-persistence.sh
+
+# Run with verbose output
+./test-data-persistence.sh --verbose
+
+# Quick persistence check (for CI/automation)
+./scripts/quick-persistence-test.sh
+
+# Clean up test data only
+./test-data-persistence.sh --clean
+```
+
+**What the persistence tests verify:**
+- MongoDB container restart → Data survives ✅
+- API container restart → Data survives ✅  
+- Full stack restart → Data survives ✅
+- Volume integrity → MongoDB volume preserved ✅
+
+**Security Features:**
+- 🔒 **No hardcoded credentials** - Tests read MongoDB credentials from environment variables
+- 📁 **Automatic environment loading** - Loads from `.env.docker` file  
+- 🛡️ **Credential override** - Can override with `MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD`
+- 🧹 **Automatic cleanup** - Test data is always cleaned up after tests
 
 ## 🚀 **Roadmap**
 
