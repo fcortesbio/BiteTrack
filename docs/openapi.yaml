@@ -96,14 +96,22 @@ components:
       type: object
       properties:
         id: { type: string }
-        customerId: { type: string }
+        customerId:
+          type: object
+          properties:
+            _id: { type: string }
+            firstName: { type: string }
+            lastName: { type: string }
+            email: { type: string, format: email }
+          required: [_id, firstName, lastName, email]
         sellerId:
           type: object
           properties:
-            id: { type: string }
+            _id: { type: string }
             firstName: { type: string }
             lastName: { type: string }
-          required: [id, firstName, lastName]
+            email: { type: string, format: email }
+          required: [_id, firstName, lastName, email]
         products:
           type: array
           items:
@@ -112,9 +120,10 @@ components:
               productId:
                 type: object
                 properties:
-                  id: { type: string }
-                  productName: { type: string }
-                required: [id, productName]
+                  _id: { type: string }
+                  name: { type: string }
+                  price: { type: number, minimum: 0 }
+                required: [_id, name, price]
               quantity: { type: integer, minimum: 1 }
               priceAtSale: { type: number, minimum: 0 }
             required: [productId, quantity, priceAtSale]
@@ -146,6 +155,38 @@ components:
           items: { $ref: "#/components/schemas/SaleWithPopulatedFields" }
         pagination: { $ref: "#/components/schemas/PaginationMetadata" }
       required: [customer, transactions, pagination]
+
+    SalesPaginationMetadata:
+      type: object
+      properties:
+        currentPage: { type: integer, minimum: 1 }
+        totalPages: { type: integer, minimum: 0 }
+        totalSales: { type: integer, minimum: 0 }
+        limit: { type: integer, minimum: 1, maximum: 100 }
+        hasNextPage: { type: boolean }
+        hasPrevPage: { type: boolean }
+      required: [currentPage, totalPages, totalSales, limit, hasNextPage, hasPrevPage]
+
+    SalesFilters:
+      type: object
+      properties:
+        customerId: { type: string }
+        sellerId: { type: string }
+        settled: { type: boolean }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time }
+        dateField: { type: string, enum: [createdAt, updatedAt] }
+        sort: { type: string }
+
+    SalesListResponse:
+      type: object
+      properties:
+        sales:
+          type: array
+          items: { $ref: "#/components/schemas/SaleWithPopulatedFields" }
+        pagination: { $ref: "#/components/schemas/SalesPaginationMetadata" }
+        filters: { $ref: "#/components/schemas/SalesFilters" }
+      required: [sales, pagination, filters]
 
     PasswordResetToken:
       type: object
@@ -730,27 +771,64 @@ paths:
   # Sales Endpoints
   /sales:
     get:
-      summary: List sales (with optional filters)
+      summary: List sales with filtering, date range, pagination, and sorting
       tags: [Sales]
       security: [{ bearerAuth: [] }]
+      description: |
+        Retrieve sales with comprehensive filtering options including date ranges,
+        pagination, and sorting capabilities. Returns populated customer, seller,
+        and product information along with pagination metadata.
       parameters:
         - name: customerId
           in: query
           schema: { type: string }
+          description: Filter by customer ID
         - name: sellerId
           in: query
           schema: { type: string }
+          description: Filter by seller ID
         - name: settled
           in: query
           schema: { type: boolean }
+          description: Filter by settlement status (true for paid, false for unpaid)
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Start date for filtering (ISO 8601 format)
+          example: "2024-01-01T00:00:00.000Z"
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: End date for filtering (ISO 8601 format)
+          example: "2024-01-31T23:59:59.999Z"
+        - name: dateField
+          in: query
+          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          description: Date field to filter by
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+          description: Number of records per page
+        - name: sort
+          in: query
+          schema: { type: string }
+          description: Sort field and direction (prefix with '-' for descending)
+          example: "-createdAt"
       responses:
         "200":
-          description: List of sales
+          description: Sales list with pagination and populated references
           content:
             application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/Sale" }
+              schema: { $ref: "#/components/schemas/SalesListResponse" }
+        "400":
+          description: Invalid parameters or date format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
     post:
       summary: Create a sale (transactional)
       tags: [Sales]

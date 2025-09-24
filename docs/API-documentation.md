@@ -676,7 +676,7 @@ Authorization: Bearer <jwt_token>
 ### 📊 List Sales
 **Endpoint:** `GET /sales`
 
-**Description:** Retrieve sales with optional filtering.
+**Description:** Retrieve sales with optional filtering, date range filtering, sorting, and pagination.
 
 **Request Headers:**
 ```
@@ -687,35 +687,79 @@ Authorization: Bearer <jwt_token>
 - `customerId` (optional): Filter by customer
 - `sellerId` (optional): Filter by seller
 - `settled` (optional): Filter by payment status (true/false)
+- `startDate` (optional): Start date for filtering (ISO 8601 format)
+- `endDate` (optional): End date for filtering (ISO 8601 format)
+- `dateField` (optional): Date field to filter by ('createdAt' or 'updatedAt', default: 'createdAt')
+- `page` (optional): Page number for pagination (default: 1)
+- `limit` (optional): Number of records per page (default: 50, max: 100)
+- `sort` (optional): Sort field and direction (e.g., 'createdAt', '-createdAt', 'totalAmount', '-totalAmount')
 
-**Example:** `GET /sales?settled=false&customerId=507f1f77bcf86cd799439020`
+**Examples:**
+- Basic filtering: `GET /sales?settled=false&customerId=507f1f77bcf86cd799439020`
+- Date range filtering: `GET /sales?startDate=2024-01-01&endDate=2024-01-31&dateField=createdAt`
+- Pagination and sorting: `GET /sales?page=2&limit=25&sort=-createdAt`
+- Combined filtering: `GET /sales?settled=false&startDate=2024-01-01&page=1&limit=10&sort=-totalAmount`
 
 **Response (200 OK):**
 ```json
-[
-  {
-    "id": "507f1f77bcf86cd799439040",
-    "customerId": "507f1f77bcf86cd799439020",
-    "sellerId": "507f1f77bcf86cd799439011",
-    "products": [
-      {
-        "productId": "507f1f77bcf86cd799439030",
-        "quantity": 2,
-        "priceAtSale": 12.99
+{
+  "sales": [
+    {
+      "id": "507f1f77bcf86cd799439040",
+      "customerId": {
+        "_id": "507f1f77bcf86cd799439020",
+        "name": "John Doe",
+        "email": "john@example.com"
       },
-      {
-        "productId": "507f1f77bcf86cd799439031",
-        "quantity": 1,
-        "priceAtSale": 9.99
-      }
-    ],
-    "totalAmount": 35.97,
-    "amountPaid": 20.00,
+      "sellerId": {
+        "_id": "507f1f77bcf86cd799439011",
+        "name": "Jane Smith",
+        "email": "jane@example.com"
+      },
+      "products": [
+        {
+          "productId": {
+            "_id": "507f1f77bcf86cd799439030",
+            "name": "Coffee",
+            "price": 12.99
+          },
+          "quantity": 2,
+          "priceAtSale": 12.99
+        },
+        {
+          "productId": {
+            "_id": "507f1f77bcf86cd799439031",
+            "name": "Croissant",
+            "price": 9.99
+          },
+          "quantity": 1,
+          "priceAtSale": 9.99
+        }
+      ],
+      "totalAmount": 35.97,
+      "amountPaid": 20.00,
+      "settled": false,
+      "createdAt": "2024-01-15T15:30:00.000Z",
+      "updatedAt": "2024-01-15T15:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 3,
+    "totalSales": 127,
+    "limit": 50,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  },
+  "filters": {
     "settled": false,
-    "createdAt": "2024-01-15T15:30:00.000Z",
-    "updatedAt": "2024-01-15T15:30:00.000Z"
+    "customerId": "507f1f77bcf86cd799439020",
+    "startDate": "2024-01-01T00:00:00.000Z",
+    "endDate": "2024-01-31T23:59:59.999Z",
+    "dateField": "createdAt",
+    "sort": "-createdAt"
   }
-]
+}
 ```
 
 ### ➕ Create Sale
