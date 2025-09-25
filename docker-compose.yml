@@ -60,10 +60,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-supersecret}@mongodb:27017/bitetrack?authSource=admin&directConnection=true
+      MONGO_URI: ${MONGO_URI:-mongodb://admin:supersecret@mongodb:27017/bitetrack?authSource=admin&directConnection=true}
       JWT_SECRET: ${JWT_SECRET:-supersecretjwt}
-      PORT: 3000
+      PORT: ${PORT:-3000}
       NODE_ENV: ${NODE_ENV:-production}
+      FRONTEND_URLS: ${FRONTEND_URLS:-http://localhost:3000}
     networks:
       - bitetrack-network
     depends_on:
