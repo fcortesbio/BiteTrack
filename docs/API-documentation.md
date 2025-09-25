@@ -1,7 +1,7 @@
 # BiteTrack API Documentation
 
 ## Overview
-BiteTrack is a RESTful API for small food businesses to manage sellers, products, customers, and sales. All API endpoints are prefixed with `/bitetrack/` and use JWT-based authentication with role-based access control.
+BiteTrack is a RESTful API for small food businesses to manage sellers, products, customers, sales, and food waste. All API endpoints are prefixed with `/bitetrack/` and use JWT-based authentication with role-based access control.
 
 **Base URL:** `http://localhost:3000/bitetrack`
 
@@ -966,6 +966,336 @@ For input validation errors:
 - Load balancer health checks
 - CI/CD pipeline validation
 - Development environment verification
+
+---
+
+## Inventory Drop System (Food Waste Management)
+
+**⚠️ Admin/SuperAdmin Access Only:** All inventory drop endpoints require `admin` or `superadmin` role.
+
+### 🗑️ Drop Inventory
+**Endpoint:** `POST /inventory-drops`
+
+**Description:** Drop inventory for expired, damaged, or end-of-day waste. Creates permanent audit record and updates product inventory atomically.
+
+**Request Headers:**
+```
+Authorization: Bearer <admin_or_superadmin_jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "productId": "507f1f77bcf86cd799439011",
+  "quantityToDrop": 5,
+  "reason": "end_of_day",
+  "notes": "Daily cleanup - product past optimal serving time",
+  "productionDate": "2024-01-15T08:00:00.000Z",
+  "expirationDate": "2024-01-15T18:00:00.000Z",
+  "batchId": "BATCH-001"
+}
+```
+
+**Required Fields:**
+- `productId`: MongoDB ObjectId of the product
+- `quantityToDrop`: Number of units to drop (must be ≤ current inventory)
+
+**Optional Fields:**
+- `reason`: Drop reason (`expired`, `end_of_day`, `quality_issue`, `damaged`, `contaminated`, `overproduction`, `other`)
+- `notes`: Additional context (max 500 characters)
+- `productionDate`: When the product was made
+- `expirationDate`: Product expiration date
+- `batchId`: Batch/lot identifier (max 100 characters)
+
+**Response (201 Created):**
+```json
+{
+  "message": "Inventory dropped successfully",
+  "drop": {
+    "id": "507f1f77bcf86cd799439014",
+    "productId": {
+      "id": "507f1f77bcf86cd799439011",
+      "productName": "Turkey Sandwich",
+      "price": 12.99
+    },
+    "productName": "Turkey Sandwich",
+    "quantityDropped": 5,
+    "originalQuantity": 25,
+    "remainingQuantity": 20,
+    "pricePerUnit": 12.99,
+    "totalValueLost": 64.95,
+    "reason": "end_of_day",
+    "notes": "Daily cleanup - product past optimal serving time",
+    "droppedBy": {
+      "id": "507f1f77bcf86cd799439012",
+      "firstName": "John",
+      "lastName": "Admin",
+      "email": "admin@business.com"
+    },
+    "droppedAt": "2024-01-15T18:30:00.000Z",
+    "undoExpiresAt": "2024-01-16T02:30:00.000Z",
+    "canBeUndone": true,
+    "isPartialDrop": true,
+    "dropPercentage": "20.00"
+  },
+  "updatedProduct": {
+    "id": "507f1f77bcf86cd799439011",
+    "productName": "Turkey Sandwich",
+    "previousQuantity": 25,
+    "newQuantity": 20,
+    "quantityDropped": 5
+  },
+  "undoInfo": {
+    "canUndo": true,
+    "undoExpiresAt": "2024-01-16T02:30:00.000Z",
+    "timeRemainingMinutes": 479
+  }
+}
+```
+
+### ↩️ Undo Inventory Drop
+**Endpoint:** `POST /inventory-drops/:dropId/undo`
+
+**Description:** Undo an inventory drop within the 8-hour window. Restores inventory and marks drop as undone.
+
+**Request Headers:**
+```
+Authorization: Bearer <admin_or_superadmin_jwt_token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "undoReason": "Accidental drop - product was still good"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Inventory drop undone successfully",
+  "drop": {
+    "id": "507f1f77bcf86cd799439014",
+    "isUndone": true,
+    "undoneBy": {
+      "id": "507f1f77bcf86cd799439012",
+      "firstName": "John",
+      "lastName": "Admin"
+    },
+    "undoneAt": "2024-01-15T19:00:00.000Z",
+    "undoReason": "Accidental drop - product was still good"
+  },
+  "restoredProduct": {
+    "id": "507f1f77bcf86cd799439011",
+    "productName": "Turkey Sandwich",
+    "previousQuantity": 20,
+    "newQuantity": 25,
+    "quantityRestored": 5
+  }
+}
+```
+
+### 📋 List Inventory Drops
+**Endpoint:** `GET /inventory-drops`
+
+**Description:** List inventory drops with filtering and pagination.
+
+**Query Parameters:**
+- `page`: Page number (default: 1)
+- `limit`: Items per page (default: 10, max: 100)
+- `productId`: Filter by specific product
+- `reason`: Filter by drop reason
+- `droppedBy`: Filter by user who dropped
+- `startDate`: Filter drops after date (ISO 8601)
+- `endDate`: Filter drops before date (ISO 8601)
+- `includeUndone`: Include undone drops (`true`/`false`, default: `false`)
+
+**Example:** `GET /inventory-drops?reason=end_of_day&startDate=2024-01-15&limit=20`
+
+**Response (200 OK):**
+```json
+{
+  "drops": [
+    {
+      "id": "507f1f77bcf86cd799439014",
+      "productName": "Turkey Sandwich",
+      "quantityDropped": 5,
+      "totalValueLost": 64.95,
+      "reason": "end_of_day",
+      "droppedBy": {
+        "firstName": "John",
+        "lastName": "Admin"
+      },
+      "droppedAt": "2024-01-15T18:30:00.000Z",
+      "canBeUndone": true,
+      "isUndone": false
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 3,
+    "totalCount": 25,
+    "hasNextPage": true,
+    "hasPrevPage": false
+  }
+}
+```
+
+### 🔄 Get Undoable Drops
+**Endpoint:** `GET /inventory-drops/undoable`
+
+**Description:** Get drops that can still be undone (within 8-hour window).
+
+**Query Parameters:**
+- `userId`: Filter by specific user (optional)
+
+**Response (200 OK):**
+```json
+{
+  "message": "Found 3 drops that can be undone",
+  "undoableDrops": [
+    {
+      "id": "507f1f77bcf86cd799439014",
+      "productName": "Turkey Sandwich",
+      "quantityDropped": 5,
+      "totalValueLost": 64.95,
+      "droppedAt": "2024-01-15T18:30:00.000Z",
+      "undoExpiresAt": "2024-01-16T02:30:00.000Z",
+      "timeRemainingMinutes": 420
+    }
+  ],
+  "currentTime": "2024-01-15T19:30:00.000Z"
+}
+```
+
+### 📊 Waste Analytics
+**Endpoint:** `GET /inventory-drops/analytics`
+
+**Description:** Get comprehensive waste analytics and cost reporting.
+
+**Query Parameters:**
+- `startDate`: Analytics period start (default: 30 days ago)
+- `endDate`: Analytics period end (default: now)
+- `productId`: Filter by specific product
+- `reason`: Filter by drop reason
+- `droppedBy`: Filter by user
+
+**Response (200 OK):**
+```json
+{
+  "period": {
+    "startDate": "2024-01-01T00:00:00.000Z",
+    "endDate": "2024-01-15T23:59:59.000Z",
+    "durationDays": 15
+  },
+  "summary": {
+    "totalQuantityDropped": 127,
+    "totalValueLost": 1842.73,
+    "totalDropCount": 23,
+    "avgValuePerDrop": 80.12
+  },
+  "analyticsByReason": [
+    {
+      "_id": "end_of_day",
+      "totalQuantityDropped": 85,
+      "totalValueLost": 1205.45,
+      "totalDropCount": 15,
+      "products": [
+        {
+          "productName": "Turkey Sandwich",
+          "totalQuantityDropped": 25,
+          "totalValueLost": 324.75,
+          "dropCount": 5
+        }
+      ]
+    }
+  ],
+  "todaysSummary": [
+    {
+      "reason": "end_of_day",
+      "totalQuantity": 12,
+      "totalValue": 156.88,
+      "dropCount": 3,
+      "uniqueProducts": 2
+    }
+  ]
+}
+```
+
+### 🔍 Get Drop Details
+**Endpoint:** `GET /inventory-drops/:dropId`
+
+**Description:** Get detailed information about a specific inventory drop.
+
+**Response (200 OK):**
+```json
+{
+  "drop": {
+    "id": "507f1f77bcf86cd799439014",
+    "productName": "Turkey Sandwich",
+    "quantityDropped": 5,
+    "originalQuantity": 25,
+    "remainingQuantity": 20,
+    "totalValueLost": 64.95,
+    "reason": "end_of_day",
+    "notes": "Daily cleanup",
+    "droppedBy": {
+      "firstName": "John",
+      "lastName": "Admin",
+      "email": "admin@business.com"
+    },
+    "droppedAt": "2024-01-15T18:30:00.000Z",
+    "undoExpiresAt": "2024-01-16T02:30:00.000Z",
+    "isUndone": false,
+    "dropPercentage": "20.00",
+    "daysSinceProduction": 1
+  },
+  "canUndo": true,
+  "timeRemainingForUndo": 420
+}
+```
+
+**Error Responses:**
+```json
+// 403 Forbidden - Insufficient permissions
+{
+  "error": "Forbidden",
+  "message": "Insufficient permissions",
+  "statusCode": 403
+}
+
+// 400 Bad Request - Cannot undo expired drop
+{
+  "error": "Cannot Undo Drop",
+  "message": "The undo window for this inventory drop has expired (8 hours)",
+  "statusCode": 400
+}
+
+// 404 Not Found - Product doesn't exist
+{
+  "error": "Product Not Found",
+  "message": "Product with the specified ID does not exist",
+  "statusCode": 404
+}
+
+// 400 Bad Request - Insufficient inventory
+{
+  "error": "Insufficient Inventory",
+  "message": "Cannot drop 10 units. Only 5 units available",
+  "statusCode": 400
+}
+```
+
+**Business Rules:**
+- **8-Hour Undo Window:** Drops can be undone within 8 hours of creation
+- **Admin Access Only:** Only `admin` and `superadmin` roles can perform drop operations
+- **Atomic Operations:** Inventory updates and drop records are created/updated together
+- **Audit Trail:** Complete tracking of who, what, when, why, and financial impact
+- **Partial Drops Supported:** Can drop specific quantities, not just entire inventory
+- **Financial Tracking:** Automatic calculation of monetary loss for reporting
+- **Compliance Ready:** Detailed records for health department and regulatory compliance
 
 ---
 
