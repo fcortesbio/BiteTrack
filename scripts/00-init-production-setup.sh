@@ -6,6 +6,10 @@
 
 set -e
 
+# Ensure UTF-8 encoding for consistent character handling
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -89,6 +93,46 @@ confirm_action() {
 
 generate_secure_secret() {
     openssl rand -base64 32 | tr -d '\n'
+}
+
+# Generate MongoDB-safe password (no URL-problematic characters)
+generate_mongo_password() {
+    # Generate a secure password using only alphanumeric characters
+    # This avoids URL encoding issues in MongoDB connection strings
+    openssl rand -hex 16 | head -c 32
+}
+
+# URL encode a string for MongoDB connection URI (bash-only implementation)
+# Fixed to properly handle % characters in environment files
+url_encode() {
+    local string="$1"
+    local encoded=""
+    local i
+    
+    for (( i=0; i<${#string}; i++ )); do
+        local char="${string:$i:1}"
+        case "$char" in
+            [a-zA-Z0-9._~-]) 
+                encoded+="$char"
+                ;;
+            *)
+                # Convert to hex and add % prefix
+                # Use printf to get the hex value properly
+                printf -v hex '%02X' "'$char"
+                encoded+="%$hex"
+                ;;
+        esac
+    done
+    echo "$encoded"
+}
+
+# Alternative: Use single quotes in environment file to prevent bash interpretation
+create_quoted_mongo_uri() {
+    local user="$1"
+    local encoded_pass="$2"
+    local db="$3"
+    # Return the URI in single quotes to prevent bash interpretation
+    echo "'mongodb://$user:$encoded_pass@mongodb:27017/$db?authSource=admin&directConnection=true'"
 }
 
 # Welcome and prerequisites check
@@ -193,8 +237,13 @@ configure_environment() {
     prompt_password "MongoDB Password (leave empty to generate secure password)" "MONGO_PASS"
     
     if [ -z "$MONGO_PASS" ]; then
-        MONGO_PASS=$(generate_secure_secret)
+        MONGO_PASS=$(generate_mongo_password)
         log_info "Generated secure MongoDB password: ${MONGO_PASS:0:8}..."
+        MONGO_PASS_ENCODED="$MONGO_PASS"  # Generated password is already safe
+    else
+        # URL encode manually entered password to handle special characters
+        MONGO_PASS_ENCODED=$(url_encode "$MONGO_PASS")
+        log_info "Password entered manually, URL encoding applied"
     fi
     
     prompt_user "MongoDB Database Name" "bitetrack" "MONGO_DB"
@@ -223,13 +272,16 @@ configure_environment() {
     # Create production environment file
     log_info "Creating $ENV_FILE..."
     
+    # Create the MongoDB URI with proper quoting to handle special characters
+    QUOTED_MONGO_URI=$(create_quoted_mongo_uri "$MONGO_USER" "$MONGO_PASS_ENCODED" "$MONGO_DB")
+    
     cat > "$ENV_FILE" << EOF
 NODE_ENV=production
 PORT=$APP_PORT
 
 # MongoDB Configuration - Production Values
-# Connection string format (for API)
-MONGO_URI=mongodb://$MONGO_USER:$MONGO_PASS@mongodb:27017/$MONGO_DB?authSource=admin&directConnection=true
+# Connection string format (for API) - using URL-encoded password (quoted to handle special chars)
+MONGO_URI=$QUOTED_MONGO_URI
 
 # Separate credentials (for scripts and docker-compose)
 MONGO_ROOT_USERNAME=$MONGO_USER
@@ -340,8 +392,8 @@ populate_test_data() {
         
         log_info "Populating database with $DATA_PRESET dataset..."
         
-        # Set MongoDB URI for Node.js script
-        export MONGO_URI="mongodb://$MONGO_USER:$MONGO_PASS@localhost:27017/$MONGO_DB?authSource=admin&directConnection=true"
+        # Set MongoDB URI for Node.js script (using URL-encoded password)
+        export MONGO_URI="mongodb://$MONGO_USER:$MONGO_PASS_ENCODED@localhost:27017/$MONGO_DB?authSource=admin&directConnection=true"
         
         node scripts/04-populate-test-data.js --preset="$DATA_PRESET" --verbose
         log_success "Test data population completed"
