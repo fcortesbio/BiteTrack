@@ -28,10 +28,17 @@ const productSchema = new mongoose.Schema(
   },
 );
 
-// Transform output
+// Add virtual field for API compatibility
+productSchema.virtual('name').get(function() {
+  return this.productName;
+});
+
+// Transform output with virtuals enabled
 productSchema.set("toJSON", {
+  virtuals: true,
   transform: function (doc, ret) {
     ret.id = ret._id;
+    ret.name = ret.productName; // Ensure name field is available for API consistency
     delete ret._id;
     delete ret.__v;
     return ret;

@@ -107,11 +107,23 @@ const listSales = async (req, res) => {
       .skip((pageNum - 1) * limitNum)
       .populate('customerId', 'firstName lastName email')
       .populate('sellerId', 'firstName lastName')
-      .populate('products.productId', 'productName');
+      .populate('products.productId', 'productName price');
     
     // Response with pagination metadata
     res.json({
-      sales: sales.map(sale => sale.toJSON()),
+      sales: sales.map(sale => {
+        const saleObj = sale.toJSON();
+        // Ensure product references have name field for API consistency
+        if (saleObj.products) {
+          saleObj.products = saleObj.products.map(product => {
+            if (product.productId && product.productId.productName) {
+              product.productId.name = product.productId.productName;
+            }
+            return product;
+          });
+        }
+        return saleObj;
+      }),
       pagination: {
         currentPage: pageNum,
         totalPages,
