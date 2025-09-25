@@ -1160,3 +1160,24 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
+
+  # Health Check Endpoint
+  /health:
+    get:
+      summary: API health check
+      tags: [Health]
+      description: |
+        Check API server status and connectivity. No authentication required.
+        Returns server status, uptime, and current timestamp.
+      responses:
+        "200":
+          description: Server is healthy and operational
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "OK" }
+                  timestamp: { type: string, format: date-time }
+                  uptime: { type: number, description: "Server uptime in seconds" }
+                required: [status, timestamp, uptime]

@@ -940,6 +940,35 @@ For input validation errors:
 
 ---
 
+## Health Check
+
+### ❤️ API Health Check
+**Endpoint:** `GET /bitetrack/health`
+
+**Description:** Check API server status and connectivity. No authentication required.
+
+**Response (200 OK):**
+```json
+{
+  "status": "OK",
+  "timestamp": "2024-01-15T23:30:00.000Z",
+  "uptime": 86400
+}
+```
+
+**Response Fields:**
+- `status`: Server status (always "OK" if responding)
+- `timestamp`: Current server timestamp in ISO 8601 format
+- `uptime`: Server uptime in seconds
+
+**Usage:**
+- Monitor API availability
+- Load balancer health checks
+- CI/CD pipeline validation
+- Development environment verification
+
+---
+
 ## Password Requirements
 
 All passwords must meet the following criteria:
