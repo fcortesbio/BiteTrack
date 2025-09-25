@@ -12,6 +12,7 @@ const sellerRoutes = require("./routes/sellers");
 const customerRoutes = require("./routes/customers");
 const productRoutes = require("./routes/products");
 const salesRoutes = require("./routes/sales");
+const inventoryDropRoutes = require("./routes/inventoryDrops");
 const testDataRoutes = require("./routes/testDataRoutes");
 
 // Import middleware
@@ -85,6 +86,7 @@ app.use("/bitetrack/sellers", sellerRoutes);
 app.use("/bitetrack/customers", customerRoutes);
 app.use("/bitetrack/products", productRoutes);
 app.use("/bitetrack/sales", salesRoutes);
+app.use("/bitetrack/inventory-drops", inventoryDropRoutes);
 app.use("/bitetrack/test-data", testDataRoutes);
 
 // 404 handler
