@@ -314,6 +314,131 @@ jj git import
 
 ---
 
+## 🔄 **PART 7: Zero-Double-Work Git Integration (15 minutes)**
+
+**🎯 The Goal**: Eliminate the need for `git add` + `git commit` while still using Git remotes!
+
+### The Problem: Double Work
+
+Many new jj users fall into this pattern:
+```bash
+# ❌ WRONG - This is double work!
+jj describe -m "my changes"     # jj tracks changes
+git add .                       # manually stage for Git  
+git commit -m "my changes"      # manually commit to Git
+git push                        # push to remote
+```
+
+### The Solution: Seamless Integration
+
+**✅ CORRECT - Single workflow:**
+```bash
+# 1. Make changes (jj tracks automatically)
+echo "new feature" > myfile.js
+
+# 2. Describe your change
+jj describe -m "feat: add new feature"
+
+# 3. Push directly to Git in ONE step!
+jj bookmark create feature/my-feature
+jj git push --bookmark feature/my-feature --allow-new
+```
+
+### Exercise 13: Practice Zero-Double-Work Workflow
+
+```bash
+# Step 1: Create a new change
+jj new -m "practice: testing zero-double-work"
+
+# Step 2: Make some changes
+echo "Testing jj Git integration!" > test-integration.md
+echo "- No more git add" >> test-integration.md
+echo "- No more git commit" >> test-integration.md
+echo "- Direct push from jj!" >> test-integration.md
+
+# Step 3: Check that jj tracked everything automatically
+jj status
+# You should see: A test-integration.md
+
+# Step 4: Create bookmark and push in one workflow
+jj bookmark create practice/zero-double-work
+jj git push --bookmark practice/zero-double-work --allow-new
+```
+
+### Exercise 14: Alternative Sync Workflow
+
+If you prefer working with existing Git branches:
+
+```bash
+# Method 1: Export then push
+jj describe -m "feat: another feature"
+jj git export              # Sync jj changes to Git
+git push origin main       # Use regular Git push
+
+# Method 2: Track existing Git branch
+jj bookmark track main@origin   # Track remote branch
+jj git push                      # Push to tracked branch
+```
+
+### Exercise 15: Handle Git Pull Requests
+
+```bash
+# When someone else pushes changes:
+git fetch                  # Get latest from remote
+jj git import             # Import Git changes to jj
+
+# When you want to sync your work:
+jj git push --all         # Push all your bookmarks
+```
+
+### 🎯 Key Git Integration Commands
+
+```bash
+# Core workflow - no double work
+jj describe -m "message"                    # Describe changes
+jj bookmark create feature/name             # Create feature bookmark
+jj git push --bookmark feature/name --allow-new  # Push to Git
+
+# Sync with existing Git workflows  
+jj git export                               # Export jj → Git
+jj git import                               # Import Git → jj
+jj bookmark track branch@origin            # Track remote branch
+jj git push                                 # Push tracked bookmarks
+
+# Handle remotes
+jj git fetch                                # Fetch from Git remotes
+jj git push --all                           # Push all bookmarks
+```
+
+### 🚫 Common Mistakes to Avoid
+
+```bash
+# ❌ DON'T do this (double work):
+jj describe -m "message"
+git add .
+git commit -m "message"    # Redundant!
+
+# ❌ DON'T do this (out of sync):
+git commit -m "message"    # jj doesn't know about this
+# Now jj and Git are out of sync!
+
+# ✅ DO this instead:
+jj describe -m "message"   # jj handles everything
+jj git push --bookmark name --allow-new
+```
+
+### 💡 Pro Tips for Git Integration
+
+1. **Work in colocated repos** - Have both `.git` and `.jj` directories
+2. **Use bookmarks for branches** - `jj bookmark create` instead of `git checkout -b`
+3. **Push from jj directly** - `jj git push` instead of `git push`
+4. **Let jj handle staging** - Never use `git add` in a jj workflow
+5. **Sync when collaborating** - Use `jj git import` after `git fetch`
+
+**🎉 Result**: You now have a single, streamlined workflow that works with both jj's power and Git's ecosystem!
+
+---
+
 ## 🚀 **Your First Real Project Workflow**
 
 Now try this with actual development:
