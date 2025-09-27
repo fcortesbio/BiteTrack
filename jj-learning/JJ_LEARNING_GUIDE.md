@@ -7,13 +7,100 @@ Welcome to your hands-on jj learning journey! This guide will take you from zero
 **Git thinking**: Working Directory → Stage → Commit  
 **jj thinking**: You're always "inside" a change, editing it directly
 
-## 📋 Prerequisites Check
+## 🛠️ Installation & Setup Guide
 
-Make sure jj is working:
+### Step 1: Install Rust and Cargo (if not already installed)
+
 ```bash
-jj --version  # Should show version 0.33.0
-jj status     # Should show current state
+# Check if Rust/Cargo is already installed
+rustc --version
+cargo --version
+
+# If not installed, install Rust via rustup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Follow the prompts, then restart your shell or run:
+source ~/.bashrc
+# OR
+source ~/.profile
 ```
+
+### Step 2: Install Jujutsu via Cargo
+
+```bash
+# Install the latest jj from crates.io
+cargo install --locked jj-cli
+
+# Add cargo bin to your PATH if not already there
+echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify installation
+jj --version  # Should show version 0.33.0 or newer
+```
+
+### Step 3: Configure jj User Settings
+
+```bash
+# Set your name and email (use your Git credentials for consistency)
+jj config set --user user.name "Your Name"
+jj config set --user user.email "your.email@example.com"
+
+# Configure colors and UI preferences
+jj config set --user ui.color "always"
+jj config set --user ui.default-command "log"
+jj config set --user ui.pager "less -FRX"  # Better pager settings
+```
+
+### Step 4: Set Up Git Integration in Existing Repository
+
+```bash
+# Navigate to your existing Git repository
+cd /path/to/your/git/repo
+
+# Initialize jj in the existing Git repo (colocated setup)
+jj git init --colocate
+
+# This creates a .jj/ directory alongside .git/
+# Both jj and Git will work on the same files
+
+# Set the author for the current working copy
+jj describe --reset-author --no-edit
+```
+
+### Step 5: Verify Git and jj Sync
+
+```bash
+# Check jj status
+jj status
+
+# Check jj can see Git history
+jj log --limit 5
+
+# Verify Git still works
+git status
+git log --oneline -5
+
+# Test sync between jj and Git
+jj git export  # Export jj changes to Git
+jj git import  # Import Git changes to jj
+```
+
+### 🎯 Configuration Summary
+
+After setup, your configuration should include:
+- ✅ **Rust/Cargo**: For installing and updating jj
+- ✅ **jj**: Latest version installed via cargo
+- ✅ **User identity**: Name and email configured
+- ✅ **Colors**: Enhanced terminal output with `ui.color "always"`
+- ✅ **Colocated repo**: jj and Git working together
+- ✅ **Sync capability**: Seamless jj ↔ Git integration
+
+**Troubleshooting:**
+- If `jj` command not found: Check `~/.cargo/bin` is in your PATH
+- If permission issues: Try `cargo install --user jj-cli`
+- If Git integration issues: Run `jj git import` to sync
+- If author issues: Run `jj describe --reset-author --no-edit`
 
 ---
 
