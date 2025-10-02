@@ -885,6 +885,166 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  # Reporting Endpoints
+  /reporting/sales/analytics:
+    get:
+      summary: Get comprehensive sales analytics
+      tags: [Reporting]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Generate comprehensive sales analytics for a given time period.
+        Includes totals, averages, top products, customer analytics, time-series data, and settlement statistics.
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Start date for filtering (ISO 8601 format)
+          example: "2024-01-01T00:00:00.000Z"
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: End date for filtering (ISO 8601 format)
+          example: "2024-01-31T23:59:59.999Z"
+        - name: dateField
+          in: query
+          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          description: Date field to filter by
+        - name: groupBy
+          in: query
+          schema: { type: string, enum: [hour, day, week, month, year], default: day }
+          description: Time grouping for time-series data
+      responses:
+        "200":
+          description: Sales analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      startDate: { type: string, format: date-time, nullable: true }
+                      endDate: { type: string, format: date-time, nullable: true }
+                      dateField: { type: string }
+                      groupBy: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      totalSales: { type: integer }
+                      totalRevenue: { type: number }
+                      totalAmountPaid: { type: number }
+                      averageOrderValue: { type: number }
+                      averageItemsPerOrder: { type: number }
+                  timeSeries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id: { type: object }
+                        salesCount: { type: integer }
+                        revenue: { type: number }
+                        averageOrderValue: { type: number }
+                  topProducts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productName: { type: string }
+                        currentPrice: { type: number }
+                        totalQuantitySold: { type: integer }
+                        totalRevenue: { type: number }
+                        salesCount: { type: integer }
+                        averagePrice: { type: number }
+                  customerAnalytics:
+                    type: object
+                    properties:
+                      uniqueCustomers: { type: integer }
+                      averageCustomerSpent: { type: number }
+                      averageOrdersPerCustomer: { type: number }
+                  paymentAnalytics:
+                    type: object
+                    properties:
+                      settled:
+                        type: object
+                        properties:
+                          count: { type: integer }
+                          totalAmount: { type: number }
+                          totalPaid: { type: number }
+                      unsettled:
+                        type: object
+                        properties:
+                          count: { type: integer }
+                          totalAmount: { type: number }
+                          totalPaid: { type: number }
+        "400":
+          description: Invalid date format or parameters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /reporting/sales/export:
+    get:
+      summary: Export sales data as CSV
+      tags: [Reporting]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Export sales data as CSV file with various formats and filtering options.
+        Supports detailed line items, summary per sale, or product performance exports.
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Start date for filtering (ISO 8601 format)
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: End date for filtering (ISO 8601 format)
+        - name: dateField
+          in: query
+          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          description: Date field to filter by
+        - name: format
+          in: query
+          schema: { type: string, enum: [detailed, summary, products], default: detailed }
+          description: |
+            Export format:
+            - detailed: Individual product line items with full transaction details
+            - summary: One row per sale with aggregate information
+            - products: Product performance metrics and sales statistics
+        - name: customerId
+          in: query
+          schema: { type: string }
+          description: Filter by customer ID
+        - name: sellerId
+          in: query
+          schema: { type: string }
+          description: Filter by seller ID
+        - name: settled
+          in: query
+          schema: { type: boolean }
+          description: Filter by settlement status
+      responses:
+        "200":
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+              example: |
+                "Sale ID","Date","Customer Name","Product Name","Quantity","Unit Price","Line Total"
+                "507f1f77bcf86cd799439041","2024-01-15","John Doe","Club Sandwich",2,12.99,25.98
+        "400":
+          description: Invalid parameters or date format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          description: CSV generation failed
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
   # Test Data Management Endpoints (Development/Testing Only)
   /test-data/status:
     get:
@@ -929,6 +1089,94 @@ paths:
                         totalAmount: { type: number }
                         settled: { type: boolean }
                         createdAt: { type: string, format: date-time }
+        "403":
+          description: Forbidden (disabled in production or insufficient permissions)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /test-data/clean:
+    delete:
+      summary: Clean/remove test data from database
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Remove test data from the database with selective preservation options.
+        Only available in non-production environments.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirmClean:
+                  type: boolean
+                  default: true
+                  description: Confirmation flag to prevent accidental deletion
+                preserveData:
+                  type: array
+                  items:
+                    type: string
+                    enum: [customers, products, sales, pendingSellers]
+                  description: Data types to preserve during cleanup
+      responses:
+        "200":
+          description: Test data cleaned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  deletedCounts:
+                    type: object
+                    properties:
+                      customers: { type: integer }
+                      products: { type: integer }
+                      sales: { type: integer }
+                      pendingSellers: { type: integer }
+        "403":
+          description: Forbidden (disabled in production or insufficient permissions)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /test-data/reset:
+    post:
+      summary: Reset database to specific test scenario (SuperAdmin only)
+      tags: [Test Data Management]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Reset the entire database to a specific test scenario state.
+        This operation cleans all data and repopulates with the selected scenario.
+        Only available to SuperAdmins in non-production environments.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scenario, confirmReset]
+              properties:
+                scenario:
+                  type: string
+                  enum: [clean, minimal, dev, full]
+                  description: Target scenario to reset to
+                confirmReset:
+                  type: boolean
+                  description: Confirmation flag (must be true)
+      responses:
+        "200":
+          description: Database reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  scenario: { type: string }
+                  resetTimestamp: { type: string, format: date-time }
         "403":
           description: Forbidden (disabled in production or insufficient permissions)
           content:

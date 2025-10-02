@@ -894,6 +894,174 @@ Content-Type: application/json
 
 ---
 
+## Sales Reporting & Analytics
+
+### 📊 Get Sales Analytics
+**Endpoint:** `GET /reporting/sales/analytics`
+
+**Description:** Generate comprehensive sales analytics for a given time period including totals, averages, top products, customer analytics, time-series data, and settlement statistics.
+
+**Request Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Query Parameters:**
+- `startDate` (optional): Start date for filtering (ISO 8601 format)
+- `endDate` (optional): End date for filtering (ISO 8601 format)
+- `dateField` (optional): Date field to filter by ('createdAt' or 'updatedAt', default: 'createdAt')
+- `groupBy` (optional): Time grouping for time-series data ('hour', 'day', 'week', 'month', 'year', default: 'day')
+
+**Examples:**
+```bash
+# Get analytics for January 2024
+GET /reporting/sales/analytics?startDate=2024-01-01&endDate=2024-01-31
+
+# Get weekly analytics for the last month
+GET /reporting/sales/analytics?startDate=2024-01-01&endDate=2024-01-31&groupBy=week
+
+# Get analytics by updatedAt field
+GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
+```
+
+**Response (200 OK):**
+```json
+{
+  "period": {
+    "startDate": "2024-01-01T00:00:00.000Z",
+    "endDate": "2024-01-31T23:59:59.999Z",
+    "dateField": "createdAt",
+    "groupBy": "day"
+  },
+  "summary": {
+    "totalSales": 127,
+    "totalRevenue": 2845.73,
+    "totalAmountPaid": 2720.50,
+    "averageOrderValue": 22.41,
+    "averageItemsPerOrder": 2.3
+  },
+  "timeSeries": [
+    {
+      "_id": {
+        "year": 2024,
+        "month": 1,
+        "day": 15
+      },
+      "salesCount": 12,
+      "revenue": 245.88,
+      "averageOrderValue": 20.49
+    }
+  ],
+  "topProducts": [
+    {
+      "productName": "Club Sandwich",
+      "currentPrice": 12.99,
+      "totalQuantitySold": 85,
+      "totalRevenue": 1104.15,
+      "salesCount": 42,
+      "averagePrice": 12.99
+    }
+  ],
+  "customerAnalytics": {
+    "uniqueCustomers": 67,
+    "averageCustomerSpent": 42.48,
+    "averageOrdersPerCustomer": 1.9
+  },
+  "paymentAnalytics": {
+    "settled": {
+      "count": 115,
+      "totalAmount": 2720.50,
+      "totalPaid": 2720.50
+    },
+    "unsettled": {
+      "count": 12,
+      "totalAmount": 125.23,
+      "totalPaid": 75.00
+    }
+  }
+}
+```
+
+### 📄 Export Sales Data as CSV
+**Endpoint:** `GET /reporting/sales/export`
+
+**Description:** Export sales data as CSV file with various formats and filtering options. Supports detailed line items, summary per sale, or product performance exports.
+
+**Request Headers:**
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Query Parameters:**
+- `startDate` (optional): Start date for filtering (ISO 8601 format)
+- `endDate` (optional): End date for filtering (ISO 8601 format)
+- `dateField` (optional): Date field to filter by ('createdAt' or 'updatedAt', default: 'createdAt')
+- `format` (optional): Export format ('detailed', 'summary', 'products', default: 'detailed')
+- `customerId` (optional): Filter by customer ID
+- `sellerId` (optional): Filter by seller ID
+- `settled` (optional): Filter by settlement status (true/false)
+
+**Export Formats:**
+- **detailed**: Individual product line items with full transaction details
+- **summary**: One row per sale with aggregate information
+- **products**: Product performance metrics and sales statistics
+
+**Examples:**
+```bash
+# Export detailed sales data for January 2024
+GET /reporting/sales/export?startDate=2024-01-01&endDate=2024-01-31&format=detailed
+
+# Export summary of unsettled sales
+GET /reporting/sales/export?settled=false&format=summary
+
+# Export product performance data
+GET /reporting/sales/export?format=products&startDate=2024-01-01
+
+# Export specific customer's transactions
+GET /reporting/sales/export?customerId=507f1f77bcf86cd799439020&format=detailed
+```
+
+**Response (200 OK):**
+```
+Content-Type: text/csv
+Content-Disposition: attachment; filename="bitetrack-sales-detailed-2024-01-15T16-30-00-000Z.csv"
+
+"Sale ID","Date","Time","Customer Name","Customer Email","Seller Name","Product Name","Quantity","Unit Price","Line Total","Sale Total","Amount Paid","Balance Due","Settled"
+"507f1f77bcf86cd799439041","2024-01-15","14:30:00","John Doe","john@example.com","Jane Smith","Club Sandwich",2,12.99,25.98,25.98,25.98,0.00,"Yes"
+```
+
+**Detailed Format CSV Columns:**
+- Sale ID, Date, Time, Customer Name, Customer Email, Seller Name
+- Product Name, Quantity, Unit Price, Line Total
+- Sale Total, Amount Paid, Balance Due, Settled
+
+**Summary Format CSV Columns:**
+- Sale ID, Date, Time, Customer Name, Customer Email, Seller Name
+- Items Count, Total Amount, Amount Paid, Balance Due, Settled
+
+**Products Format CSV Columns:**
+- Product Name, Current Price, Total Quantity Sold, Number of Sales
+- Total Revenue, Average Sale Price, Min/Max Sale Price, Revenue per Unit
+
+**Error Responses:**
+```json
+// 400 Bad Request - Invalid parameters
+{
+  "error": "Bad Request",
+  "message": "Invalid format. Use: detailed, summary, or products",
+  "statusCode": 400
+}
+
+// 500 Internal Server Error - CSV generation failed
+{
+  "error": "Internal Server Error",
+  "message": "Failed to generate CSV export",
+  "statusCode": 500
+}
+```
+
+---
+
 ## Error Handling
 
 ### Common HTTP Status Codes

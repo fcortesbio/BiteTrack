@@ -2,7 +2,7 @@
 
 > **Transform your food business from spreadsheet chaos to structured success**
 
-BiteTrack is a production-ready RESTful API that empowers small food businesses to **ditch the spreadsheets** and embrace professional inventory, sales, and customer management. Built with Express.js, MongoDB, and enterprise-grade security.
+BiteTrack is a production-ready RESTful API that empowers small food businesses to **ditch the spreadsheets** and embrace professional inventory, sales, customer management, and business intelligence. Built with Express.js, MongoDB, and enterprise-grade security with comprehensive reporting and food waste compliance features.
 
 ## 🎯 **Why BiteTrack?**
 
@@ -18,6 +18,8 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 - ✅ **Atomic sales transactions** - Complete data integrity
 - ✅ **Multi-user support** with role-based permissions
 - ✅ **Customer relationship tracking** - Build lasting connections
+- ✅ **Business intelligence & reporting** - Sales analytics and CSV exports
+- ✅ **Food waste compliance** - Track and analyze inventory drops
 - ✅ **Docker-ready deployment** - Get running in minutes
 - ✅ **JWT-secured API** - Enterprise-level security
 
@@ -210,6 +212,21 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 - **Advanced sales filtering** - Date ranges, pagination, sorting, and search
 - **Customer transaction history** - Detailed purchase tracking per customer
 
+### 📊 **Business Intelligence & Reporting**
+- **Comprehensive sales analytics** - Revenue, trends, top products, customer insights
+- **Time-series data analysis** - Hourly, daily, weekly, monthly, yearly aggregations
+- **CSV export system** - Detailed, summary, and product performance formats
+- **Payment settlement tracking** - Monitor outstanding balances and cash flow
+- **Customer behavior analysis** - Purchase patterns and loyalty metrics
+
+### 🗑️ **Food Waste Management & Compliance**
+- **Inventory drop tracking** - Record expired, damaged, or end-of-day waste
+- **Cost analysis** - Calculate monetary impact of food waste
+- **Compliance reporting** - Detailed records for health department requirements
+- **Undo system** - 8-hour window to reverse accidental drops
+- **Waste analytics** - Identify patterns and optimize inventory management
+- **Audit trails** - Complete tracking of who, what, when, why for all drops
+
 ### 👥 **Multi-User Business Operations**
 - **Staff management** - Multiple sellers with different permission levels
 - **Customer database** - Track customer information and purchase history
@@ -230,12 +247,15 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 
 | Feature | Endpoints | Key Actions |
 |---------|-----------|-------------|
-| **🔐 Auth** | `/auth/*` | Login, activate accounts, password reset |
+| **🔐 Auth** | `/auth/*` | Login, activate accounts, password recovery |
 | **🔎 Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
 | **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
-| **🏪 Customers** | `/customers/*` | Customer database and contact info |
-| **📦 Products** | `/products/*` | Inventory, pricing, and catalog |
-|| **💳 Sales** | `/sales/*` | Process orders, advanced filtering, payment tracking |
+| **🏪 Customers** | `/customers/*` | Customer database, contact info, transaction history |
+| **📦 Products** | `/products/*` | Inventory management, pricing, and catalog |
+| **💳 Sales** | `/sales/*` | Process orders, advanced filtering, payment tracking |
+| **📊 Reporting** | `/reporting/*` | **NEW:** Sales analytics, CSV exports, business intelligence |
+| **🗑️ Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
+| **🧪 Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
 
 > 📚 **Full API documentation:** [`docs/API.md`](docs/API.md) | **Postman Collection:** [`docs/BiteTrack.postman_collection.json`](docs/BiteTrack.postman_collection.json)
 
@@ -588,10 +608,16 @@ docker compose exec mongodb mongoexport \
 
 ## 🚀 **Roadmap**
 
-### Next Release (v2.0)
-- [ ] **Reporting Dashboard** - Weekly sales, inventory alerts, top products
-- [ ] **Advanced Analytics** - Customer behavior, sales trends
+### Recently Completed (✅ **v2.0 Features**)
+- [✅] **Sales Analytics System** - Comprehensive reporting with time-series data
+- [✅] **CSV Export System** - Multiple export formats for business analysis
+- [✅] **Food Waste Management** - Complete inventory drop tracking and compliance
+- [✅] **Advanced Customer Analytics** - Behavior analysis and purchase patterns
+
+### Next Release (v2.1)
+- [ ] **Real-time Dashboard** - Web interface for non-technical users
 - [ ] **Webhook System** - Real-time notifications for low stock, large sales
+- [ ] **Advanced Reporting UI** - Visual charts and interactive reports
 
 ### Future Vision
 - [ ] **Frontend Client** - React/Vue dashboard for non-technical users  
