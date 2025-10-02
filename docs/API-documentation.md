@@ -562,6 +562,186 @@ Authorization: Bearer <jwt_token>
 
 **Response (204 No Content):** Empty response body
 
+### 📥 Import Customers from CSV
+**Endpoint:** `POST /customers/import`
+
+**Description:** Bulk import customers from a CSV file. The import process validates each row and provides detailed reporting of successful imports and failures.
+
+**Request Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: multipart/form-data
+```
+
+**Request Body (multipart/form-data):**
+- `csvFile`: CSV file with customer data
+
+**Expected CSV Format:**
+```csv
+firstName,lastName,phoneNumber,email
+John,Doe,5551234567,john.doe@example.com
+Jane,Smith,5559876543,jane.smith@example.com
+Bob,Johnson,5555551234,
+Alice,Williams,5551111111,alice.williams@test.com
+```
+
+**CSV Requirements:**
+- **firstName**: Required, non-empty string
+- **lastName**: Required, non-empty string  
+- **phoneNumber**: Required, exactly 10 digits, must be unique
+- **email**: Optional, must be unique if provided
+- Maximum file size: 5MB
+- Supported formats: .csv files only
+
+**Response (200 OK) - Successful Import:**
+```json
+{
+  "success": true,
+  "message": "CSV import completed. 7 customers imported successfully, 0 failed.",
+  "summary": {
+    "totalRows": 7,
+    "successful": 7,
+    "failed": 0
+  },
+  "successfulImports": [
+    {
+      "row": 1,
+      "customer": {
+        "id": "507f1f77bcf86cd799439022",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phoneNumber": "5551234567",
+        "email": "john.doe@example.com",
+        "lastTransaction": null,
+        "createdAt": "2024-01-15T22:00:00.000Z",
+        "updatedAt": "2024-01-15T22:00:00.000Z"
+      }
+    }
+    // ... more successful imports (limited to first 10 in response)
+  ],
+  "failures": [],
+  "truncated": {
+    "successfulImports": false,
+    "failures": false
+  }
+}
+```
+
+**Response (200 OK) - Import with Errors:**
+```json
+{
+  "success": true,
+  "message": "CSV import completed. 2 customers imported successfully, 3 failed.",
+  "summary": {
+    "totalRows": 5,
+    "successful": 2,
+    "failed": 3
+  },
+  "successfulImports": [
+    {
+      "row": 1,
+      "customer": {
+        "id": "507f1f77bcf86cd799439023",
+        "firstName": "Valid",
+        "lastName": "Customer",
+        "phoneNumber": "5551234567",
+        "email": "valid@example.com",
+        "lastTransaction": null,
+        "createdAt": "2024-01-15T22:05:00.000Z",
+        "updatedAt": "2024-01-15T22:05:00.000Z"
+      }
+    }
+  ],
+  "failures": [
+    {
+      "row": 2,
+      "data": {
+        "firstName": "",
+        "lastName": "MissingFirst",
+        "phoneNumber": "5559876543",
+        "email": "missing.first@example.com"
+      },
+      "errors": [
+        {
+          "field": "firstName",
+          "message": "First name is required"
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "data": {
+        "firstName": "Duplicate",
+        "lastName": "Phone",
+        "phoneNumber": "5551234567",
+        "email": "duplicate@example.com"
+      },
+      "errors": [
+        {
+          "field": "phoneNumber",
+          "message": "Phone number already exists",
+          "existingCustomer": {
+            "id": "507f1f77bcf86cd799439023",
+            "name": "Valid Customer",
+            "phoneNumber": "5551234567"
+          }
+        }
+      ]
+    }
+    // ... more failures (limited to first 20 in response)
+  ],
+  "truncated": {
+    "successfulImports": false,
+    "failures": false
+  }
+}
+```
+
+**Error Responses:**
+```json
+// 400 Bad Request - No file provided
+{
+  "error": "Bad Request",
+  "message": "No CSV file provided",
+  "statusCode": 400
+}
+
+// 400 Bad Request - Invalid file type
+{
+  "error": "Bad Request",
+  "message": "Only CSV files are allowed",
+  "statusCode": 400
+}
+
+// 413 Payload Too Large - File too big
+{
+  "error": "Payload Too Large",
+  "message": "File size exceeds 5MB limit",
+  "statusCode": 413
+}
+```
+
+**Import Behavior:**
+- **Non-blocking**: Import continues even when individual rows fail
+- **Detailed reporting**: Each failure includes row number, data, and specific error reasons
+- **Conflict detection**: Identifies duplicate phone numbers and emails with existing customer info
+- **Data validation**: Validates all required fields and formats before import
+- **Response limiting**: Large imports show first 10 successful and first 20 failed imports in response
+- **Atomic per row**: Each customer creation is independent; failures don't affect other rows
+
+**Usage Examples:**
+```bash
+# Import customers from CSV file
+curl -X POST http://localhost:3000/bitetrack/customers/import \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "csvFile=@customers.csv"
+
+# Import with jq for pretty output
+curl -X POST http://localhost:3000/bitetrack/customers/import \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "csvFile=@customers.csv" | jq
+```
+
 ---
 
 ## Product Management

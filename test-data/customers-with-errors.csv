@@ -1,0 +1,10 @@
+firstName,lastName,phoneNumber,email
+Valid,Customer,5551234567,valid@example.com
+,MissingFirst,5559876543,missing.first@example.com
+Missing,,5555551234,missing.last@example.com
+Invalid,PhoneFormat,555-123-4567,invalid.phone@example.com
+Too,Short,123456789,too.short@example.com
+Too,Long,55512345678,too.long@example.com
+No,Phone,,no.phone@example.com
+Duplicate,Phone,5551234567,duplicate@example.com
+Another,Valid,5553333333,another.valid@example.com

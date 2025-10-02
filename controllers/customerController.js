@@ -1,5 +1,8 @@
 const Customer = require('../models/Customer');
 const Sale = require('../models/Sale');
+const csv = require('csv-parser');
+const multer = require('multer');
+const { Readable } = require('stream');
 
 const listCustomers = async (req, res) => {
   try {
@@ -316,10 +319,209 @@ const getCustomerTransactions = async (req, res) => {
   }
 };
 
+// Helper function to validate customer data
+const validateCustomerData = (data) => {
+  const errors = [];
+  
+  // Required field validations
+  if (!data.firstName || !data.firstName.toString().trim()) {
+    errors.push({ field: 'firstName', message: 'First name is required' });
+  }
+  
+  if (!data.lastName || !data.lastName.toString().trim()) {
+    errors.push({ field: 'lastName', message: 'Last name is required' });
+  }
+  
+  if (!data.phoneNumber || !data.phoneNumber.toString().trim()) {
+    errors.push({ field: 'phoneNumber', message: 'Phone number is required' });
+  } else {
+    // Phone number format validation
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(data.phoneNumber.toString().trim())) {
+      errors.push({ field: 'phoneNumber', message: 'Phone number must be exactly 10 digits' });
+    }
+  }
+  
+  return errors;
+};
+
+// Helper function to check for existing customers
+const checkForConflicts = async (customerData) => {
+  const conflicts = [];
+  const phoneNumber = customerData.phoneNumber.toString().trim();
+  const email = customerData.email ? customerData.email.toString().toLowerCase().trim() : null;
+  
+  // Check for duplicate phone number
+  const existingByPhone = await Customer.findOne({ phoneNumber });
+  if (existingByPhone) {
+    conflicts.push({
+      field: 'phoneNumber',
+      message: 'Phone number already exists',
+      existingCustomer: {
+        id: existingByPhone._id,
+        name: `${existingByPhone.firstName} ${existingByPhone.lastName}`,
+        phoneNumber: existingByPhone.phoneNumber
+      }
+    });
+  }
+  
+  // Check for duplicate email if provided
+  if (email) {
+    const existingByEmail = await Customer.findOne({ email });
+    if (existingByEmail) {
+      conflicts.push({
+        field: 'email',
+        message: 'Email already exists',
+        existingCustomer: {
+          id: existingByEmail._id,
+          name: `${existingByEmail.firstName} ${existingByEmail.lastName}`,
+          email: existingByEmail.email
+        }
+      });
+    }
+  }
+  
+  return conflicts;
+};
+
+const importCustomersFromCSV = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'No CSV file provided',
+        statusCode: 400
+      });
+    }
+
+    const results = [];
+    const successfulImports = [];
+    const failures = [];
+    let rowNumber = 0;
+
+    // Create a readable stream from the buffer
+    const stream = Readable.from(req.file.buffer.toString());
+    
+    // Process CSV with promise wrapper
+    await new Promise((resolve, reject) => {
+      stream
+        .pipe(csv())
+        .on('data', (data) => {
+          results.push(data);
+        })
+        .on('end', resolve)
+        .on('error', reject);
+    });
+
+    // Process each row
+    for (const row of results) {
+      rowNumber++;
+      
+      try {
+        // Basic validation
+        const validationErrors = validateCustomerData(row);
+        if (validationErrors.length > 0) {
+          failures.push({
+            row: rowNumber,
+            data: row,
+            errors: validationErrors
+          });
+          continue;
+        }
+
+        // Check for conflicts
+        const conflicts = await checkForConflicts(row);
+        if (conflicts.length > 0) {
+          failures.push({
+            row: rowNumber,
+            data: row,
+            errors: conflicts
+          });
+          continue;
+        }
+
+        // Create customer
+        const customerData = {
+          firstName: row.firstName.toString().trim(),
+          lastName: row.lastName.toString().trim(),
+          phoneNumber: row.phoneNumber.toString().trim(),
+          email: row.email && row.email.toString().trim() !== '' ? 
+                 row.email.toString().toLowerCase().trim() : undefined
+        };
+
+        const customer = new Customer(customerData);
+        await customer.save();
+        
+        successfulImports.push({
+          row: rowNumber,
+          customer: customer.toJSON()
+        });
+
+      } catch (error) {
+        // Handle unexpected errors during customer creation
+        const errorMessage = error.name === 'ValidationError' ? 
+          Object.values(error.errors).map(err => ({
+            field: err.path,
+            message: err.message
+          })) : [{ field: 'general', message: error.message || 'Unexpected error occurred' }];
+        
+        failures.push({
+          row: rowNumber,
+          data: row,
+          errors: errorMessage
+        });
+      }
+    }
+
+    // Return comprehensive results
+    res.status(200).json({
+      success: true,
+      message: `CSV import completed. ${successfulImports.length} customers imported successfully, ${failures.length} failed.`,
+      summary: {
+        totalRows: results.length,
+        successful: successfulImports.length,
+        failed: failures.length
+      },
+      successfulImports: successfulImports.slice(0, 10), // Limit to first 10 for response size
+      failures: failures.slice(0, 20), // Limit to first 20 failures
+      truncated: {
+        successfulImports: successfulImports.length > 10,
+        failures: failures.length > 20
+      }
+    });
+
+  } catch (error) {
+    console.error('CSV import error:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to process CSV file',
+      statusCode: 500,
+      details: error.message
+    });
+  }
+};
+
+// Configure multer for file upload
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV files are allowed'));
+    }
+  }
+});
+
 module.exports = {
   listCustomers,
   createCustomer,
   updateCustomer,
   deleteCustomer,
-  getCustomerTransactions
+  getCustomerTransactions,
+  importCustomersFromCSV,
+  upload
 };
