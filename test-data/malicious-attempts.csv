@@ -1,0 +1,8 @@
+firstName,lastName,phoneNumber,email
+"'; DROP TABLE customers; --",Injection,5551234567,sql@injection.com
+"<script>alert('XSS')</script>",Script,5559876543,xss@test.com
+"${process.env.JWT_SECRET}",Template,5555551234,template@injection.com
+"{{constructor.constructor('return process')().env}}",Handlebars,5551111111,handlebars@attack.com
+"function(){return 'injected'}()",Function,5552222222,function@injection.com
+"__proto__",Prototype,5553333333,proto@pollution.com
+"require('child_process').exec('ls -la')",ChildProcess,5554444444,child@process.com

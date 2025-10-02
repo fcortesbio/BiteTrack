@@ -1,0 +1,5 @@
+firstName,lastName,phoneNumber,email
+"'; DROP TABLE customers; --",Injection,9991234567,sql@injection.com
+"<script>alert('XSS')</script>",Script,9999876543,xss@test.com
+"${process.env.JWT_SECRET}",Template,9995551234,template@injection.com
+"{{constructor.constructor('return process')().env}}",Handlebars,9991111111,handlebars@attack.com
