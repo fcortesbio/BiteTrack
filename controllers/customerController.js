@@ -14,16 +14,88 @@ const createCustomer = async (req, res) => {
   try {
     const { firstName, lastName, phoneNumber, email } = req.body;
 
+    // Check for duplicate phone number
+    const existingCustomerByPhone = await Customer.findOne({ phoneNumber });
+    if (existingCustomerByPhone) {
+      return res.status(409).json({
+        error: 'Conflict',
+        message: 'A customer with this phone number already exists',
+        statusCode: 409,
+        details: [{
+          field: 'phoneNumber',
+          message: 'Phone number must be unique',
+          existingCustomer: {
+            id: existingCustomerByPhone._id,
+            name: `${existingCustomerByPhone.firstName} ${existingCustomerByPhone.lastName}`,
+            phoneNumber: existingCustomerByPhone.phoneNumber
+          }
+        }]
+      });
+    }
+
+    // Check for duplicate email if provided
+    if (email && email.trim() !== '') {
+      const existingCustomerByEmail = await Customer.findOne({ email: email.toLowerCase().trim() });
+      if (existingCustomerByEmail) {
+        return res.status(409).json({
+          error: 'Conflict',
+          message: 'A customer with this email already exists',
+          statusCode: 409,
+          details: [{
+            field: 'email',
+            message: 'Email must be unique',
+            existingCustomer: {
+              id: existingCustomerByEmail._id,
+              name: `${existingCustomerByEmail.firstName} ${existingCustomerByEmail.lastName}`,
+              email: existingCustomerByEmail.email
+            }
+          }]
+        });
+      }
+    }
+
+    // Create new customer
     const customer = new Customer({
-      firstName,
-      lastName,
-      phoneNumber,
-      email: email || undefined // Convert empty string to undefined for sparse index
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      phoneNumber: phoneNumber.trim(),
+      email: email && email.trim() !== '' ? email.toLowerCase().trim() : undefined
     });
 
     await customer.save();
     res.status(201).json(customer.toJSON());
   } catch (error) {
+    // Handle MongoDB duplicate key errors as backup
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyPattern)[0];
+      const fieldDisplayName = duplicateField === 'phoneNumber' ? 'phone number' : duplicateField;
+      
+      return res.status(409).json({
+        error: 'Conflict',
+        message: `A customer with this ${fieldDisplayName} already exists`,
+        statusCode: 409,
+        details: [{
+          field: duplicateField,
+          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`
+        }]
+      });
+    }
+    
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const details = Object.values(error.errors).map(err => ({
+        field: err.path,
+        message: err.message
+      }));
+      
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Customer data validation failed',
+        statusCode: 400,
+        details
+      });
+    }
+    
     throw error;
   }
 };
@@ -33,18 +105,9 @@ const updateCustomer = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Convert empty email to undefined for sparse index
-    if (updates.email === '') {
-      updates.email = undefined;
-    }
-
-    const customer = await Customer.findByIdAndUpdate(
-      id,
-      updates,
-      { new: true, runValidators: true }
-    );
-
-    if (!customer) {
+    // Verify customer exists
+    const existingCustomer = await Customer.findById(id);
+    if (!existingCustomer) {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Customer not found',
@@ -52,8 +115,111 @@ const updateCustomer = async (req, res) => {
       });
     }
 
+    // Check for duplicate phone number if being updated
+    if (updates.phoneNumber && updates.phoneNumber.trim() !== existingCustomer.phoneNumber) {
+      const duplicatePhoneCustomer = await Customer.findOne({ 
+        phoneNumber: updates.phoneNumber.trim(),
+        _id: { $ne: id } // Exclude current customer
+      });
+      
+      if (duplicatePhoneCustomer) {
+        return res.status(409).json({
+          error: 'Conflict',
+          message: 'A customer with this phone number already exists',
+          statusCode: 409,
+          details: [{
+            field: 'phoneNumber',
+            message: 'Phone number must be unique',
+            existingCustomer: {
+              id: duplicatePhoneCustomer._id,
+              name: `${duplicatePhoneCustomer.firstName} ${duplicatePhoneCustomer.lastName}`,
+              phoneNumber: duplicatePhoneCustomer.phoneNumber
+            }
+          }]
+        });
+      }
+    }
+
+    // Check for duplicate email if being updated
+    if (updates.email && updates.email.trim() !== '' && 
+        updates.email.toLowerCase().trim() !== existingCustomer.email) {
+      const duplicateEmailCustomer = await Customer.findOne({ 
+        email: updates.email.toLowerCase().trim(),
+        _id: { $ne: id } // Exclude current customer
+      });
+      
+      if (duplicateEmailCustomer) {
+        return res.status(409).json({
+          error: 'Conflict',
+          message: 'A customer with this email already exists',
+          statusCode: 409,
+          details: [{
+            field: 'email',
+            message: 'Email must be unique',
+            existingCustomer: {
+              id: duplicateEmailCustomer._id,
+              name: `${duplicateEmailCustomer.firstName} ${duplicateEmailCustomer.lastName}`,
+              email: duplicateEmailCustomer.email
+            }
+          }]
+        });
+      }
+    }
+
+    // Prepare clean updates
+    const cleanUpdates = { ...updates };
+    
+    // Clean and normalize data
+    if (cleanUpdates.firstName) cleanUpdates.firstName = cleanUpdates.firstName.trim();
+    if (cleanUpdates.lastName) cleanUpdates.lastName = cleanUpdates.lastName.trim();
+    if (cleanUpdates.phoneNumber) cleanUpdates.phoneNumber = cleanUpdates.phoneNumber.trim();
+    
+    // Handle email normalization
+    if (cleanUpdates.email === '' || cleanUpdates.email === null) {
+      cleanUpdates.email = undefined; // For sparse index
+    } else if (cleanUpdates.email) {
+      cleanUpdates.email = cleanUpdates.email.toLowerCase().trim();
+    }
+
+    const customer = await Customer.findByIdAndUpdate(
+      id,
+      cleanUpdates,
+      { new: true, runValidators: true }
+    );
+
     res.json(customer.toJSON());
   } catch (error) {
+    // Handle MongoDB duplicate key errors
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyPattern)[0];
+      const fieldDisplayName = duplicateField === 'phoneNumber' ? 'phone number' : duplicateField;
+      
+      return res.status(409).json({
+        error: 'Conflict',
+        message: `A customer with this ${fieldDisplayName} already exists`,
+        statusCode: 409,
+        details: [{
+          field: duplicateField,
+          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`
+        }]
+      });
+    }
+    
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const details = Object.values(error.errors).map(err => ({
+        field: err.path,
+        message: err.message
+      }));
+      
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Customer data validation failed',
+        statusCode: 400,
+        details
+      });
+    }
+    
     throw error;
   }
 };
