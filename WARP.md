@@ -116,6 +116,24 @@ BiteTrack/
 - Customer `lastTransaction` updated on successful sale
 - Sales track `priceAtSale` for historical accuracy
 
+### Reporting & Analytics Architecture
+
+**Comprehensive sales reporting system:**
+- **Analytics endpoint** (`/reporting/sales/analytics`) provides:
+  - Time-series data with flexible grouping (hour/day/week/month/year)
+  - Top products by revenue and quantity
+  - Customer analytics (unique customers, average spend)
+  - Payment settlement statistics
+- **CSV export endpoint** (`/reporting/sales/export`) supports three formats:
+  - `detailed`: Individual product line items with full transaction details
+  - `summary`: One row per sale with aggregate information
+  - `products`: Product performance metrics and sales statistics
+- **Advanced filtering** on all reporting endpoints:
+  - Date range filtering with timezone handling
+  - Customer/seller filtering
+  - Settlement status filtering
+- **Optimized MongoDB aggregation pipelines** for performance
+
 ### Database Relationships
 - `Seller.createdBy` → `Seller._id` (supports "Self" for bootstrap superadmin)
 - `Sale.customerId` → `Customer._id`
@@ -139,6 +157,7 @@ BiteTrack/
 - `/customers/*` - Customer database
 - `/products/*` - Inventory management  
 - `/sales/*` - Transaction processing
+- `/reporting/*` - Sales analytics and CSV exports
 
 ## Environment Configuration
 

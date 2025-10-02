@@ -1161,6 +1161,159 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
+  # Reporting Endpoints
+  /reporting/sales/analytics:
+    get:
+      summary: Generate comprehensive sales analytics
+      tags: [Reporting]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Generate comprehensive sales analytics including time-series data,
+        top products, customer analytics, and payment statistics.
+        Supports flexible time-based grouping for trend analysis.
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Start date for filtering (ISO 8601 format)
+          example: "2024-01-01T00:00:00.000Z"
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: End date for filtering (ISO 8601 format)
+          example: "2024-01-31T23:59:59.999Z"
+        - name: dateField
+          in: query
+          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          description: Date field to filter by
+        - name: groupBy
+          in: query
+          schema: { type: string, enum: [hour, day, week, month, year], default: day }
+          description: Time grouping for trend analysis
+      responses:
+        "200":
+          description: Comprehensive sales analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  period:
+                    type: object
+                    properties:
+                      startDate: { type: string, format: date-time }
+                      endDate: { type: string, format: date-time }
+                      dateField: { type: string }
+                      groupBy: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      totalSales: { type: integer }
+                      totalRevenue: { type: number }
+                      totalAmountPaid: { type: number }
+                      averageOrderValue: { type: number }
+                      averageItemsPerOrder: { type: number }
+                  timeSeries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id: { type: object }
+                        salesCount: { type: integer }
+                        revenue: { type: number }
+                        averageOrderValue: { type: number }
+                  topProducts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productName: { type: string }
+                        totalQuantitySold: { type: integer }
+                        totalRevenue: { type: number }
+                        salesCount: { type: integer }
+                  customerAnalytics:
+                    type: object
+                    properties:
+                      uniqueCustomers: { type: integer }
+                      averageCustomerSpent: { type: number }
+                      averageOrdersPerCustomer: { type: number }
+                  paymentAnalytics:
+                    type: object
+                    properties:
+                      settled:
+                        type: object
+                        properties:
+                          count: { type: integer }
+                          totalAmount: { type: number }
+                          totalPaid: { type: number }
+                      unsettled:
+                        type: object
+                        properties:
+                          count: { type: integer }
+                          totalAmount: { type: number }
+                          totalPaid: { type: number }
+        "400":
+          description: Invalid parameters or date format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /reporting/sales/export:
+    get:
+      summary: Export sales data as CSV
+      tags: [Reporting]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Export sales data in various CSV formats for external analysis.
+        Supports detailed transaction data, summary reports, and product performance exports.
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Start date for filtering (ISO 8601 format)
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: End date for filtering (ISO 8601 format)
+        - name: dateField
+          in: query
+          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          description: Date field to filter by
+        - name: format
+          in: query
+          schema: { type: string, enum: [detailed, summary, products], default: detailed }
+          description: CSV export format
+        - name: customerId
+          in: query
+          schema: { type: string }
+          description: Filter by customer ID
+        - name: sellerId
+          in: query
+          schema: { type: string }
+          description: Filter by seller ID
+        - name: settled
+          in: query
+          schema: { type: boolean }
+          description: Filter by settlement status
+      responses:
+        "200":
+          description: CSV file download
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'attachment; filename="bitetrack-sales-detailed-2024-01-01.csv"'
+        "400":
+          description: Invalid parameters or format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
   # Health Check Endpoint
   /health:
     get:
