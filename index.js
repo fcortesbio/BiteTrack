@@ -89,6 +89,7 @@ app.use("/bitetrack/products", productRoutes);
 app.use("/bitetrack/sales", salesRoutes);
 app.use("/bitetrack/inventory-drops", inventoryDropRoutes);
 app.use("/bitetrack/test-data", testDataRoutes);
+app.use("/bitetrack/reporting", reportingRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
