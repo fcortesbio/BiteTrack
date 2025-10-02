@@ -14,6 +14,7 @@ const productRoutes = require("./routes/products");
 const salesRoutes = require("./routes/sales");
 const inventoryDropRoutes = require("./routes/inventoryDrops");
 const testDataRoutes = require("./routes/testDataRoutes");
+const reportingRoutes = require("./routes/reporting");
 
 // Import middleware
 const errorHandler = require("./middleware/errorHandler");
