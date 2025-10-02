@@ -4,16 +4,29 @@
 
 BiteTrack is a production-ready RESTful API that empowers small food businesses to **ditch the spreadsheets** and embrace professional inventory, sales, customer management, and business intelligence. Built with Express.js, MongoDB, and enterprise-grade security with comprehensive reporting and food waste compliance features.
 
+---
+
+**📚 Quick Navigation:**
+[🚀 Quick Start](#-quick-start-5-minutes) • [🔑 First-Time Setup](#-first-time-setup-critical) • [📊 API Overview](#-api-overview) • [🏗️ Production Setup](#-production-setup) • [📄 Documentation](#-full-api-documentation-docsapi-documentationmd--postman-collection-docspostman-collectionjson)
+
 ## 🎯 **Why BiteTrack?**
 
-**The Problem:** Small food businesses struggle with:
+<table>
+<tr>
+<td width="50%">
+
+### 😟 **The Problem**
+Small food businesses struggle with:
 - 📊 Messy spreadsheets that break and get lost
 - 🤔 No real-time inventory tracking
 - 📱 Manual sales recording prone to errors
 - 👥 Unstructured customer data
 - 🔒 No secure multi-user access control
 
-**The Solution:** BiteTrack provides:
+</td>
+<td width="50%">
+
+### ✨ **The BiteTrack Solution**
 - ✅ **Real-time inventory management** - Never oversell again
 - ✅ **Atomic sales transactions** - Complete data integrity
 - ✅ **Multi-user support** with role-based permissions
@@ -23,58 +36,67 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 - ✅ **Docker-ready deployment** - Get running in minutes
 - ✅ **JWT-secured API** - Enterprise-level security
 
-## 🚀 **Quick Start (Docker Compose)**
+</td>
+</tr>
+</table>
+
+## 🚀 **Quick Start (5 Minutes)**
+
+**Get BiteTrack running in under 5 minutes:**
 
 ```bash
-# 1. Clone and setup
+# 1. Clone and navigate
 git clone https://github.com/fcortesbio/BiteTrack
 cd BiteTrack
 
-# 2. Setup MongoDB keyfile (for replica set authentication)
+# 2. Setup environment
 ./scripts/01-setup-keyfile.sh
+cp .env.development.example .env.development
 
-# 3. Copy development environment template
-cp .env.example .env.development
-# Edit .env.development with your settings if needed
-
-# 4. Start complete stack (MongoDB + BiteTrack API)
+# 3. Start everything
 docker compose up -d
 
-# 5. Verify everything is running
-docker compose ps
+# 4. Verify health
 curl http://localhost:3000/bitetrack/health
-
-# 🎉 API ready at http://localhost:3000
-# 🍃 MongoDB available at localhost:27017
 ```
 
-### 📋 **Complete Setup Workflow**
+**✨ That's it!** Your API is now running at `http://localhost:3000`
 
-**🎯 Option 1: Interactive Production Setup (Recommended)**
+> **⚠️ Next:** You'll need to create a SuperAdmin user before using the API (see [First-Time Setup](#-first-time-setup-critical) below)
+
+### 📋 **Advanced Setup Options**
+
+<details>
+<summary><strong>🤖 Automated Production Setup</strong></summary>
+
 ```bash
 # One-command production setup wizard
 ./scripts/00-init-production-setup.sh
 ```
-This interactive script guides you through the complete production setup process, including Docker cleanup, environment configuration, and all setup steps.
+Interactive script that handles complete production deployment with guided configuration.
 
-**🔧 Option 2: Manual Step-by-Step Setup**  
-For development or manual control, follow these numbered scripts in order:
+</details>
+
+<details>
+<summary><strong>🔧 Manual Step-by-Step Setup</strong></summary>
+
+For development or when you need full control:
 
 ```bash
-# Phase 1: Environment Setup
-./scripts/01-setup-keyfile.sh          # MongoDB keyfile setup
-./scripts/02-quick-persistence-test.sh # Verify stack health
+# Environment & Database
+./scripts/01-setup-keyfile.sh          # MongoDB keyfile
+./scripts/02-quick-persistence-test.sh # Health check
 
-# Phase 2: System Initialization  
-./scripts/03-create-superadmin.sh       # Create admin user (REQUIRED)
-./scripts/04-populate-test-data.js      # Add sample data
+# User Management & Data  
+./scripts/03-create-superadmin.sh       # Admin user (REQUIRED)
+./scripts/04-populate-test-data.js      # Sample data
 
-# Phase 3: Testing & Validation
-./scripts/05-test-data-persistence.sh   # Comprehensive testing
-./scripts/06-test-sales-filtering.js    # API feature validation
+# Testing & Validation
+./scripts/05-test-data-persistence.sh   # Data persistence test
+./scripts/06-test-sales-filtering.js    # API validation
 ```
 
-> 💡 **Scripts are numbered in logical workflow order** - follow the sequence for best results!
+</details>
 
 ## ⚙️ **Environment Configuration**
 
@@ -82,14 +104,15 @@ BiteTrack uses different environment files for different deployment scenarios:
 
 | File | Purpose | Tracked in Git |
 |------|---------|----------------|
-| `.env.example` | 📝 Template for developers | ✅ Yes (safe defaults) |
+| `.env.development.example` | 📝 Development template | ✅ Yes (safe defaults) |
 | `.env.development` | 👨‍💻 Local development config | ❌ No (contains secrets) |
 | `.env.production.template` | 🏗️ Production deployment guide | ✅ Yes (template only) |
+| `.env.production` | 🚀 Production config | ❌ No (contains secrets) |
 
 ### **Setup Your Environment**
 ```bash
 # For development (recommended)
-cp .env.example .env.development
+cp .env.development.example .env.development
 # Edit .env.development with your actual values
 
 # For production deployment
@@ -178,7 +201,7 @@ curl -X GET http://localhost:3000/bitetrack/sellers \
 node create-superadmin.js
 
 # Step 2: Copy/paste MongoDB command in mongosh
-mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
+mongosh mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 # Paste the generated db.sellers.insertOne() command
 ```
 
@@ -257,7 +280,7 @@ mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
 | **🗑️ Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
 | **🧪 Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
 
-> 📚 **Full API documentation:** [`docs/API.md`](docs/API.md) | **Postman Collection:** [`docs/BiteTrack.postman_collection.json`](docs/BiteTrack.postman_collection.json)
+> 📚 **Full API documentation:** [`docs/API-documentation.md`](docs/API-documentation.md) | **Postman Collection:** [`docs/postman-collection.json`](docs/postman-collection.json)
 
 ## 📊 **Data Models & Business Logic**
 
@@ -460,7 +483,7 @@ npm run dev  # Uses nodemon for hot reload
 curl http://localhost:3000/bitetrack/health
 
 # Import Postman collection for comprehensive testing
-# File: docs/BiteTrack.postman_collection.json
+# File: docs/postman-collection.json
 ```
 
 ### Data Persistence Testing
@@ -508,7 +531,7 @@ BiteTrack provides **both REST API and direct MongoDB access**, giving system ad
 #### **MongoDB Shell (mongosh) Access:**
 ```bash
 # Connect directly to the database
-mongosh mongodb://admin:supersecret@localhost:27017/bitetrack
+mongosh mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 
 # Example: View all collections
 show collections
@@ -530,7 +553,7 @@ db.sales.aggregate([
 #### **MongoDB Compass Integration:**
 ```bash
 # Connection string for MongoDB Compass GUI
-mongodb://admin:supersecret@localhost:27017/bitetrack
+mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 ```
 
 **Compass provides:**
@@ -578,17 +601,17 @@ db.sales.getIndexes()  // View all indexes
 ```bash
 # Full database backup
 docker compose exec mongodb mongodump \
-  --uri="mongodb://admin:supersecret@localhost:27017/bitetrack" \
+  --uri="mongodb://admin:${MONGO_ROOT_PASSWORD}@localhost:27017/bitetrack" \
   --out /data/backups/$(date +%Y%m%d_%H%M%S)
 
 # Restore from backup
 docker compose exec mongodb mongorestore \
-  --uri="mongodb://admin:supersecret@localhost:27017" \
+  --uri="mongodb://admin:${MONGO_ROOT_PASSWORD}@localhost:27017" \
   --drop /data/backups/BACKUP_FOLDER_NAME
 
 # Export specific collection to JSON
 docker compose exec mongodb mongoexport \
-  --uri="mongodb://admin:supersecret@localhost:27017/bitetrack" \
+  --uri="mongodb://admin:${MONGO_ROOT_PASSWORD}@localhost:27017/bitetrack" \
   --collection=sales \
   --out=/data/exports/sales_export.json
 ```
@@ -649,4 +672,4 @@ BiteTrack is open source and welcomes contributions!
 
 **🌟 Star this repo** if BiteTrack helps your food business grow! 
 
-**Questions?** Reach out via [GitHub Issues](https://github.com/fcortesbio/BiteTrack/issues) or check the [documentation](docs/API.md).
+**Questions?** Reach out via [GitHub Issues](https://github.com/fcortesbio/BiteTrack/issues) or check the [documentation](docs/API-documentation.md).
