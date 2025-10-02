@@ -15,3 +15,4 @@ test-data/sales-filtering-test-report.json
 
 # Secrets file containing credentials
 .secrets
+.env.development
