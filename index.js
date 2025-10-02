@@ -19,6 +19,9 @@ const reportingRoutes = require("./routes/reporting");
 // Import middleware
 const errorHandler = require("./middleware/errorHandler");
 
+// Import Swagger documentation configuration
+const { setupSwaggerUI } = require('./config/swagger');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -71,6 +74,40 @@ mongoose
     console.error("MongoDB connection error:", error);
     process.exit(1);
   });
+
+// Setup Swagger UI Documentation Portal
+setupSwaggerUI(app);
+
+// Welcome route - redirect to interactive documentation
+app.get('/', (req, res) => {
+  res.json({
+    message: '🍔 Welcome to BiteTrack API - Enterprise Business Intelligence Platform',
+    version: '2.0.0+',
+    documentation: {
+      interactive: `${req.protocol}://${req.get('host')}/api-docs`,
+      json: `${req.protocol}://${req.get('host')}/api-docs.json`,
+      static: 'https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md'
+    },
+    capabilities: {
+      endpoints: '36 professional API endpoints',
+      categories: '9 business management categories',
+      features: [
+        'Advanced Business Intelligence & Analytics',
+        'Food Waste Management & Compliance',
+        'Multi-role Authentication & Security',
+        'Atomic Transactions & Inventory Management',
+        'Professional Testing Infrastructure'
+      ]
+    },
+    quickStart: {
+      step1: 'Visit /api-docs for interactive documentation',
+      step2: 'Use POST /bitetrack/auth/login to get JWT token',
+      step3: 'Add Bearer token to Authorization header',
+      step4: 'Explore all 36 endpoints with live testing'
+    },
+    health: `${req.protocol}://${req.get('host')}/bitetrack/health`
+  });
+});
 
 // Health check endpoint
 app.get("/bitetrack/health", (req, res) => {
