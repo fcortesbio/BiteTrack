@@ -75,17 +75,25 @@ mongoose
     process.exit(1);
   });
 
-// Setup Swagger UI Documentation Portal
-setupSwaggerUI(app);
+// Setup Swagger UI Documentation Portal with dynamic port configuration
+setupSwaggerUI(app, PORT);
 
 // Welcome route - redirect to interactive documentation
 app.get('/', (req, res) => {
+  const host = req.get('host') || `localhost:${PORT}`;
+  const protocol = req.protocol || 'http';
+  
   res.json({
     message: '🍔 Welcome to BiteTrack API - Enterprise Business Intelligence Platform',
     version: '2.0.0+',
+    server: {
+      host: host,
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development'
+    },
     documentation: {
-      interactive: `${req.protocol}://${req.get('host')}/api-docs`,
-      json: `${req.protocol}://${req.get('host')}/api-docs.json`,
+      interactive: `${protocol}://${host}/api-docs`,
+      json: `${protocol}://${host}/api-docs.json`,
       static: 'https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md'
     },
     capabilities: {
