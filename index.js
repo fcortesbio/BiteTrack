@@ -24,6 +24,16 @@ const { setupSwaggerUI } = require('./config/swagger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Development environment logging
+if (isDevelopment) {
+  console.log('🔧 Development mode detected - Enhanced verbosity enabled');
+  console.log('📁 Environment file:', process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env');
+  console.log('🗄️  MongoDB URI:', process.env.MONGO_URI ? '✅ Configured' : '❌ Missing');
+  console.log('🔐 JWT Secret:', process.env.JWT_SECRET ? '✅ Configured' : '❌ Missing');
+  console.log('🌍 Frontend URLs:', process.env.FRONTEND_URLS || 'Using defaults');
+}
 
 // Trust proxy for reverse proxy deployments (Nginx, Traefik, etc.)
 app.set('trust proxy', 1);
@@ -59,19 +69,40 @@ app.use(limiter);
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// logging middleware
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms"),
-);
+// Logging middleware - enhanced verbosity for development
+if (isDevelopment) {
+  // Detailed development logging with colors and request details
+  app.use(morgan(':date[clf] :method :url :status :res[content-length] - :response-time ms :user-agent'));
+  
+  // Log environment variables confirmation (once)
+  console.log('🔍 Development logging enabled - Full request details will be shown');
+  console.log('📋 CORS origins:', corsOptions.origin);
+} else {
+  // Standard production logging
+  app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+}
 
-// Connect to MongoDB
+// Connect to MongoDB with enhanced development information
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("Connected to MongoDB");
+    if (isDevelopment) {
+      // More detailed MongoDB connection info for development
+      const connectionInfo = mongoose.connection;
+      console.log('🍃 MongoDB connection established successfully');
+      console.log(`📊 MongoDB database: ${connectionInfo.name}`);
+      console.log(`🔌 MongoDB host: ${connectionInfo.host}:${connectionInfo.port}`);
+      console.log(`🔢 MongoDB connection ID: ${connectionInfo.id}`);
+    } else {
+      console.log("Connected to MongoDB");
+    }
   })
   .catch((error) => {
-    console.error("MongoDB connection error:", error);
+    console.error("🔴 MongoDB connection error:", error);
+    if (isDevelopment) {
+      console.error("🧪 Check your .env.development file and MongoDB service status");
+      console.error("📌 MongoDB URI format should be: mongodb://username:password@host:port/database");
+    }
     process.exit(1);
   });
 
@@ -148,10 +179,22 @@ app.use("*", (req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// Start server
+// Start server with enhanced development information
 app.listen(PORT, () => {
-  console.log(`BiteTrack API server running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`\n🚀 BiteTrack API server running on port ${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+  
+  if (isDevelopment) {
+    console.log('\n📝 Development Server Information:');
+    console.log(`🔗 API Base URL: http://localhost:${PORT}/bitetrack`);
+    console.log(`📚 Interactive Docs: http://localhost:${PORT}/api-docs`);
+    console.log(`❤️  Health Check: http://localhost:${PORT}/bitetrack/health`);
+    console.log(`📊 API Overview: http://localhost:${PORT}/`);
+    console.log('\n🚀 Ready for development! File changes will trigger automatic restart.');
+    console.log('📂 Watching files: *.js, *.json, *.yaml');
+  }
+  
+  console.log('\n✨ Server ready - Happy coding! ✨\n');
 });
 
 module.exports = app;
