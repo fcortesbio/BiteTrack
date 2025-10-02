@@ -11,12 +11,20 @@ const path = require('path');
  * with Swagger UI to provide an interactive documentation portal.
  */
 
-// Load existing OpenAPI specification
-const loadOpenAPISpec = () => {
+// Load existing OpenAPI specification with dynamic server configuration
+const loadOpenAPISpec = (port, host = 'localhost') => {
   try {
     const yamlPath = path.join(__dirname, '../docs/openapi.yaml');
     const fileContents = fs.readFileSync(yamlPath, 'utf8');
     const spec = yaml.load(fileContents);
+    
+    // Update servers with dynamic port and environment-aware configuration
+    spec.servers = [
+      {
+        url: `http://${host}:${port}/bitetrack`,
+        description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`
+      }
+    ];
     
     // Enhanced with additional Swagger UI customizations
     spec.info = {
@@ -79,7 +87,7 @@ const loadOpenAPISpec = () => {
   } catch (error) {
     console.error('Error loading OpenAPI specification:', error);
     
-    // Fallback basic configuration
+    // Fallback basic configuration with dynamic port
     return {
       openapi: '3.1.0',
       info: {
@@ -89,8 +97,8 @@ const loadOpenAPISpec = () => {
       },
       servers: [
         {
-          url: 'http://localhost:3000/bitetrack',
-          description: 'Development server'
+          url: `http://${host}:${port}/bitetrack`,
+          description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`
         }
       ]
     };
@@ -159,16 +167,16 @@ const swaggerOptions = {
   }
 };
 
-// Load and export the complete specification
-const swaggerSpec = loadOpenAPISpec();
-
 module.exports = {
-  swaggerSpec,
   swaggerUi,
   swaggerOptions,
+  loadOpenAPISpec, // Export the function so we can call it with dynamic parameters
   
-  // Helper function to serve Swagger UI
-  setupSwaggerUI: (app) => {
+  // Helper function to serve Swagger UI with dynamic configuration
+  setupSwaggerUI: (app, port, host = 'localhost') => {
+    // Load specification with dynamic port and host
+    const swaggerSpec = loadOpenAPISpec(port, host);
+    
     // Swagger UI endpoint
     app.use('/api-docs', swaggerUi.serve);
     app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
@@ -179,8 +187,13 @@ module.exports = {
       res.send(swaggerSpec);
     });
     
-    console.log('📚 Swagger UI Documentation Portal initialized');
-    console.log('🌐 Interactive docs available at: http://localhost:3000/api-docs');
-    console.log('📄 JSON specification at: http://localhost:3000/api-docs.json');
+    // Dynamic logging with correct port information
+    const environment = process.env.NODE_ENV || 'development';
+    console.log(`📚 Swagger UI Documentation Portal initialized (${environment})`);
+    console.log(`🌐 Interactive docs available at: http://${host}:${port}/api-docs`);
+    console.log(`📄 JSON specification at: http://${host}:${port}/api-docs.json`);
+    
+    // Return the spec for potential use elsewhere
+    return swaggerSpec;
   }
 };
