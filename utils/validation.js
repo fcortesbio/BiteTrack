@@ -124,7 +124,9 @@ const validationRules = {
     body('phoneNumber')
       .trim()
       .notEmpty()
-      .withMessage('Phone number is required'),
+      .withMessage('Phone number is required')
+      .matches(/^\d{10}$/)
+      .withMessage('Phone number must be exactly 10 digits'),
     body('email')
       .optional()
       .isEmail()
@@ -147,7 +149,9 @@ const validationRules = {
       .optional()
       .trim()
       .notEmpty()
-      .withMessage('Phone number cannot be empty'),
+      .withMessage('Phone number cannot be empty')
+      .matches(/^\d{10}$/)
+      .withMessage('Phone number must be exactly 10 digits'),
     body('email')
       .optional()
       .isEmail()
