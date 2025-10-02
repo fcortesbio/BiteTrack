@@ -1,0 +1,35 @@
+{
+  "watch": [
+    "controllers/",
+    "models/",
+    "routes/",
+    "middleware/",
+    "utils/",
+    "config/",
+    "index.js",
+    ".env.development"
+  ],
+  "ext": "js,json,yaml,yml",
+  "ignore": [
+    "node_modules/",
+    "coverage/",
+    "test-data/",
+    "docs/",
+    "*.log",
+    "*.md",
+    "test-customer-validation.md"
+  ],
+  "delay": 1000,
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "colours": true,
+  "legacyWatch": false,
+  "verbose": false,
+  "quiet": false,
+  "events": {
+    "start": "echo '🔧 Starting BiteTrack development server...'",
+    "restart": "echo '🔄 Restarting due to file changes...'",
+    "crash": "echo '💥 Server crashed - fix the error and save a file to restart'"
+  }
+}
