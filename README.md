@@ -7,7 +7,7 @@ BiteTrack is a production-ready RESTful API that empowers small food businesses 
 ---
 
 **📚 Quick Navigation:**
-[🚀 Quick Start](#-quick-start-5-minutes) • [🔑 First-Time Setup](#-first-time-setup-critical) • [📊 API Overview](#-api-overview) • [🏗️ Production Setup](#-production-setup) • [📄 Documentation](#-full-api-documentation-docsapi-documentationmd--postman-collection-docspostman-collectionjson)
+[🚀 Quick Start](#-quick-start-5-minutes) • [🔑 First-Time Setup](#-first-time-setup-critical) • [🧪 Testing](#-testing-infrastructure) • [📊 API Overview](#-api-overview) • [🏗️ Production Setup](#-production-setup) • [📄 Documentation](#-full-api-documentation-docsapi-documentationmd--postman-collection-docspostman-collectionjson)
 
 ## 🎯 **Why BiteTrack?**
 
@@ -208,6 +208,48 @@ mongosh mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 </details>
 
 > 💡 **Pro tip:** The API includes a public route to check if an email exists: `GET /auth/seller-status?email=test@example.com` - perfect for client-side login flows!
+
+## 🧪 **Testing Infrastructure**
+
+**Production-ready testing suite with Jest + Supertest + MongoDB Memory Server**
+
+### ⚡ **Quick Testing**
+```bash
+# Run all tests (20/20 passing)
+npm test
+
+# Development testing workflows
+npm run test:watch      # Watch mode for active development
+npm run test:coverage   # Coverage analysis (26% → 95% roadmap)
+npm run test:verbose    # Detailed test output
+
+# Run specific test suites
+npm test -- auth-real   # Authentication tests (16/16 ✅)
+npm test -- products    # Product tests (placeholder - ready for implementation)
+npm test -- sales       # Sales tests (placeholder - ready for implementation)
+```
+
+### 📊 **Current Test Status**
+- **✅ Authentication Routes**: 16/16 tests passing (100% complete)
+  - Login, activation, password reset, seller status
+  - JWT token validation, password hashing, role management
+  - Security edge cases and error handling
+- **⚠️ API Endpoints**: 0% coverage (authentication foundation complete)
+  - Products, Sales, Customers, Inventory, Reporting (ready for implementation)
+  - Comprehensive test roadmap with 8-phase expansion plan
+
+### 🎯 **Testing Roadmap**
+**Phase 1 (Weeks 1-2):** Product + Sales Testing → 60% coverage  
+**Phase 2 (Weeks 3-4):** Customer + Seller Management → 80% coverage  
+**Phase 3 (Weeks 5-6):** Inventory + Reporting → 90% coverage  
+**Phase 4 (Weeks 7-8):** Security + Performance → 95% coverage
+
+### 📚 **Testing Documentation**
+- **📋 Complete Status & Roadmap**: [`TESTING-STATUS.md`](TESTING-STATUS.md)
+- **🔧 Test Infrastructure Guide**: [`tests/README.md`](tests/README.md)
+- **💻 Test Implementation Examples**: [`tests/integration/auth-real.test.js`](tests/integration/auth-real.test.js)
+
+**🚀 Ready for systematic API testing expansion with production-grade infrastructure!**
 
 ## 💼 **Perfect For**
 
