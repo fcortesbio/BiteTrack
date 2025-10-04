@@ -1,13 +1,15 @@
 openapi: 3.1.0
 info:
   title: BiteTrack API
-  version: 1.0.0
+  version: 2.1.0
   description: >
-    BiteTrack is a Dockerized Express.js RESTful API designed for small food
-    businesses to manage sellers, products, customers, and sales.
-    Authentication is JWT-based with role-based access control.
+    BiteTrack is a comprehensive food business management platform with enterprise-grade
+    features including CSV data import, advanced analytics, and production-ready error handling.
+    Features JWT-based authentication with role-based access control, inventory management,
+    sales processing, and business intelligence capabilities.
 servers:
-  - url: http://localhost:3000/bitetrack
+  - url: http://localhost:3001/bitetrack
+    description: Development server
 
 components:
   securitySchemes:
@@ -89,6 +91,33 @@ components:
         settled: { type: boolean, description: "True if fully paid" }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
+        # CSV Import specific fields
+        originalCreatedAt: 
+          type: string
+          format: date-time
+          nullable: true
+          description: "Original sale date from imported data (for historical accuracy)"
+        importedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: "Timestamp when this sale was imported from external source"
+        externalSale:
+          type: boolean
+          default: false
+          description: "True if this sale was imported from external system"
+        importBatch:
+          type: string
+          nullable: true
+          description: "Batch identifier for tracking imported sales"
+        receiptUrl:
+          type: string
+          nullable: true
+          description: "URL to receipt or proof of sale"
+        paymentMethod:
+          type: string
+          nullable: true
+          description: "Payment method used for the transaction"
       required:
         [customerId, sellerId, products, totalAmount, amountPaid, settled]
 
@@ -202,7 +231,8 @@ components:
         error: { type: string }
         message: { type: string }
         statusCode: { type: integer }
-      required: [error, message, statusCode]
+        timestamp: { type: string, format: date-time }
+      required: [error, message, statusCode, timestamp]
 
     ValidationError:
       type: object
@@ -217,7 +247,58 @@ components:
               field: { type: string }
               message: { type: string }
         statusCode: { type: integer }
-      required: [error, message, statusCode]
+        timestamp: { type: string, format: date-time }
+      required: [error, message, statusCode, timestamp]
+        
+    # CSV Import specific schemas
+    CSVImportSummary:
+      type: object
+      properties:
+        totalRows: { type: integer, minimum: 0 }
+        imported: { type: integer, minimum: 0 }
+        skipped: { type: integer, minimum: 0 }
+        importBatchId: { type: string }
+      required: [totalRows, imported, skipped, importBatchId]
+        
+    CSVImportError:
+      type: object
+      properties:
+        field: { type: string }
+        message: { type: string }
+      required: [field, message]
+        
+    CSVSkippedRow:
+      type: object
+      properties:
+        row: { type: integer, minimum: 1 }
+        data: { type: object }
+        skip_reason: { type: string }
+        errors: 
+          type: array
+          items: { $ref: "#/components/schemas/CSVImportError" }
+      required: [row, data, skip_reason, errors]
+        
+    CSVImportResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        summary: { $ref: "#/components/schemas/CSVImportSummary" }
+        importedSales:
+          type: array
+          items: { type: object }
+        skippedRows:
+          type: array
+          items: { $ref: "#/components/schemas/CSVSkippedRow" }
+        warnings:
+          type: array
+          items: { type: string }
+        truncated:
+          type: object
+          properties:
+            importedSales: { type: boolean }
+            skippedRows: { type: boolean }
+      required: [success, message, summary, importedSales, skippedRows, warnings, truncated]
 
     LoginRequest:
       type: object
@@ -863,6 +944,55 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/ValidationError" }
 
+  /sales/import:
+    post:
+      summary: Import sales data from CSV file
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Import sales data from CSV file with comprehensive validation and error handling.
+        Supports customer/product resolution, duplicate detection, and batch tracking.
+        
+        **CSV Format Required:**
+        - Date,Contact Name,Contact Phone,Contact Email,Product,Quantity,Unit Price,Total Amount,Amount Paid
+        
+        **Features:**
+        - Automatic phone number normalization (supports various formats)
+        - Customer resolution by phone or email
+        - Product lookup by name (case-insensitive)
+        - Duplicate detection based on customer + timestamp
+        - Historical date preservation with originalCreatedAt
+        - Batch tracking for audit purposes
+        - Comprehensive error reporting with skip reasons
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [csvFile]
+              properties:
+                csvFile:
+                  type: string
+                  format: binary
+                  description: CSV file containing sales data (max 10MB)
+      responses:
+        "200":
+          description: CSV import completed with results
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CSVImportResponse" }
+        "400":
+          description: No file provided or invalid file format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413":
+          description: File size exceeds 10MB limit
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
   /sales/{id}:
     get:
       summary: Get sale details
@@ -884,6 +1014,49 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
+
+  /sales/{id}/settle:
+    patch:
+      summary: Settle (update payment for) a sale
+      tags: [Sales]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Update the payment amount for a sale and automatically calculate settlement status.
+        The sale will be marked as settled if amountPaid >= totalAmount.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+          description: Sale ID to settle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amountPaid]
+              properties:
+                amountPaid:
+                  type: number
+                  minimum: 0
+                  description: New payment amount for the sale
+      responses:
+        "200":
+          description: Sale payment updated successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Sale" }
+        "404":
+          description: Sale not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "400":
+          description: Invalid payment amount
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
 
   # Reporting Endpoints
   /reporting/sales/analytics:
@@ -1286,37 +1459,6 @@ paths:
               schema: { $ref: "#/components/schemas/Error" }
         "403":
           description: Forbidden (disabled in production, insufficient permissions, or not SuperAdmin)
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Error" }
-
-  /sales/{id}/settle:
-    patch:
-      summary: Settle a sale (update payment)
-      tags: [Sales]
-      security: [{ bearerAuth: [] }]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [amountPaid]
-              properties:
-                amountPaid: { type: number, minimum: 0 }
-      responses:
-        "200":
-          description: Sale payment updated
-          content:
-            application/json:
-              schema: { $ref: "#/components/schemas/Sale" }
-        "404":
-          description: Sale not found
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
