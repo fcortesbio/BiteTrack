@@ -179,10 +179,71 @@ app.use("*", (req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+// Global error handlers to prevent server crashes
+process.on('uncaughtException', (error) => {
+  console.error('💥 UNCAUGHT EXCEPTION! Shutting down gracefully...');
+  console.error('Error name:', error.name);
+  console.error('Error message:', error.message);
+  if (isDevelopment) {
+    console.error('Stack trace:', error.stack);
+  }
+  
+  // Perform graceful shutdown
+  gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED REJECTION! Shutting down gracefully...');
+  console.error('Reason:', reason);
+  console.error('Promise:', promise);
+  
+  // Perform graceful shutdown
+  gracefulShutdown('unhandledRejection');
+});
+
+// Graceful shutdown handler
+function gracefulShutdown(signal) {
+  console.log(`\n🔄 Received ${signal}. Starting graceful shutdown...`);
+  
+  // Close server first to stop accepting new requests
+  server.close(() => {
+    console.log('🔌 HTTP server closed');
+    
+    // Close MongoDB connection
+    mongoose.connection.close(false, () => {
+      console.log('🍃 MongoDB connection closed');
+      
+      if (isDevelopment) {
+        console.log('🧪 Development server shutdown complete');
+      }
+      
+      process.exit(1);
+    });
+  });
+  
+  // Force shutdown if graceful shutdown takes too long
+  setTimeout(() => {
+    console.error('⚠️  Forced shutdown - graceful shutdown timeout');
+    process.exit(1);
+  }, 10000); // 10 seconds timeout
+}
+
+// Handle SIGTERM and SIGINT signals for graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 SIGTERM received');
+  gracefulShutdown('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+  console.log('🛑 SIGINT received (Ctrl+C)');
+  gracefulShutdown('SIGINT');
+});
+
 // Start server with enhanced development information
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n🚀 BiteTrack API server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log('🛡️  Global error handlers installed');
   
   if (isDevelopment) {
     console.log('\n📝 Development Server Information:');

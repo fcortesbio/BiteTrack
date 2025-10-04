@@ -6,7 +6,7 @@ const csv = require('csv-parser');
 const multer = require('multer');
 const { Readable } = require('stream');
 
-const listSales = async (req, res) => {
+const listSales = async (req, res, next) => {
   try {
     const { 
       customerId, 
@@ -148,11 +148,11 @@ const listSales = async (req, res) => {
       }
     });
   } catch (error) {
-    throw error;
+    return next(error);
   }
 };
 
-const createSale = async (req, res) => {
+const createSale = async (req, res, next) => {
   const session = await mongoose.startSession();
   
   try {
@@ -220,13 +220,13 @@ const createSale = async (req, res) => {
         statusCode: 400
       });
     }
-    throw error;
+    return next(error);
   } finally {
     await session.endSession();
   }
 };
 
-const getSale = async (req, res) => {
+const getSale = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -241,11 +241,11 @@ const getSale = async (req, res) => {
 
     res.json(sale.toJSON());
   } catch (error) {
-    throw error;
+    return next(error);
   }
 };
 
-const settleSale = async (req, res) => {
+const settleSale = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { amountPaid } = req.body;
@@ -265,7 +265,7 @@ const settleSale = async (req, res) => {
     await sale.save();
     res.json(sale.toJSON());
   } catch (error) {
-    throw error;
+    return next(error);
   }
 };
 
@@ -388,7 +388,7 @@ const validateCSVRow = (row) => {
   return { errors, normalized };
 };
 
-const importSalesFromCSV = async (req, res) => {
+const importSalesFromCSV = async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -615,12 +615,7 @@ const importSalesFromCSV = async (req, res) => {
 
   } catch (error) {
     console.error('CSV import error:', error);
-    return res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to process CSV file',
-      statusCode: 500,
-      details: error.message
-    });
+    return next(error);
   }
 };
 
