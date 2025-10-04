@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">10.52% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/95</span>
+                <span class='fraction'>10/95</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">10.63% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/94</span>
+                <span class='fraction'>10/94</span>
             </div>
         
             
@@ -456,11 +456,11 @@
 <a name='L391'></a><a href='#L391'>391</a>
 <a name='L392'></a><a href='#L392'>392</a>
 <a name='L393'></a><a href='#L393'>393</a>
-<a name='L394'></a><a href='#L394'>394</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L394'></a><a href='#L394'>394</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -477,8 +477,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -569,7 +569,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -654,8 +654,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -746,8 +746,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -844,16 +844,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const TestDataPopulator = <span class="cstat-no" title="statement not covered" >require('../scripts/04-populate-test-data');</span>
-const Customer = <span class="cstat-no" title="statement not covered" >require('../models/Customer');</span>
-const Product = <span class="cstat-no" title="statement not covered" >require('../models/Product');</span>
-const Sale = <span class="cstat-no" title="statement not covered" >require('../models/Sale');</span>
-const PendingSeller = <span class="cstat-no" title="statement not covered" >require('../models/PendingSeller');</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const TestDataPopulator = require('../scripts/04-populate-test-data');
+const Customer = require('../models/Customer');
+const Product = require('../models/Product');
+const Sale = require('../models/Sale');
+const PendingSeller = require('../models/PendingSeller');
 &nbsp;
 /**
  * Test Data Management Controller
@@ -870,7 +870,7 @@ const PendingSeller = <span class="cstat-no" title="statement not covered" >requ
  * @access  Admin/SuperAdmin only
  * @body    { preset?, cleanBefore?, verbose? }
  */
-const populateTestData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
+const populateTestData = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // Security check - only allow in non-production environments
 <span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'production') {</span>
@@ -962,7 +962,7 @@ const populateTestData = <span class="cstat-no" title="statement not covered" ><
  * @access  Admin/SuperAdmin only
  * @body    { confirmClean?, preserveData? }
  */
-const cleanTestData = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
+const cleanTestData = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // Security check - only allow in non-production environments
 <span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'production') {</span>
@@ -1047,7 +1047,7 @@ const cleanTestData = <span class="cstat-no" title="statement not covered" ><spa
  * @route   GET /api/test-data/status
  * @access  Admin/SuperAdmin only
  */
-const getTestDataStatus = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
+const getTestDataStatus = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // Security check - only allow in non-production environments
 <span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'production') {</span>
@@ -1139,7 +1139,7 @@ const getTestDataStatus = <span class="cstat-no" title="statement not covered" >
  * @access  SuperAdmin only
  * @body    { scenario, confirmReset }
  */
-const resetToScenario = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
+const resetToScenario = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     // Security check - only allow in non-production environments
 <span class="cstat-no" title="statement not covered" >    if (process.env.NODE_ENV === 'production') {</span>
@@ -1237,7 +1237,7 @@ const resetToScenario = <span class="cstat-no" title="statement not covered" ><s
   }
 };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = {</span>
+module.exports = {
   populateTestData,
   cleanTestData,
   getTestDataStatus,
@@ -1249,7 +1249,7 @@ const resetToScenario = <span class="cstat-no" title="statement not covered" ><s
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-04T15:38:34.459Z
+                at 2025-10-04T15:44:47.973Z
             </div>
         <script src="../prettify.js"></script>
         <script>

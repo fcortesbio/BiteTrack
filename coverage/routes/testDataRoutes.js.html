@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/9</span>
+                <span class='fraction'>9/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -108,22 +108,19 @@
 <a name='L43'></a><a href='#L43'>43</a>
 <a name='L44'></a><a href='#L44'>44</a>
 <a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<a name='L46'></a><a href='#L46'>46</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -133,31 +130,34 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const express = <span class="cstat-no" title="statement not covered" >require('express');</span>
-const router = <span class="cstat-no" title="statement not covered" >express.Router();</span>
+<span class="cline-any cline-yes">2x</span></td><td class="text"><pre class="prettyprint lang-js">const express = require('express');
+const router = express.Router();
 &nbsp;
 // Import middleware
-const { authenticate, authorize } = <span class="cstat-no" title="statement not covered" >require('../middleware/auth');</span>
+const { authenticate, authorize } = require('../middleware/auth');
 &nbsp;
 // Import controller functions
 const {
@@ -165,7 +165,7 @@ const {
   cleanTestData,
   getTestDataStatus,
   resetToScenario
-} = <span class="cstat-no" title="statement not covered" >require('../controllers/testDataController');</span>
+} = require('../controllers/testDataController');
 &nbsp;
 /**
  * Test Data Management Routes
@@ -178,34 +178,34 @@ const {
 // @route   GET /test-data/status
 // @desc    Get current test data statistics and counts
 // @access  Admin/SuperAdmin
-<span class="cstat-no" title="statement not covered" >router.get('/status', authenticate, authorize('admin', 'superadmin'), getTestDataStatus);</span>
+router.get('/status', authenticate, authorize('admin', 'superadmin'), getTestDataStatus);
 &nbsp;
 // @route   POST /test-data/populate
 // @desc    Populate database with test data
 // @access  Admin/SuperAdmin
 // @body    { preset: 'minimal|dev|full|bulk', cleanBefore: boolean, verbose: boolean }
-<span class="cstat-no" title="statement not covered" >router.post('/populate', authenticate, authorize('admin', 'superadmin'), populateTestData);</span>
+router.post('/populate', authenticate, authorize('admin', 'superadmin'), populateTestData);
 &nbsp;
 // @route   DELETE /test-data/clean
 // @desc    Clean/remove test data from database
 // @access  Admin/SuperAdmin
 // @body    { confirmClean: true, preserveData: ['customers', 'products', 'sales', 'pendingSellers'] }
-<span class="cstat-no" title="statement not covered" >router.delete('/clean', authenticate, authorize('admin', 'superadmin'), cleanTestData);</span>
+router.delete('/clean', authenticate, authorize('admin', 'superadmin'), cleanTestData);
 &nbsp;
 // @route   POST /test-data/reset
 // @desc    Reset database to specific test scenario (SuperAdmin only)
 // @access  SuperAdmin only
 // @body    { scenario: 'clean|minimal|dev|full', confirmReset: true }
-<span class="cstat-no" title="statement not covered" >router.post('/reset', authenticate, authorize('superadmin'), resetToScenario);</span>
+router.post('/reset', authenticate, authorize('superadmin'), resetToScenario);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >module.exports = router;</span></pre></td></tr></table></pre>
+module.exports = router;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-04T15:38:34.497Z
+                at 2025-10-04T15:44:48.005Z
             </div>
         <script src="../prettify.js"></script>
         <script>
