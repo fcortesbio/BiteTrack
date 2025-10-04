@@ -1,0 +1,10 @@
+customerName,contact,productName,quantity,amountPaid,paymentMethod,timestamp,receiptUrl
+Valid Customer,5551234567,Club Sandwich,1,12.99,Card,10/4/2024 16:00:00,
+Missing Name,,Coffee,1,4.50,Cash,10/4/2024 16:15:00,
+Missing Product,jane@example.com,,1,5.00,Cash,10/4/2024 16:30:00,
+Invalid Contact,invalid-contact,Burger,1,10.00,Cash,10/4/2024 16:45:00,
+Unknown Customer,unknowncustomer@example.com,Club Sandwich,1,12.99,Card,10/4/2024 17:00:00,
+Unknown Product,5559876543,NonExistentProduct,1,15.00,Cash,10/4/2024 17:15:00,
+Negative Payment,5552222222,Coffee,1,-5.00,Cash,10/4/2024 17:30:00,
+Invalid Quantity,alice.williams@test.com,Club Sandwich,0,12.99,Card,10/4/2024 17:45:00,
+Invalid Date,5553333333,Coffee,1,4.50,Cash,invalid-date-format,

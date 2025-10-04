@@ -42,6 +42,32 @@ const saleSchema = new mongoose.Schema({
   settled: {
     type: Boolean,
     default: false
+  },
+  
+  // CSV Import Fields (all optional for backwards compatibility)
+  originalCreatedAt: {
+    type: Date,
+    default: null
+  },
+  importedAt: {
+    type: Date,
+    default: null
+  },
+  externalSale: {
+    type: Boolean,
+    default: false
+  },
+  receiptUrl: {
+    type: String,
+    default: null
+  },
+  importBatch: {
+    type: String,
+    default: null
+  },
+  paymentMethod: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
