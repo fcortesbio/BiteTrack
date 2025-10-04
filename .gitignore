@@ -19,3 +19,4 @@ coverage/
 # Secrets file containing credentials
 .secrets
 .env.development
+.secrets-backup
