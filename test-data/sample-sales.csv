@@ -1,0 +1,6 @@
+customerName,contact,productName,quantity,amountPaid,paymentMethod,timestamp,receiptUrl
+John Doe,5551234567,Club Sandwich,2,25.98,Card,10/4/2024 14:30:15,https://drive.google.com/file/d/abc123
+Jane Smith,jane@example.com,Coffee,1,4.50,Cash,10/4/2024 14:45:00,
+Bob Johnson,5559876543,Burger Combo,1,12.99,Transfer,10/4/2024 15:00:30,https://drive.google.com/file/d/def456
+Alice Williams,alice.williams@test.com,Veggie Wrap,1,0,Cash,10/4/2024 15:15:45,
+Carol Brown,5552222222,Club Sandwich,1,12.99,Card,10/4/2024 15:30:00,

@@ -19,10 +19,10 @@ const getSalesAnalytics = async (req, res) => {
       groupBy = 'day' // day, week, month, year
     } = req.query;
 
-    // Build date filter
+    // Build date filter - use originalCreatedAt when available, fallback to createdAt
     const dateFilter = {};
     if (startDate || endDate) {
-      const filter = {};
+      const filter = [];
       
       if (startDate) {
         const start = new Date(startDate);
@@ -34,7 +34,12 @@ const getSalesAnalytics = async (req, res) => {
           });
         }
         start.setUTCHours(0, 0, 0, 0);
-        filter.$gte = start;
+        filter.push({
+          $gte: [
+            { $ifNull: [`$originalCreatedAt`, `$${dateField}`] },
+            start
+          ]
+        });
       }
       
       if (endDate) {
@@ -47,10 +52,17 @@ const getSalesAnalytics = async (req, res) => {
           });
         }
         end.setUTCHours(23, 59, 59, 999);
-        filter.$lte = end;
+        filter.push({
+          $lte: [
+            { $ifNull: [`$originalCreatedAt`, `$${dateField}`] },
+            end
+          ]
+        });
       }
       
-      dateFilter[dateField] = filter;
+      if (filter.length > 0) {
+        dateFilter.$expr = filter.length === 1 ? filter[0] : { $and: filter };
+      }
     }
 
     // Parallel execution of analytics queries
@@ -80,8 +92,13 @@ const getSalesAnalytics = async (req, res) => {
       Sale.aggregate([
         { $match: dateFilter },
         {
+          $addFields: {
+            effectiveDate: { $ifNull: ['$originalCreatedAt', `$${dateField}`] }
+          }
+        },
+        {
           $group: {
-            _id: getGroupByDateExpression(groupBy, `$${dateField}`),
+            _id: getGroupByDateExpression(groupBy, '$effectiveDate'),
             salesCount: { $sum: 1 },
             revenue: { $sum: '$totalAmount' },
             averageOrderValue: { $avg: '$totalAmount' }
