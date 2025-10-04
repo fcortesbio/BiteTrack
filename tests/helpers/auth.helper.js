@@ -4,7 +4,7 @@
  */
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
-const User = require('../../models/User');
+const Seller = require('../../models/Seller');
 
 /**
  * Login a user and return response with token
@@ -14,7 +14,7 @@ const User = require('../../models/User');
  */
 const loginUser = async (app, credentials) => {
   const response = await request(app)
-    .post('/auth/login')
+    .post('/bitetrack/auth/login')
     .send(credentials);
   
   return response;
@@ -32,7 +32,7 @@ const getAuthToken = async (app, userData = null) => {
   
   // Register user
   await request(app)
-    .post('/auth/register')
+    .post('/bitetrack/auth/register')
     .send(defaultUserData);
   
   // Login user
@@ -89,7 +89,7 @@ const createAuthenticatedRequest = (requestObject, token) => {
 const createUserDirectly = async (userData = null) => {
   const defaultUserData = userData || testUtils.createTestUser();
   
-  const user = new User(defaultUserData);
+  const user = new Seller(defaultUserData);
   await user.save();
   
   return user;
@@ -104,7 +104,7 @@ const createAdminUserDirectly = async (role = 'admin') => {
   const adminData = testUtils.createAdminUser();
   adminData.role = role;
   
-  const admin = new User(adminData);
+  const admin = new Seller(adminData);
   await admin.save();
   
   return admin;
@@ -164,7 +164,7 @@ const createExpiredToken = (payload = {}) => {
     ...payload
   };
   
-  return jwt.sign(expiredPayload, process.env.JWT_SECRET || 'test-secret', {
+  return jwt.sign(expiredPayload, process.env.JWT_SECRET || 'test-jwt-secret-key-for-testing-only-not-for-production', {
     expiresIn: '-1h' // Expired 1 hour ago
   });
 };
