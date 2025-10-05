@@ -5,121 +5,121 @@
     {
       "firstName": "Alice",
       "lastName": "Johnson",
-      "phoneNumber": "+1-555-0101",
+      "phoneNumber": "5550101012",
       "email": "alice.johnson@email.com"
     },
     {
       "firstName": "Bob",
       "lastName": "Williams",
-      "phoneNumber": "(555) 123-4567",
+      "phoneNumber": "5551234567",
       "email": null
     },
     {
       "firstName": "Carmen",
       "lastName": "Martinez",
-      "phoneNumber": "555-234-5678",
+      "phoneNumber": "5552345678",
       "email": "carmen.martinez@gmail.com"
     },
     {
       "firstName": "Daniel",
       "lastName": "Brown",
-      "phoneNumber": "+1 (555) 345-6789",
+      "phoneNumber": "5553456789",
       "email": "dan.brown@outlook.com"
     },
     {
       "firstName": "Emma",
       "lastName": "Davis",
-      "phoneNumber": "555.456.7890",
+      "phoneNumber": "5554567890",
       "email": null
     },
     {
       "firstName": "Frank",
       "lastName": "Wilson",
-      "phoneNumber": "+1-555-567-8901",
+      "phoneNumber": "5555678901",
       "email": "frank.wilson@company.com"
     },
     {
       "firstName": "Grace",
       "lastName": "Lee",
-      "phoneNumber": "(555) 678-9012",
+      "phoneNumber": "5556789012",
       "email": "grace.lee@university.edu"
     },
     {
       "firstName": "Henry",
       "lastName": "Taylor",
-      "phoneNumber": "555-789-0123",
+      "phoneNumber": "5557890123",
       "email": null
     },
     {
       "firstName": "Isabella",
       "lastName": "Garcia",
-      "phoneNumber": "+1 555 890 1234",
+      "phoneNumber": "5558901234",
       "email": "isabella.garcia@yahoo.com"
     },
     {
       "firstName": "Jack",
       "lastName": "Anderson",
-      "phoneNumber": "(555) 901-2345",
+      "phoneNumber": "5559012345",
       "email": "jack.anderson@hotmail.com"
     },
     {
       "firstName": "Katie",
       "lastName": "Thompson",
-      "phoneNumber": "555.012.3456",
+      "phoneNumber": "5550123456",
       "email": "katie.thompson@business.org"
     },
     {
       "firstName": "Luis",
       "lastName": "Rodriguez",
-      "phoneNumber": "+1-555-123-4568",
+      "phoneNumber": "5551234568",
       "email": null
     },
     {
       "firstName": "Maya",
       "lastName": "Patel",
-      "phoneNumber": "(555) 234-5679",
+      "phoneNumber": "5552345679",
       "email": "maya.patel@tech.com"
     },
     {
       "firstName": "Nathan",
       "lastName": "Clark",
-      "phoneNumber": "555-345-6780",
+      "phoneNumber": "5553456780",
       "email": "nathan.clark@consulting.net"
     },
     {
       "firstName": "Olivia",
       "lastName": "White",
-      "phoneNumber": "+1 (555) 456-7891",
+      "phoneNumber": "5554567891",
       "email": null
     },
     {
       "firstName": "Paul",
       "lastName": "Harris",
-      "phoneNumber": "555.567.8902",
+      "phoneNumber": "5555678902",
       "email": "paul.harris@design.studio"
     },
     {
       "firstName": "Quinn",
       "lastName": "Martin",
-      "phoneNumber": "+1-555-678-9013",
+      "phoneNumber": "5556789013",
       "email": "quinn.martin@freelance.com"
     },
     {
       "firstName": "Rachel",
       "lastName": "Jackson",
-      "phoneNumber": "(555) 789-0124",
+      "phoneNumber": "5557890124",
       "email": "rachel.jackson@nonprofit.org"
     },
     {
       "firstName": "Samuel",
       "lastName": "Moore",
-      "phoneNumber": "555-890-1235",
+      "phoneNumber": "5558901235",
       "email": null
     },
     {
       "firstName": "Tina",
       "lastName": "Young",
-      "phoneNumber": "+1 555 901 2346",
+      "phoneNumber": "5559012346",
       "email": "tina.young@local.gov"
     }
   ],
@@ -127,31 +127,31 @@
     {
       "firstName": "Regular",
       "lastName": "Customer",
-      "phoneNumber": "+1-555-BULK-01",
+      "phoneNumber": "5551000001",
       "email": "regular@testdata.com"
     },
     {
       "firstName": "VIP",
       "lastName": "Customer",
-      "phoneNumber": "+1-555-BULK-02",
+      "phoneNumber": "5551000002",
       "email": "vip@testdata.com"
     },
     {
       "firstName": "Occasional",
       "lastName": "Buyer",
-      "phoneNumber": "+1-555-BULK-03",
+      "phoneNumber": "5551000003",
       "email": null
     },
     {
       "firstName": "Corporate",
       "lastName": "Account",
-      "phoneNumber": "+1-555-BULK-04",
+      "phoneNumber": "5551000004",
       "email": "corporate@testcompany.com"
     },
     {
       "firstName": "Student",
       "lastName": "Discount",
-      "phoneNumber": "+1-555-BULK-05",
+      "phoneNumber": "5551000005",
       "email": "student@university.edu"
     }
   ]

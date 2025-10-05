@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 TEST_ID="persistence-test-$(date +%s)"
 TEST_DB="bitetrack"
-COMPOSE_ENV_FILE=".env.development"
+COMPOSE_ENV_FILE=""  # Will be auto-detected
 VERBOSE=false
 CLEAN_ONLY=false
 
@@ -50,6 +50,49 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Auto-detect which environment file is currently in use
+detect_environment_file() {
+    log_info "Detecting current environment configuration..."
+    
+    # Check if containers are running and inspect their environment
+    if docker compose ps | grep -q "bitetrack-api"; then
+        local node_env=$(docker inspect bitetrack-api | jq -r '.[0].Config.Env[]' | grep "NODE_ENV=" | cut -d'=' -f2 2>/dev/null || echo "unknown")
+        local port=$(docker inspect bitetrack-api | jq -r '.[0].Config.Env[]' | grep "PORT=" | cut -d'=' -f2 2>/dev/null || echo "unknown")
+        
+        verbose_log "Detected NODE_ENV: $node_env"
+        verbose_log "Detected PORT: $port"
+        
+        if [ "$node_env" = "production" ] && [ "$port" = "3000" ]; then
+            COMPOSE_ENV_FILE=".env.production"
+        elif [ "$node_env" = "development" ] && [ "$port" = "3001" ]; then
+            COMPOSE_ENV_FILE=".env.development"
+        else
+            # Fallback: check which files exist
+            if [ -f ".env.production" ] && [ ! -f ".env.development" ]; then
+                COMPOSE_ENV_FILE=".env.production"
+            elif [ -f ".env.development" ]; then
+                COMPOSE_ENV_FILE=".env.development"
+            else
+                log_error "Cannot determine environment file to use"
+                exit 1
+            fi
+        fi
+    else
+        # No containers running, use file precedence
+        if [ -f ".env.production" ]; then
+            COMPOSE_ENV_FILE=".env.production"
+        elif [ -f ".env.development" ]; then
+            COMPOSE_ENV_FILE=".env.development"
+        else
+            log_error "No environment files found"
+            exit 1
+        fi
+    fi
+    
+    log_info "Using environment file: $COMPOSE_ENV_FILE"
+    verbose_log "Environment detection completed"
+}
 
 # Helper functions
 log_info() {
@@ -125,8 +168,10 @@ check_prerequisites() {
         exit 1
     fi
     
-    if [ ! -f "$COMPOSE_ENV_FILE" ]; then
-        log_error "Environment file $COMPOSE_ENV_FILE not found"
+    # Environment file will be detected later
+    # Check if at least one environment file exists
+    if [ ! -f ".env.production" ] && [ ! -f ".env.development" ]; then
+        log_error "No environment files found (.env.production or .env.development)"
         exit 1
     fi
     
@@ -334,6 +379,9 @@ run_persistence_tests() {
     # Ensure prerequisites
     check_prerequisites
     
+    # Detect which environment file to use
+    detect_environment_file
+    
     # Load environment variables
     load_environment
     
@@ -362,6 +410,7 @@ run_persistence_tests() {
 if [ "$CLEAN_ONLY" = true ]; then
     log_info "Cleanup mode: Removing all test data..."
     check_prerequisites
+    detect_environment_file
     load_environment
     ensure_stack_running
     cleanup_test_data

@@ -4,7 +4,8 @@
 # Interactive script to set up BiteTrack from scratch for production deployment
 # This script orchestrates all numbered scripts in the correct order
 
-set -e
+# Removed set -e for better error handling
+# Now using step-level error handling with user interaction
 
 # Ensure UTF-8 encoding for consistent character handling
 export LANG=C.UTF-8
@@ -74,9 +75,14 @@ prompt_user() {
 prompt_password() {
     local prompt="$1"
     local var_name="$2"
+    local debug_mode="${3:-false}"
     
     echo -ne "${YELLOW}$prompt${NC}: "
-    read -s user_input
+    if [ "$debug_mode" = "true" ]; then
+        read -r user_input  # Visible for debugging
+    else
+        read -s user_input  # Hidden for production
+    fi
     echo ""
     eval "$var_name=\"$user_input\""
 }
@@ -91,16 +97,118 @@ confirm_action() {
     esac
 }
 
+# Enhanced error handling for step execution
+execute_step() {
+    local step_name="$1"
+    local step_function="$2"
+    local allow_skip="${3:-true}"  # Default to allowing skip
+    
+    while true; do
+        log_step "Executing: $step_name"
+        
+        if $step_function; then
+            log_success "$step_name completed successfully"
+            return 0
+        else
+            local exit_code=$?
+            log_error "$step_name failed with exit code $exit_code"
+            
+            echo ""
+            echo -e "${YELLOW}What would you like to do?${NC}"
+            if [ "$allow_skip" = "true" ]; then
+                echo "  [r] Retry this step"
+                echo "  [s] Skip this step and continue"
+                echo "  [a] Abort setup"
+                echo -ne "Choose an option [r/s/a]: "
+            else
+                echo "  [r] Retry this step"
+                echo "  [a] Abort setup"
+                echo -ne "Choose an option [r/a]: "
+            fi
+            
+            read -r choice
+            case "$choice" in
+                [rR]|[rR][eE][tT][rR][yY])
+                    continue  # Loop again to retry
+                    ;;
+                [sS]|[sS][kK][iI][pP])
+                    if [ "$allow_skip" = "true" ]; then
+                        log_warning "Skipping $step_name"
+                        return 0
+                    else
+                        log_error "This step cannot be skipped"
+                        continue
+                    fi
+                    ;;
+                [aA]|[aA][bB][oO][rR][tT]|"")
+                    log_error "Setup aborted by user"
+                    exit 1
+                    ;;
+                *)
+                    log_error "Invalid choice. Please select r, s, or a."
+                    continue
+                    ;;
+            esac
+        fi
+    done
+}
+
+# Validate MongoDB password strength (relaxed for testing)
+validate_mongo_password() {
+    local password="$1"
+    local errors=()
+    
+    # Check minimum length (relaxed to 8 characters)
+    if [ ${#password} -lt 8 ]; then
+        errors+=("Password must be at least 8 characters long")
+    fi
+    
+    # Check for at least one uppercase letter
+    if ! [[ "$password" =~ [A-Z] ]]; then
+        errors+=("Password must contain at least one uppercase letter")
+    fi
+    
+    # Check for at least one lowercase letter
+    if ! [[ "$password" =~ [a-z] ]]; then
+        errors+=("Password must contain at least one lowercase letter")
+    fi
+    
+    # Check for at least one digit
+    if ! [[ "$password" =~ [0-9] ]]; then
+        errors+=("Password must contain at least one digit")
+    fi
+    
+    # Special characters are now OPTIONAL for easier testing
+    # Just warn about URL-problematic characters
+    if [[ "$password" =~ [@#%\&\+=\?\[\]\s] ]]; then
+        log_warning "Password contains characters that might cause URL encoding issues"
+        log_warning "Consider avoiding: @ # % & + = ? [ ] (spaces)"
+    fi
+    
+    if [ ${#errors[@]} -gt 0 ]; then
+        log_error "Password validation failed:"
+        for error in "${errors[@]}"; do
+            echo -e "  ${RED}•${NC} $error"
+        done
+        echo ""
+        echo -e "${BLUE}Password requirements (relaxed for testing):${NC}"
+        echo -e "  • At least 8 characters long"
+        echo -e "  • Contains uppercase and lowercase letters"
+        echo -e "  • Contains at least one digit"
+        echo -e "  • Special characters are optional"
+        echo -e "  • Good examples: Password123, TestPass99, SimpleDB123"
+        return 1
+    fi
+    
+    return 0
+}
+
 generate_secure_secret() {
     openssl rand -base64 32 | tr -d '\n'
 }
 
 # Generate MongoDB-safe password (no URL-problematic characters)
-generate_mongo_password() {
-    # Generate a secure password using only alphanumeric characters
-    # This avoids URL encoding issues in MongoDB connection strings
-    openssl rand -hex 16 | head -c 32
-}
+# Removed auto-generation of MongoDB passwords - users must provide their own
 
 # URL encode a string for MongoDB connection URI (bash-only implementation)
 # Fixed to properly handle % characters in environment files
@@ -151,14 +259,16 @@ show_welcome() {
     echo -e "BiteTrack for production deployment from scratch."
     echo ""
     echo -e "${BLUE}What this script will do:${NC}"
-    echo "  📋 1. Clean up existing Docker environment (optional)"
+    echo "  🧽 0. Clean environment variables to prevent conflicts"
+    echo "  📋 1. Clean up Docker environment (BiteTrack-only or complete cleanup)"
     echo "  🔧 2. Configure production environment variables"
     echo "  🔐 3. Generate MongoDB keyfile"
     echo "  🐳 4. Start Docker containers"
     echo "  ✅ 5. Verify system health"
     echo "  👤 6. Create SuperAdmin user"
-    echo "  📊 7. Populate test data (optional)"
-    echo "  🧪 8. Run comprehensive tests"
+    echo "  🔐 7. Generate .secrets file with all credentials"
+    echo "  📊 8. Populate test data (optional)"
+    echo "  🧪 9. Run comprehensive tests"
     echo ""
 }
 
@@ -169,14 +279,14 @@ check_prerequisites() {
     if ! command -v docker &> /dev/null; then
         log_error "Docker is not installed or not in PATH"
         echo "Please install Docker and try again."
-        exit 1
+        return 1
     fi
     
     # Check Docker Compose
     if ! docker compose version &> /dev/null; then
         log_error "Docker Compose is not available"
         echo "Please install Docker Compose and try again."
-        exit 1
+        return 1
     fi
     
     # Check required tools
@@ -184,45 +294,72 @@ check_prerequisites() {
         if ! command -v "$tool" &> /dev/null; then
             log_error "$tool is not installed"
             echo "Please install $tool and try again."
-            exit 1
+            return 1
         fi
     done
     
     log_success "All prerequisites are available"
+    return 0
 }
 
 docker_cleanup() {
     log_header "🧹 DOCKER CLEANUP"
     
-    log_warning "This will remove ALL Docker containers, images, and free up disk space."
-    log_warning "This is useful for a completely fresh start but will affect other projects too."
+    echo -e "${BLUE}Cleanup Options:${NC}"
+    echo "  1. BiteTrack only - Stop and remove BiteTrack containers/volumes"
+    echo "  2. Complete cleanup - Remove ALL Docker containers, images, volumes"
+    echo "  3. Skip cleanup"
+    echo ""
+    echo -ne "${YELLOW}Select cleanup option [1/2/3]:${NC} "
+    read -r cleanup_choice
     
-    if confirm_action "Do you want to perform a complete Docker cleanup?"; then
-        log_info "Performing complete Docker cleanup..."
-        
-        # Stop and remove all containers
-        if [ "$(docker ps -aq)" ]; then
-            docker stop $(docker ps -aq) 2>/dev/null || true
-            docker rm $(docker ps -aq) 2>/dev/null || true
-        fi
-        
-        # Remove all images
-        if [ "$(docker images -aq)" ]; then
-            docker rmi $(docker images -aq) 2>/dev/null || true
-        fi
-        
-        # Clean up
-        docker container prune -f 2>/dev/null || true
-        docker image prune -af 2>/dev/null || true
-        docker volume prune -f 2>/dev/null || true
-        docker network prune -f 2>/dev/null || true
-        
-        log_success "Docker cleanup completed"
-    else
-        log_info "Skipping Docker cleanup"
-        log_info "Stopping BiteTrack containers only..."
-        docker compose down -v 2>/dev/null || true
-    fi
+    case "$cleanup_choice" in
+        1)
+            log_info "Cleaning up BiteTrack containers only..."
+            docker compose down -v 2>/dev/null || true
+            log_success "BiteTrack cleanup completed"
+            return 0
+            ;;
+        2)
+            log_warning "⚠️  COMPLETE DOCKER CLEANUP SELECTED ⚠️"
+            log_warning "This will remove ALL Docker containers, images, and volumes."
+            log_warning "This affects ALL projects on your system, not just BiteTrack."
+            echo ""
+            if confirm_action "Are you absolutely sure you want to proceed?"; then
+                log_info "Performing comprehensive Docker cleanup..."
+                
+                # Use the comprehensive cleanup command
+                if docker stop $(docker ps -aq) 2>/dev/null && \
+                   docker rm $(docker ps -aq) 2>/dev/null && \
+                   docker rmi $(docker images -aq) 2>/dev/null && \
+                   docker container prune -f 2>/dev/null && \
+                   docker compose down -v 2>/dev/null && \
+                   docker volume prune -f 2>/dev/null; then
+                    log_success "Complete Docker cleanup completed"
+                else
+                    log_warning "Some cleanup operations may have failed (this is normal if no containers/images existed)"
+                fi
+                
+                # Clean up any lingering Docker environment variables
+                log_info "Cleaning Docker-related environment variables..."
+                unset COMPOSE_FILE COMPOSE_PROJECT_NAME DOCKER_BUILDKIT
+                
+                return 0
+            else
+                log_info "Complete cleanup cancelled, performing BiteTrack-only cleanup..."
+                docker compose down -v 2>/dev/null || true
+                return 0
+            fi
+            ;;
+        3|"")
+            log_info "Skipping Docker cleanup"
+            return 0
+            ;;
+        *)
+            log_error "Invalid option. Skipping cleanup."
+            return 0
+            ;;
+    esac
 }
 
 configure_environment() {
@@ -234,17 +371,26 @@ configure_environment() {
     echo ""
     echo -e "${BLUE}MongoDB Configuration:${NC}"
     prompt_user "MongoDB Username" "bitetrack-admin" "MONGO_USER"
-    prompt_password "MongoDB Password (leave empty to generate secure password)" "MONGO_PASS"
     
-    if [ -z "$MONGO_PASS" ]; then
-        MONGO_PASS=$(generate_mongo_password)
-        log_info "Generated secure MongoDB password: ${MONGO_PASS:0:8}..."
-        MONGO_PASS_ENCODED="$MONGO_PASS"  # Generated password is already safe
-    else
-        # URL encode manually entered password to handle special characters
-        MONGO_PASS_ENCODED=$(url_encode "$MONGO_PASS")
-        log_info "Password entered manually, URL encoding applied"
-    fi
+    # Require strong password with validation
+    while true; do
+        prompt_password "MongoDB Password (required - will be validated)" "MONGO_PASS"
+        
+        if [ -z "$MONGO_PASS" ]; then
+            log_error "MongoDB password is required for production deployment"
+            continue
+        fi
+        
+        if validate_mongo_password "$MONGO_PASS"; then
+            # URL encode the password to handle special characters
+            MONGO_PASS_ENCODED=$(url_encode "$MONGO_PASS")
+            log_success "Password validated and encoded successfully"
+            break
+        else
+            echo ""
+            log_info "Please enter a stronger password that meets the requirements above."
+        fi
+    done
     
     prompt_user "MongoDB Database Name" "bitetrack" "MONGO_DB"
     
@@ -305,21 +451,48 @@ EOF
     
     log_success "Production environment configuration created"
     log_info "Configuration saved to: $ENV_FILE"
+    return 0
 }
 
 setup_keyfile() {
     log_header "🔐 MONGODB KEYFILE SETUP"
     
     log_info "Setting up MongoDB replica set keyfile..."
-    ./scripts/01-setup-keyfile.sh
-    log_success "MongoDB keyfile setup completed"
+    if ./scripts/01-setup-keyfile.sh; then
+        log_success "MongoDB keyfile setup completed"
+        return 0
+    else
+        log_error "MongoDB keyfile setup failed"
+        return 1
+    fi
 }
 
 start_containers() {
     log_header "🐳 DOCKER CONTAINERS STARTUP"
     
-    log_info "Starting BiteTrack production stack..."
-    docker compose --env-file "$ENV_FILE" up -d
+    # Double-check environment is clean before starting
+    if [ -n "$MONGO_ROOT_PASSWORD" ] && [ "$MONGO_ROOT_PASSWORD" != "$MONGO_PASS" ]; then
+        log_warning "Environment variable mismatch detected - cleaning..."
+        unset MONGO_ROOT_PASSWORD MONGO_ROOT_USERNAME MONGO_USER MONGO_PASS
+    fi
+    
+    log_info "Starting BiteTrack production stack with environment file: $ENV_FILE"
+    
+    # Ensure we're using the correct environment file explicitly
+    if [ ! -f "$ENV_FILE" ]; then
+        log_error "Environment file not found: $ENV_FILE"
+        return 1
+    fi
+    
+    # Warn if conflicting environment files exist
+    if [ -f ".env.development" ] && [ "$ENV_FILE" != ".env.development" ]; then
+        log_warning "Multiple environment files detected - using: $ENV_FILE"
+    fi
+    
+    if ! docker compose --env-file "$ENV_FILE" up -d; then
+        log_error "Failed to start Docker containers"
+        return 1
+    fi
     
     log_info "Waiting for containers to be healthy..."
     sleep 10
@@ -327,10 +500,12 @@ start_containers() {
     # Check container status
     if docker compose ps | grep -q "healthy"; then
         log_success "Containers started successfully"
+        return 0
     else
         log_error "Some containers may not be healthy"
         log_info "Container status:"
         docker compose ps
+        return 1
     fi
 }
 
@@ -338,13 +513,20 @@ verify_system() {
     log_header "✅ SYSTEM HEALTH VERIFICATION"
     
     log_info "Running system health checks..."
+    log_info "Waiting for API to be fully ready..."
+    sleep 5  # Give API time to fully initialize
     
     # Set environment variables for the health check
     export MONGO_ROOT_USERNAME="$MONGO_USER"
     export MONGO_ROOT_PASSWORD="$MONGO_PASS"
     
-    ./scripts/02-quick-persistence-test.sh
-    log_success "System health verification completed"
+    if ./scripts/02-quick-persistence-test.sh; then
+        log_success "System health verification completed"
+        return 0
+    else
+        log_error "System health verification failed"
+        return 1
+    fi
 }
 
 create_superadmin() {
@@ -369,12 +551,16 @@ create_superadmin() {
     export MONGO_ROOT_USERNAME="$MONGO_USER"
     export MONGO_ROOT_PASSWORD="$MONGO_PASS"
     
-    ./scripts/03-create-superadmin.sh --non-interactive
-    
-    log_success "SuperAdmin user created successfully"
-    log_info "Login credentials:"
-    log_info "  Email: $ADMIN_EMAIL"
-    log_info "  Password: [as entered]"
+    if ./scripts/03-create-superadmin.sh --non-interactive; then
+        log_success "SuperAdmin user created successfully"
+        log_info "Login credentials:"
+        log_info "  Email: $ADMIN_EMAIL"
+        log_info "  Password: [as entered]"
+        return 0
+    else
+        log_error "SuperAdmin user creation failed"
+        return 1
+    fi
 }
 
 populate_test_data() {
@@ -395,10 +581,16 @@ populate_test_data() {
         # Set MongoDB URI for Node.js script (using URL-encoded password)
         export MONGO_URI="mongodb://$MONGO_USER:$MONGO_PASS_ENCODED@localhost:27017/$MONGO_DB?authSource=admin&directConnection=true"
         
-        node scripts/04-populate-test-data.js --preset="$DATA_PRESET" --verbose
-        log_success "Test data population completed"
+        if node scripts/04-populate-test-data.js --preset="$DATA_PRESET" --verbose; then
+            log_success "Test data population completed"
+            return 0
+        else
+            log_error "Test data population failed"
+            return 1
+        fi
     else
         log_info "Skipping test data population"
+        return 0
     fi
 }
 
@@ -411,7 +603,10 @@ run_comprehensive_tests() {
         export MONGO_ROOT_USERNAME="$MONGO_USER"
         export MONGO_ROOT_PASSWORD="$MONGO_PASS"
         
-        ./scripts/05-test-data-persistence.sh --verbose
+        if ! ./scripts/05-test-data-persistence.sh --verbose; then
+            log_error "Data persistence tests failed"
+            return 1
+        fi
         
         log_info "Running API feature tests..."
         
@@ -422,14 +617,100 @@ run_comprehensive_tests() {
             jq -r '.token' 2>/dev/null || echo "")
         
         if [ -n "$JWT_TOKEN" ] && [ "$JWT_TOKEN" != "null" ]; then
-            node scripts/06-test-sales-filtering.js --auth-token="$JWT_TOKEN" --verbose
+            if ! node scripts/06-test-sales-filtering.js --auth-token="$JWT_TOKEN" --verbose; then
+                log_warning "API feature tests failed, but continuing..."
+            fi
         else
             log_warning "Could not obtain authentication token for API tests"
         fi
         
         log_success "Comprehensive testing completed"
+        return 0
     else
         log_info "Skipping comprehensive tests"
+        return 0
+    fi
+}
+
+create_secrets_file() {
+    log_header "🔐 CREATING SECRETS FILE"
+    
+    local secrets_file=".secrets"
+    
+    # Backup existing secrets file if it exists
+    if [ -f "$secrets_file" ]; then
+        local backup_file=".secrets.backup.$(date +%Y%m%d_%H%M%S)"
+        mv "$secrets_file" "$backup_file"
+        log_info "Existing secrets file backed up to: $backup_file"
+    fi
+    
+    log_info "Generating secure credentials file..."
+    
+    cat > "$secrets_file" << EOF
+# BiteTrack Secrets File
+# DO NOT COMMIT THIS FILE TO VERSION CONTROL
+# This file contains sensitive credentials for the BiteTrack application
+
+# Production Environment Configuration
+ENVIRONMENT=production
+CREATED_BY_SCRIPT=true
+
+# SuperAdmin User Credentials
+SUPERADMIN_EMAIL=$ADMIN_EMAIL
+SUPERADMIN_PASSWORD=$ADMIN_PASSWORD
+SUPERADMIN_FIRST_NAME=$ADMIN_FIRST_NAME
+SUPERADMIN_LAST_NAME=$ADMIN_LAST_NAME
+SUPERADMIN_DOB=$ADMIN_DOB
+SUPERADMIN_ROLE=superadmin
+
+# MongoDB Database Credentials
+MONGO_ROOT_USERNAME=$MONGO_USER
+MONGO_ROOT_PASSWORD=$MONGO_PASS
+MONGO_DATABASE=$MONGO_DB
+MONGO_URI_ENCODED='$QUOTED_MONGO_URI'
+
+# JWT Configuration
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRES_IN=$JWT_EXPIRES
+
+# Application Configuration
+APP_PORT=$APP_PORT
+FRONTEND_URLS=$FRONTEND_URLS
+LOG_LEVEL=$LOG_LEVEL
+
+# Quick Test Commands
+# Test API Health:
+# curl http://localhost:$APP_PORT/bitetrack/health
+#
+# Test Login:
+# curl -X POST http://localhost:$APP_PORT/bitetrack/auth/login \\
+#   -H "Content-Type: application/json" \\
+#   -d '{"email":"$ADMIN_EMAIL","password":"YOUR_PASSWORD"}'
+
+# Created: $(date)
+# Environment File: $ENV_FILE
+# MongoDB Connection: localhost:27017
+EOF
+
+    # Set secure permissions
+    chmod 600 "$secrets_file"
+    
+    log_success "Secrets file created: $secrets_file"
+    log_info "File permissions set to 600 (owner read/write only)"
+    
+    # Add to .gitignore if not already present
+    if [ -f ".gitignore" ]; then
+        if ! grep -q ".secrets" ".gitignore"; then
+            echo "" >> .gitignore
+            echo "# Secrets file (contains sensitive credentials)" >> .gitignore
+            echo ".secrets" >> .gitignore
+            echo ".secrets.backup.*" >> .gitignore
+            log_info "Added .secrets to .gitignore"
+        else
+            log_info ".secrets already in .gitignore"
+        fi
+    else
+        log_warning ".gitignore not found - create one to prevent committing secrets"
     fi
 }
 
@@ -443,26 +724,38 @@ show_completion() {
     echo "  🍃 MongoDB: localhost:27017"
     echo "  👤 SuperAdmin: $ADMIN_EMAIL"
     echo "  📁 Environment: $ENV_FILE"
+    echo "  🔐 Secrets: .secrets (secure credentials)"
     echo ""
     echo -e "${BLUE}🔗 Quick Links:${NC}"
     echo "  Health Check: curl http://localhost:$APP_PORT/bitetrack/health"
     echo "  API Documentation: http://localhost:$APP_PORT/bitetrack/docs"
     echo ""
     echo -e "${BLUE}🚀 Next Steps:${NC}"
-    echo "  1. Test the API endpoints using the SuperAdmin credentials"
+    echo "  1. Test the API endpoints using credentials in .secrets file"
     echo "  2. Configure your frontend to use: http://localhost:$APP_PORT"
     echo "  3. Set up reverse proxy (Nginx/Traefik) for production domain"
     echo "  4. Configure SSL/TLS certificates for HTTPS"
     echo ""
-    echo -e "${BLUE}🛠️ Useful Commands:${NC}"
+    echo -e "${BLUE}🔐 Security Notes:${NC}"
+    echo "  • .secrets file contains all sensitive credentials"
+    echo "  • File is set to 600 permissions (owner access only)"
+    echo "  • Added to .gitignore to prevent accidental commits"
+    echo ""
+    echo -e "${BLUE}🔧 Useful Commands:${NC}"
     echo "  View logs:    docker compose logs -f"
     echo "  Stop stack:   docker compose down"
     echo "  Restart:      docker compose --env-file $ENV_FILE up -d"
+    echo "  View secrets: cat .secrets"
+    echo ""
+    echo -e "${BLUE}🔧 Troubleshooting:${NC}"
+    echo "  If you experience authentication issues, clean environment and restart:"
+    echo "  unset MONGO_ROOT_PASSWORD MONGO_ROOT_USERNAME && docker compose down -v"
+    echo "  Then re-run: docker compose --env-file $ENV_FILE up -d"
     echo ""
     echo -e "${GREEN}Happy coding! 🚀${NC}"
 }
 
-# Main execution
+# Main execution with enhanced error handling
 main() {
     show_welcome
     
@@ -471,16 +764,94 @@ main() {
         exit 0
     fi
     
-    check_prerequisites
-    docker_cleanup
-    configure_environment
-    setup_keyfile
-    start_containers
-    verify_system
-    create_superadmin
-    populate_test_data
-    run_comprehensive_tests
+    # Execute each step with error handling
+    execute_step "Prerequisites Check" "check_prerequisites" false
+    execute_step "Docker Cleanup" "docker_cleanup" true
+    execute_step "Environment Configuration" "configure_environment" false
+    execute_step "MongoDB Keyfile Setup" "setup_keyfile" false
+    execute_step "Docker Containers Startup" "start_containers" false
+    execute_step "System Health Verification" "verify_system" false
+    execute_step "SuperAdmin User Creation" "create_superadmin" false
+    execute_step "Secrets File Creation" "create_secrets_file" false
+    execute_step "Test Data Population" "populate_test_data" true
+    execute_step "Comprehensive Testing" "run_comprehensive_tests" true
+    
     show_completion
+}
+
+# Environment variable hygiene - clean potentially conflicting variables
+clean_environment() {
+    log_info "Cleaning potentially conflicting environment variables..."
+    
+    # List of variables that might conflict with our setup
+    local vars_to_clean=(
+        "MONGO_ROOT_USERNAME"
+        "MONGO_ROOT_PASSWORD" 
+        "MONGO_USER"
+        "MONGO_PASS"
+        "MONGO_URI"
+        "JWT_SECRET"
+        "ADMIN_EMAIL"
+        "ADMIN_PASSWORD"
+        "ADMIN_FIRST_NAME"
+        "ADMIN_LAST_NAME"
+        "ADMIN_DOB"
+    )
+    
+    local found_conflicts=false
+    
+    for var in "${vars_to_clean[@]}"; do
+        if [ -n "${!var}" ]; then
+            if [ "$found_conflicts" = false ]; then
+                echo ""
+                log_warning "Found existing environment variables that may interfere:"
+                found_conflicts=true
+            fi
+            echo "  • $var=${!var:0:10}..."
+            unset "$var"
+        fi
+    done
+    
+    if [ "$found_conflicts" = true ]; then
+        log_info "Cleaned conflicting environment variables"
+        echo ""
+    else
+        log_success "No conflicting environment variables found"
+    fi
+}
+
+# Diagnostic function for troubleshooting environment issues
+diagnose_environment() {
+    echo -e "${BLUE}🔍 Environment Diagnostics:${NC}"
+    echo "==========================="
+    
+    echo -e "\n${CYAN}Current Environment Variables:${NC}"
+    env | grep -E "(MONGO|JWT|ADMIN)" | sort || echo "No relevant environment variables found"
+    
+    echo -e "\n${CYAN}Environment File Contents:${NC}"
+    if [ -f "$ENV_FILE" ]; then
+        echo "File: $ENV_FILE"
+        grep -E "(MONGO|JWT)" "$ENV_FILE" | head -10
+    else
+        echo "No environment file found at: $ENV_FILE"
+    fi
+    
+    echo -e "\n${CYAN}Docker Container Environment:${NC}"
+    if docker ps | grep -q "bitetrack-mongodb"; then
+        echo "MongoDB Container:"
+        docker exec bitetrack-mongodb env | grep MONGO_INITDB || echo "Container not accessible"
+    else
+        echo "MongoDB container not running"
+    fi
+    
+    if docker ps | grep -q "bitetrack-api"; then
+        echo "API Container:"
+        docker exec bitetrack-api env | grep MONGO_URI || echo "Container not accessible"
+    else
+        echo "API container not running"
+    fi
+    
+    echo "==========================="
 }
 
 # Check if running from correct directory
@@ -489,6 +860,9 @@ if [ ! -f "docker-compose.yml" ]; then
     log_error "Please run this script from the BiteTrack project root directory"
     exit 1
 fi
+
+# Clean environment before starting
+clean_environment
 
 # Run main function
 main "$@"

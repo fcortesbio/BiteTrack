@@ -20,3 +20,8 @@ coverage/
 .secrets
 .env.development
 .secrets-backup
+
+# Secrets files (contains sensitive credentials)
+.secrets
+.secrets.*
+.secrets.backup.*
