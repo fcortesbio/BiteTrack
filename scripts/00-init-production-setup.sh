@@ -267,8 +267,9 @@ show_welcome() {
     echo "  ✅ 5. Verify system health"
     echo "  👤 6. Create SuperAdmin user"
     echo "  🔐 7. Generate .secrets file with all credentials"
-    echo "  📊 8. Populate test data (optional)"
-    echo "  🧪 9. Run comprehensive tests"
+    echo "  🔗 8. Create .env symlink for Docker Compose"
+    echo "  📊 9. Populate test data (optional)"
+    echo "  🧪 10. Run comprehensive tests"
     echo ""
 }
 
@@ -736,6 +737,52 @@ EOF
     fi
 }
 
+create_environment_symlink() {
+    log_header "🔗 ENVIRONMENT SYMLINK SETUP"
+    
+    log_info "Setting up default environment symlink for Docker Compose..."
+    
+    # Check if .env already exists
+    if [ -f ".env" ]; then
+        # Check if it's already a symlink to our environment file
+        if [ -L ".env" ] && [ "$(readlink .env)" = "$ENV_FILE" ]; then
+            log_success ".env symlink already points to $ENV_FILE"
+            return 0
+        fi
+        
+        # Backup existing .env file
+        local backup_file=".env.backup.$(date +%Y%m%d_%H%M%S)"
+        mv ".env" "$backup_file"
+        log_info "Existing .env file backed up to: $backup_file"
+    fi
+    
+    # Create symlink to our environment file
+    ln -sf "$ENV_FILE" ".env"
+    
+    log_success "Created .env symlink pointing to $ENV_FILE"
+    log_info "This eliminates Docker Compose warnings about missing environment variables"
+    
+    # Add .env to .gitignore if not already present (since it's a symlink to production data)
+    if [ -f ".gitignore" ]; then
+        if ! grep -q "^\.env$" ".gitignore"; then
+            echo "" >> .gitignore
+            echo "# Environment symlink (points to production config)" >> .gitignore
+            echo ".env" >> .gitignore
+            echo ".env.backup.*" >> .gitignore
+            log_info "Added .env to .gitignore"
+        else
+            log_info ".env already in .gitignore"
+        fi
+    fi
+    
+    # Verify symlink works
+    if docker compose config > /dev/null 2>&1; then
+        log_success "Docker Compose can now read environment variables without warnings"
+    else
+        log_warning "Docker Compose config validation failed - check your environment file"
+    fi
+}
+
 show_completion() {
     log_header "🎉 PRODUCTION SETUP COMPLETED"
     
@@ -746,6 +793,7 @@ show_completion() {
     echo "  🍃 MongoDB: localhost:27017"
     echo "  👤 SuperAdmin: $ADMIN_EMAIL"
     echo "  📁 Environment: $ENV_FILE"
+    echo "  🔗 Symlink: .env -> $ENV_FILE"
     echo "  🔐 Secrets: .secrets (secure credentials)"
     echo ""
     echo -e "${BLUE}🔗 Quick Links:${NC}"
@@ -766,7 +814,8 @@ show_completion() {
     echo -e "${BLUE}🔧 Useful Commands:${NC}"
     echo "  View logs:    docker compose logs -f"
     echo "  Stop stack:   docker compose down"
-    echo "  Restart:      docker compose --env-file $ENV_FILE up -d"
+    echo "  Restart:      docker compose up -d  (no --env-file needed thanks to .env symlink)"
+    echo "  Alternative:  docker compose --env-file $ENV_FILE up -d"
     echo "  View secrets: cat .secrets"
     echo ""
     echo -e "${BLUE}🔧 Troubleshooting:${NC}"
@@ -795,6 +844,7 @@ main() {
     execute_step "System Health Verification" "verify_system" false
     execute_step "SuperAdmin User Creation" "create_superadmin" false
     execute_step "Secrets File Creation" "create_secrets_file" false
+    execute_step "Environment Symlink Setup" "create_environment_symlink" false
     execute_step "Test Data Population" "populate_test_data" true
     execute_step "Comprehensive Testing" "run_comprehensive_tests" true
     
