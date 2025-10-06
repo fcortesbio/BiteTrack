@@ -26,3 +26,7 @@ coverage/
 .secrets.*
 .secrets.backup.*
 keyfile
+
+# Environment symlink (points to production config)
+.env
+.env.backup.*
