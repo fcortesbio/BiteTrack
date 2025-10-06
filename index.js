@@ -123,8 +123,8 @@ app.get('/', (req, res) => {
       environment: process.env.NODE_ENV || 'development'
     },
     documentation: {
-      interactive: `${protocol}://${host}/api-docs`,
-      json: `${protocol}://${host}/api-docs.json`,
+      interactive: `${protocol}://${host}/bitetrack/api-docs`,
+      json: `${protocol}://${host}/bitetrack/api-docs.json`,
       static: 'https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md'
     },
     capabilities: {
@@ -139,7 +139,7 @@ app.get('/', (req, res) => {
       ]
     },
     quickStart: {
-      step1: 'Visit /api-docs for interactive documentation',
+      step1: 'Visit /bitetrack/api-docs for interactive documentation',
       step2: 'Use POST /bitetrack/auth/login to get JWT token',
       step3: 'Add Bearer token to Authorization header',
       step4: 'Explore all 36 endpoints with live testing'
@@ -248,7 +248,7 @@ const server = app.listen(PORT, () => {
   if (isDevelopment) {
     console.log('\n📝 Development Server Information:');
     console.log(`🔗 API Base URL: http://localhost:${PORT}/bitetrack`);
-    console.log(`📚 Interactive Docs: http://localhost:${PORT}/api-docs`);
+    console.log(`📚 Interactive Docs: http://localhost:${PORT}/bitetrack/api-docs`);
     console.log(`❤️  Health Check: http://localhost:${PORT}/bitetrack/health`);
     console.log(`📊 API Overview: http://localhost:${PORT}/`);
     console.log('\n🚀 Ready for development! File changes will trigger automatic restart.');

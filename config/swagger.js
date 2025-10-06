@@ -178,11 +178,11 @@ module.exports = {
     const swaggerSpec = loadOpenAPISpec(port, host);
     
     // Swagger UI endpoint
-    app.use('/api-docs', swaggerUi.serve);
-    app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
+    app.use('/bitetrack/api-docs', swaggerUi.serve);
+    app.get('/bitetrack/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions));
     
     // JSON endpoint for raw spec
-    app.get('/api-docs.json', (req, res) => {
+    app.get('/bitetrack/api-docs.json', (req, res) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(swaggerSpec);
     });
@@ -190,8 +190,8 @@ module.exports = {
     // Dynamic logging with correct port information
     const environment = process.env.NODE_ENV || 'development';
     console.log(`📚 Swagger UI Documentation Portal initialized (${environment})`);
-    console.log(`🌐 Interactive docs available at: http://${host}:${port}/api-docs`);
-    console.log(`📄 JSON specification at: http://${host}:${port}/api-docs.json`);
+    console.log(`🌐 Interactive docs available at: http://${host}:${port}/bitetrack/api-docs`);
+    console.log(`📄 JSON specification at: http://${host}:${port}/bitetrack/api-docs.json`);
     
     // Return the spec for potential use elsewhere
     return swaggerSpec;
