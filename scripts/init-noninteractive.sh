@@ -384,15 +384,21 @@ start_containers() {
     local max_attempts=30
     local attempt=0
     
+    log_info "Waiting for all containers to be healthy..."
+    
     while [[ $attempt -lt $max_attempts ]]; do
-        if docker compose ps | grep -q "healthy"; then
-            log_success "Containers started successfully"
+        # Check if both MongoDB and API containers are healthy
+        local mongodb_healthy=$(docker compose ps mongodb | grep -c "healthy" || echo "0")
+        local api_healthy=$(docker compose ps bitetrack-api | grep -c "healthy" || echo "0")
+        
+        if [[ $mongodb_healthy -gt 0 && $api_healthy -gt 0 ]]; then
+            log_success "All containers are healthy"
             return 0
         fi
         
         attempt=$((attempt + 1))
-        log_info "Waiting for containers to be healthy (attempt $attempt/$max_attempts)..."
-        sleep 5
+        log_info "Container health check (attempt $attempt/$max_attempts): MongoDB=$mongodb_healthy API=$api_healthy"
+        sleep 3
     done
     
     log_error "Containers failed to start within expected time"
@@ -402,15 +408,29 @@ start_containers() {
 verify_system() {
     log_info "Verifying system health..."
     
-    # Test API health endpoint
-    if curl -s "http://localhost:$APP_PORT/bitetrack/health" > /dev/null; then
-        log_success "API health check passed"
-    else
-        log_error "API health check failed"
-        return 1
-    fi
+    # Wait for API to be fully ready
+    local max_attempts=30
+    local attempt=0
     
-    return 0
+    log_info "Waiting for API to be ready..."
+    
+    while [[ $attempt -lt $max_attempts ]]; do
+        if curl -s "http://localhost:$APP_PORT/bitetrack/health" > /dev/null 2>&1; then
+            log_success "API health check passed"
+            return 0
+        fi
+        
+        attempt=$((attempt + 1))
+        log_info "API health check attempt $attempt/$max_attempts..."
+        sleep 2
+    done
+    
+    log_error "API health check failed after $max_attempts attempts"
+    log_info "Container status:"
+    docker compose ps
+    log_info "API container logs (last 10 lines):"
+    docker compose logs bitetrack-api --tail 10
+    return 1
 }
 
 create_superadmin() {
