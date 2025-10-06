@@ -7,8 +7,8 @@ services:
     container_name: bitetrack-mongodb
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-supersecret}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     ports:
       - "27017:27017"
     volumes:
@@ -42,7 +42,7 @@ services:
     entrypoint: >
       bash -c "sleep 5 &&
       mongosh --host mongodb:27017
-      -u ${MONGO_ROOT_USERNAME:-admin} -p ${MONGO_ROOT_PASSWORD:-supersecret}
+      -u ${MONGO_ROOT_USERNAME} -p ${MONGO_ROOT_PASSWORD}
       --authenticationDatabase admin
       --eval '
         rs.initiate({
@@ -60,11 +60,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MONGO_URI: ${MONGO_URI:-mongodb://admin:supersecret@mongodb:27017/bitetrack?authSource=admin&directConnection=true}
-      JWT_SECRET: ${JWT_SECRET:-supersecretjwt}
+      MONGO_URI: ${MONGO_URI}
+      JWT_SECRET: ${JWT_SECRET}
       PORT: ${PORT:-3000}
       NODE_ENV: ${NODE_ENV:-production}
-      FRONTEND_URLS: ${FRONTEND_URLS:-http://localhost:3000}
+      FRONTEND_URLS: ${FRONTEND_URLS}
     networks:
       - bitetrack-network
     depends_on:

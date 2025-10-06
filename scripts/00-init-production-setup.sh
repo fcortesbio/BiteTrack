@@ -476,6 +476,23 @@ start_containers() {
         unset MONGO_ROOT_PASSWORD MONGO_ROOT_USERNAME MONGO_USER MONGO_PASS
     fi
     
+    # Validate environment file contains our credentials
+    log_info "Validating environment configuration..."
+    if ! grep -q "MONGO_ROOT_USERNAME=$MONGO_USER" "$ENV_FILE"; then
+        log_error "Environment file validation failed - MongoDB username mismatch"
+        log_error "Expected: $MONGO_USER, but file contains: $(grep MONGO_ROOT_USERNAME $ENV_FILE)"
+        return 1
+    fi
+    
+    if ! grep -q "MONGO_ROOT_PASSWORD=$MONGO_PASS" "$ENV_FILE"; then
+        log_error "Environment file validation failed - MongoDB password mismatch"
+        return 1
+    fi
+    
+    log_success "Environment file validation passed"
+    log_info "MongoDB Username: $MONGO_USER"
+    log_info "MongoDB Database: $MONGO_DB"
+    
     log_info "Starting BiteTrack production stack with environment file: $ENV_FILE"
     
     # Ensure we're using the correct environment file explicitly
@@ -488,6 +505,11 @@ start_containers() {
     if [ -f ".env.development" ] && [ "$ENV_FILE" != ".env.development" ]; then
         log_warning "Multiple environment files detected - using: $ENV_FILE"
     fi
+    
+    # Final verification: show what credentials Docker Compose will receive
+    log_info "Docker Compose will use these credentials from $ENV_FILE:"
+    log_info "  MONGO_ROOT_USERNAME: $(grep '^MONGO_ROOT_USERNAME=' $ENV_FILE | cut -d'=' -f2)"
+    log_info "  MONGO_ROOT_PASSWORD: [REDACTED - $(echo $MONGO_PASS | cut -c1-3)]***"
     
     if ! docker compose --env-file "$ENV_FILE" up -d; then
         log_error "Failed to start Docker containers"
