@@ -388,8 +388,8 @@ start_containers() {
     
     while [[ $attempt -lt $max_attempts ]]; do
         # Check if both MongoDB and API containers are healthy
-        local mongodb_healthy=$(docker compose ps mongodb | grep -c "healthy" || echo "0")
-        local api_healthy=$(docker compose ps bitetrack-api | grep -c "healthy" || echo "0")
+        local mongodb_healthy=$(docker compose ps mongodb | grep -c "healthy" 2>/dev/null || echo "0")
+        local api_healthy=$(docker compose ps bitetrack-api | grep -c "healthy" 2>/dev/null || echo "0")
         
         if [[ $mongodb_healthy -gt 0 && $api_healthy -gt 0 ]]; then
             log_success "All containers are healthy"
