@@ -479,6 +479,120 @@ docker compose logs -f bitetrack-api
 docker compose logs -f mongodb
 ```
 
+### 🚀 **Production Deployment Strategies**
+
+**✅ Your database data is always safe!** BiteTrack uses persistent Docker volumes (`mongodb_data`) that survive container updates, ensuring zero data loss during deployments.
+
+#### **Strategy 1: Rolling Update (Recommended - Zero Downtime)**
+
+```bash
+# Safe deployment - only rebuilds API container, DB stays running
+git pull origin main
+docker compose up --build -d bitetrack-api
+
+# Verify deployment
+docker compose ps
+curl http://your-domain/bitetrack/health
+docker compose logs -f bitetrack-api
+```
+
+**✅ Benefits:**
+- Zero downtime (database never stops)
+- Fastest deployment method
+- Database connections maintained
+- Perfect for minor updates and bug fixes
+
+#### **Strategy 2: Complete Stack Rebuild (Safe)**
+
+```bash
+# Full stack rebuild - data persists via volumes
+docker compose down                    # Stop containers (volumes preserved)
+git pull origin main                   # Get latest code
+docker compose up --build -d          # Rebuild and start everything
+
+# Verify deployment
+docker compose logs -f
+curl http://your-domain/bitetrack/health
+```
+
+**✅ Benefits:**
+- Complete environment refresh
+- Rebuilds both API and database containers
+- Data automatically restored from persistent volumes
+- Good for major updates or configuration changes
+
+#### **Strategy 3: Blue-Green Deployment (Zero Downtime - Advanced)**
+
+```bash
+# For critical production with load balancer/reverse proxy
+
+# 1. Create secondary deployment
+cp docker-compose.yml docker-compose.blue.yml
+# Edit docker-compose.blue.yml to use port 3001 for bitetrack-api
+
+# 2. Deploy new version alongside current
+docker compose -f docker-compose.blue.yml up --build -d bitetrack-api
+
+# 3. Test new version
+curl http://localhost:3001/bitetrack/health
+
+# 4. Switch traffic (update load balancer/proxy to port 3001)
+# 5. Stop old version after verification
+docker compose -f docker-compose.yml down bitetrack-api
+```
+
+**✅ Benefits:**
+- Absolute zero downtime
+- Instant rollback capability
+- Full testing before traffic switch
+- Enterprise-grade deployment pattern
+
+#### **🔒 Production Safety Checklist**
+
+**Before deploying:**
+
+```bash
+# 1. Create database backup (extra safety)
+docker compose exec mongodb mongodump --out /data/backup-$(date +%Y%m%d-%H%M%S)
+
+# 2. Verify environment variables
+cat .env.production
+
+# 3. Test in staging environment (if available)
+docker compose -f docker-compose.yml --env-file .env.staging up -d
+```
+
+**After deploying:**
+
+```bash
+# 4. Run comprehensive health checks
+curl http://your-domain/bitetrack/health
+curl http://your-domain/bitetrack/  # API overview
+
+# 5. Monitor logs for errors
+docker compose logs -f bitetrack-api --tail=100
+
+# 6. Test critical endpoints
+curl -X POST http://your-domain/bitetrack/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password"}'
+```
+
+#### **📊 Database Persistence Guarantee**
+
+**Why your data is always safe:**
+- 🔒 **Named Docker Volumes**: `mongodb_data:/data/db` persists on host
+- 🏗️ **Container Independence**: API rebuilds don't affect database container
+- 💾 **MongoDB Durability**: All writes are persisted to disk immediately
+- 🔄 **Restart Policies**: `restart: unless-stopped` ensures automatic recovery
+- ✅ **Volume Survival**: Data survives `docker compose down`, only destroyed by `docker compose down -v`
+
+**Data persistence verified through:**
+- Container restarts ✅
+- Image updates ✅ 
+- Host reboots ✅
+- Docker service restarts ✅
+
 ### Scaling & Updates
 ```bash
 # Update to latest code
