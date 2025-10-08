@@ -201,31 +201,58 @@ process.on('unhandledRejection', (reason, promise) => {
   gracefulShutdown('unhandledRejection');
 });
 
+// Flag to prevent multiple shutdown attempts
+let isShuttingDown = false;
+
 // Graceful shutdown handler
-function gracefulShutdown(signal) {
+async function gracefulShutdown(signal) {
+  // Prevent multiple shutdown attempts
+  if (isShuttingDown) {
+    console.log(`⚠️  Shutdown already in progress, ignoring ${signal}`);
+    return;
+  }
+  
+  isShuttingDown = true;
   console.log(`\n🔄 Received ${signal}. Starting graceful shutdown...`);
   
-  // Close server first to stop accepting new requests
-  server.close(() => {
-    console.log('🔌 HTTP server closed');
-    
-    // Close MongoDB connection
-    mongoose.connection.close(false, () => {
-      console.log('🍃 MongoDB connection closed');
-      
-      if (isDevelopment) {
-        console.log('🧪 Development server shutdown complete');
-      }
-      
-      process.exit(1);
-    });
-  });
-  
   // Force shutdown if graceful shutdown takes too long
-  setTimeout(() => {
+  const forceShutdownTimer = setTimeout(() => {
     console.error('⚠️  Forced shutdown - graceful shutdown timeout');
     process.exit(1);
   }, 10000); // 10 seconds timeout
+  
+  try {
+    // Close server first to stop accepting new requests
+    await new Promise((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log('🔌 HTTP server closed');
+          resolve();
+        }
+      });
+    });
+    
+    // Close MongoDB connection using Promise-based API (Mongoose v8+)
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
+      console.log('🍃 MongoDB connection closed');
+    }
+    
+    if (isDevelopment) {
+      console.log('🧪 Development server shutdown complete');
+    }
+    
+    clearTimeout(forceShutdownTimer);
+    console.log('✅ Graceful shutdown completed successfully');
+    process.exit(0);
+    
+  } catch (error) {
+    console.error('❌ Error during graceful shutdown:', error.message);
+    clearTimeout(forceShutdownTimer);
+    process.exit(1);
+  }
 }
 
 // Handle SIGTERM and SIGINT signals for graceful shutdown
