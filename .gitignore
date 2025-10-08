@@ -30,3 +30,4 @@ keyfile
 # Environment symlink (points to production config)
 .env
 .env.backup.*
+error-logs.txt
