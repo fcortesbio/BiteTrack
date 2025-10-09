@@ -110,7 +110,7 @@ mongoose
 setupSwaggerUI(app, PORT);
 
 // Welcome route - redirect to interactive documentation
-app.get('/', (req, res) => {
+app.get('/bitetrack', (req, res) => {
   const host = req.get('host') || `localhost:${PORT}`;
   const protocol = req.protocol || 'http';
   
