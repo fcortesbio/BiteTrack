@@ -1,4 +1,4 @@
-const swaggerJSDoc = require('swagger-jsdoc');
+// const swaggerJSDoc = require('swagger-jsdoc'); <-- this is never used ; 
 const swaggerUi = require('swagger-ui-express');
 const fs = require('fs');
 const yaml = require('js-yaml');
@@ -15,6 +15,7 @@ const path = require('path');
 const loadOpenAPISpec = (port, host = 'localhost') => {
   try {
     const yamlPath = path.join(__dirname, '../docs/openapi.yaml');
+    // eslint-disable-next-line no-sync
     const fileContents = fs.readFileSync(yamlPath, 'utf8');
     const spec = yaml.load(fileContents);
     
@@ -163,7 +164,7 @@ const swaggerOptions = {
     persistAuthorization: true,
     // Show request duration
     showExtensions: true,
-    showCommonExtensions: true,
+    // showCommonExtensions: true, <-- remove duplicate
   },
 };
 
