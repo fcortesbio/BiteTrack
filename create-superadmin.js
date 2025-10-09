@@ -1,5 +1,5 @@
-const bcrypt = require("bcryptjs");
-const readline = require("readline");
+const bcrypt = require('bcryptjs');
+const readline = require('readline');
 
 // Create an interface for reading input from the command line
 const rl = readline.createInterface({
@@ -21,12 +21,12 @@ const askQuestion = (query) =>
  * @returns {string} The formatted string.
  */
 const capitalizeAndTrim = (str) => {
-  if (!str) return "";
+  if (!str) {return '';}
   return str
     .toLowerCase()
-    .split(" ")
+    .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
+    .join(' ')
     .trim();
 };
 
@@ -38,7 +38,7 @@ const capitalizeAndTrim = (str) => {
 const validatePassword = (password) => {
   // Password must be at least 8 characters long
   if (password.length < 8) {
-    console.log("Password must be at least 8 characters long.");
+    console.log('Password must be at least 8 characters long.');
     return false;
   }
   // Check for at least one lowercase, uppercase, number, and symbol
@@ -48,19 +48,19 @@ const validatePassword = (password) => {
   const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password);
 
   if (!hasLowercase) {
-    console.log("Password must contain at least one lowercase letter.");
+    console.log('Password must contain at least one lowercase letter.');
     return false;
   }
   if (!hasUppercase) {
-    console.log("Password must contain at least one uppercase letter.");
+    console.log('Password must contain at least one uppercase letter.');
     return false;
   }
   if (!hasNumber) {
-    console.log("Password must contain at least one number.");
+    console.log('Password must contain at least one number.');
     return false;
   }
   if (!hasSymbol) {
-    console.log("Password must contain at least one symbol.");
+    console.log('Password must contain at least one symbol.');
     return false;
   }
 
@@ -70,59 +70,59 @@ const validatePassword = (password) => {
 /**
  * Main function to guide the user and generate the MongoDB command.
  */
-const main = async () => {
+const main = async() => {
   console.log("Let's create a new MongoDB user object.");
-  console.log("---------------------------------------");
+  console.log('---------------------------------------');
 
-  let firstName = "";
+  let firstName = '';
   while (firstName.length < 2) {
     firstName = capitalizeAndTrim(
       await askQuestion("Enter the user's first name: "),
     );
     if (firstName.length < 2) {
-      console.log("First name is too short. Please try again.");
+      console.log('First name is too short. Please try again.');
     }
   }
 
-  let lastName = "";
+  let lastName = '';
   while (lastName.length < 2) {
     lastName = capitalizeAndTrim(
       await askQuestion("Enter the user's last name: "),
     );
     if (lastName.length < 2) {
-      console.log("Last name is too short. Please try again.");
+      console.log('Last name is too short. Please try again.');
     }
   }
 
-  let email = "";
+  let email = '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   while (!emailRegex.test(email)) {
     email = (await askQuestion("Enter the user's email: "))
       .trim()
       .toLowerCase();
     if (!emailRegex.test(email)) {
-      console.log("Invalid email format. Please try again.");
+      console.log('Invalid email format. Please try again.');
     }
   }
 
-  let dob = "";
+  let dob = '';
   while (!Date.parse(dob)) {
     dob = await askQuestion("Enter the user's date of birth (YYYY-MM-DD): ");
     if (!Date.parse(dob)) {
-      console.log("Invalid date format. Please use YYYY-MM-DD.");
+      console.log('Invalid date format. Please use YYYY-MM-DD.');
     }
   }
 
-  let password = "";
+  let password = '';
   while (!validatePassword(password)) {
     password = await askQuestion(
-      "Enter a secure password (min 8 chars, incl. lowercase, uppercase, number, symbol): ",
+      'Enter a secure password (min 8 chars, incl. lowercase, uppercase, number, symbol): ',
     );
   }
 
-  console.log("Hashing password...");
+  console.log('Hashing password...');
   const hashedPassword = await bcrypt.hash(password, 12);
-  console.log("Password successfully hashed!");
+  console.log('Password successfully hashed!');
 
   const mongoCommand = `db.sellers.insertOne({
   firstName: "${firstName}",
@@ -137,18 +137,18 @@ const main = async () => {
   updatedAt: new Date()
 });`;
 
-  console.log("\n---------------------------------------");
+  console.log('\n---------------------------------------');
   console.log(
-    "Copy and paste the following command into your mongosh terminal:",
+    'Copy and paste the following command into your mongosh terminal:',
   );
-  console.log("---------------------------------------");
+  console.log('---------------------------------------');
   console.log(mongoCommand);
-  console.log("---------------------------------------");
+  console.log('---------------------------------------');
 
   rl.close();
 };
 
 main().catch((err) => {
-  console.error("An error occurred:", err);
+  console.error('An error occurred:', err);
   rl.close();
 });

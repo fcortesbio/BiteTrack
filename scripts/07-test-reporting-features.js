@@ -28,7 +28,7 @@ class ReportingTester {
       passed: 0,
       failed: 0,
       total: 0,
-      details: []
+      details: [],
     };
   }
 
@@ -41,7 +41,7 @@ class ReportingTester {
     // Try to authenticate with default superadmin credentials
     const loginData = {
       email: process.env.TEST_EMAIL || 'admin@bitetrack.com',
-      password: process.env.TEST_PASSWORD || 'SuperAdmin123!'
+      password: process.env.TEST_PASSWORD || 'SuperAdmin123!',
     };
 
     try {
@@ -61,7 +61,7 @@ class ReportingTester {
       this.testResults.details.push({
         name: testName,
         status: 'PASS',
-        message: 'Test passed successfully'
+        message: 'Test passed successfully',
       });
       this.log(`✅ ${testName}`);
     } catch (error) {
@@ -69,7 +69,7 @@ class ReportingTester {
       this.testResults.details.push({
         name: testName,
         status: 'FAIL',
-        message: error.message
+        message: error.message,
       });
       console.error(`❌ ${testName}: ${error.message}`);
     }
@@ -80,9 +80,9 @@ class ReportingTester {
       const response = await axios.get(`${this.baseUrl}${endpoint}`, {
         params,
         headers: {
-          Authorization: `Bearer ${this.authToken}`
+          Authorization: `Bearer ${this.authToken}`,
         },
-        timeout: 30000 // Increased timeout for complex queries
+        timeout: 30000, // Increased timeout for complex queries
       });
       return response.data;
     } catch (error) {
@@ -95,10 +95,10 @@ class ReportingTester {
       const response = await axios.get(`${this.baseUrl}${endpoint}`, {
         params,
         headers: {
-          Authorization: `Bearer ${this.authToken}`
+          Authorization: `Bearer ${this.authToken}`,
         },
         responseType: 'stream',
-        timeout: 30000
+        timeout: 30000,
       });
       return response;
     } catch (error) {
@@ -145,7 +145,7 @@ class ReportingTester {
     const response = await this.apiCall('/reporting/sales/analytics', {
       startDate,
       endDate,
-      groupBy: 'month'
+      groupBy: 'month',
     });
 
     if (response.period.startDate !== startDate + 'T00:00:00.000Z') {
@@ -170,7 +170,7 @@ class ReportingTester {
       const response = await this.apiCall('/reporting/sales/analytics', {
         groupBy,
         startDate: '2024-01-01',
-        endDate: '2024-12-31'
+        endDate: '2024-12-31',
       });
 
       if (response.period.groupBy !== groupBy) {
@@ -193,7 +193,7 @@ class ReportingTester {
     const response = await this.downloadCSV('/reporting/sales/export', {
       format: 'detailed',
       startDate: '2024-01-01',
-      endDate: '2024-12-31'
+      endDate: '2024-12-31',
     });
 
     // Check response headers
@@ -230,7 +230,7 @@ class ReportingTester {
     const expectedColumns = [
       'Sale ID', 'Date', 'Time', 'Customer Name', 'Customer Email',
       'Seller Name', 'Product Name', 'Quantity', 'Unit Price', 
-      'Line Total', 'Sale Total', 'Amount Paid', 'Balance Due', 'Settled'
+      'Line Total', 'Sale Total', 'Amount Paid', 'Balance Due', 'Settled',
     ];
 
     for (const column of expectedColumns) {
@@ -248,7 +248,7 @@ class ReportingTester {
   async testCSVExportSummary() {
     const response = await this.downloadCSV('/reporting/sales/export', {
       format: 'summary',
-      settled: true
+      settled: true,
     });
 
     // Validate headers
@@ -263,7 +263,7 @@ class ReportingTester {
   async testCSVExportProducts() {
     const response = await this.downloadCSV('/reporting/sales/export', {
       format: 'products',
-      startDate: '2024-01-01'
+      startDate: '2024-01-01',
     });
 
     // Validate headers
@@ -314,7 +314,7 @@ class ReportingTester {
     const response = await this.apiCall('/reporting/sales/analytics', {
       startDate: '2020-01-01',
       endDate: '2030-12-31',
-      groupBy: 'month'
+      groupBy: 'month',
     });
 
     const endTime = Date.now();
@@ -339,13 +339,13 @@ class ReportingTester {
         total: this.testResults.total,
         passed: this.testResults.passed,
         failed: this.testResults.failed,
-        successRate: `${((this.testResults.passed / this.testResults.total) * 100).toFixed(1)}%`
+        successRate: `${((this.testResults.passed / this.testResults.total) * 100).toFixed(1)}%`,
       },
-      details: this.testResults.details
+      details: this.testResults.details,
     };
 
     // Write report to file
-    const reportPath = `./test-data/reporting-test-report.json`;
+    const reportPath = './test-data/reporting-test-report.json';
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
 
     console.log('\n📊 REPORTING FUNCTIONALITY TEST REPORT');
@@ -402,7 +402,7 @@ async function main() {
   const options = {
     verbose: false,
     authToken: null,
-    baseUrl: 'http://localhost:3000/bitetrack'
+    baseUrl: 'http://localhost:3000/bitetrack',
   };
   
   args.forEach(arg => {

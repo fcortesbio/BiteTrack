@@ -4,20 +4,20 @@ const passwordResetTokenSchema = new mongoose.Schema({
   token: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   sellerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Seller',
-    required: true
+    required: true,
   },
   expiresAt: {
     type: Date,
     required: true,
-    default: () => new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-  }
+    default: () => new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
 // Auto-delete expired tokens
@@ -30,7 +30,7 @@ passwordResetTokenSchema.set('toJSON', {
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });
 
 module.exports = mongoose.model('PasswordResetToken', passwordResetTokenSchema);

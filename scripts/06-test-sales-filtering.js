@@ -28,7 +28,7 @@ class SalesFilteringTester {
       passed: 0,
       failed: 0,
       total: 0,
-      details: []
+      details: [],
     };
   }
 
@@ -41,7 +41,7 @@ class SalesFilteringTester {
     // Try to authenticate with default superadmin credentials
     const loginData = {
       email: process.env.TEST_EMAIL || 'admin@bitetrack.com',
-      password: process.env.TEST_PASSWORD || 'SuperAdmin123!'
+      password: process.env.TEST_PASSWORD || 'SuperAdmin123!',
     };
 
     try {
@@ -61,7 +61,7 @@ class SalesFilteringTester {
       this.testResults.details.push({
         name: testName,
         status: 'PASS',
-        message: 'Test passed successfully'
+        message: 'Test passed successfully',
       });
       this.log(`✅ ${testName}`);
     } catch (error) {
@@ -69,7 +69,7 @@ class SalesFilteringTester {
       this.testResults.details.push({
         name: testName,
         status: 'FAIL',
-        message: error.message
+        message: error.message,
       });
       console.error(`❌ ${testName}: ${error.message}`);
     }
@@ -80,9 +80,9 @@ class SalesFilteringTester {
       const response = await axios.get(`${this.baseUrl}${endpoint}`, {
         params,
         headers: {
-          Authorization: `Bearer ${this.authToken}`
+          Authorization: `Bearer ${this.authToken}`,
         },
-        timeout: 10000
+        timeout: 10000,
       });
       return response.data;
     } catch (error) {
@@ -143,7 +143,7 @@ class SalesFilteringTester {
 
     // Check if results are sorted ascending by totalAmount
     for (let i = 1; i < ascending.sales.length; i++) {
-      if (ascending.sales[i].totalAmount < ascending.sales[i-1].totalAmount) {
+      if (ascending.sales[i].totalAmount < ascending.sales[i - 1].totalAmount) {
         throw new Error('Results not sorted ascending by totalAmount');
       }
     }
@@ -153,12 +153,12 @@ class SalesFilteringTester {
     
     // Check if results are sorted descending by totalAmount
     for (let i = 1; i < descending.sales.length; i++) {
-      if (descending.sales[i].totalAmount > descending.sales[i-1].totalAmount) {
+      if (descending.sales[i].totalAmount > descending.sales[i - 1].totalAmount) {
         throw new Error('Results not sorted descending by totalAmount');
       }
     }
 
-    this.log(`  Sorting working: ASC range $${ascending.sales[0].totalAmount}-$${ascending.sales[ascending.sales.length-1].totalAmount}`);
+    this.log(`  Sorting working: ASC range $${ascending.sales[0].totalAmount}-$${ascending.sales[ascending.sales.length - 1].totalAmount}`);
   }
 
   async testSettledFiltering() {
@@ -203,7 +203,7 @@ class SalesFilteringTester {
     const filtered = await this.apiCall('/sales', { 
       startDate,
       endDate,
-      dateField: 'createdAt'
+      dateField: 'createdAt',
     });
 
     // All sales should be within the date range (which should be all of them)
@@ -219,7 +219,7 @@ class SalesFilteringTester {
     const recent = await this.apiCall('/sales', { 
       startDate: yesterday,
       endDate: now,
-      dateField: 'createdAt'
+      dateField: 'createdAt',
     });
 
     this.log(`  Date filtering: ${recent.sales.length} sales in last 24 hours`);
@@ -276,7 +276,7 @@ class SalesFilteringTester {
       settled: false,
       limit: 3,
       sort: '-createdAt',
-      dateField: 'createdAt'
+      dateField: 'createdAt',
     });
 
     // Verify all results match the filters
@@ -335,13 +335,13 @@ class SalesFilteringTester {
         total: this.testResults.total,
         passed: this.testResults.passed,
         failed: this.testResults.failed,
-        successRate: `${((this.testResults.passed / this.testResults.total) * 100).toFixed(1)}%`
+        successRate: `${((this.testResults.passed / this.testResults.total) * 100).toFixed(1)}%`,
       },
-      details: this.testResults.details
+      details: this.testResults.details,
     };
 
     // Write report to file
-    const reportPath = `./test-data/sales-filtering-test-report.json`;
+    const reportPath = './test-data/sales-filtering-test-report.json';
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
 
     console.log('\n📊 SALES FILTERING TEST REPORT');
@@ -398,7 +398,7 @@ async function main() {
   const options = {
     verbose: false,
     authToken: null,
-    baseUrl: 'http://localhost:3000/bitetrack'
+    baseUrl: 'http://localhost:3000/bitetrack',
   };
   
   args.forEach(arg => {

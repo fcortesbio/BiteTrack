@@ -42,7 +42,7 @@ class TestDataPopulator {
       products: [],
       sales: [],
       pendingSellers: [],
-      sellers: []
+      sellers: [],
     };
     
     this.testData = {};
@@ -79,7 +79,7 @@ class TestDataPopulator {
   }
 
   async cleanDatabase() {
-    if (!this.clean) return;
+    if (!this.clean) {return;}
     
     try {
       await Sale.deleteMany({});
@@ -100,18 +100,18 @@ class TestDataPopulator {
     let customerData = [];
     
     switch (this.preset) {
-      case 'minimal':
-        customerData = customers.slice(0, 5);
-        break;
-      case 'dev':
-        customerData = customers.slice(0, 10);
-        break;
-      case 'full':
-        customerData = customers;
-        break;
-      case 'bulk':
-        customerData = [...customers, ...bulkTestCustomers];
-        break;
+    case 'minimal':
+      customerData = customers.slice(0, 5);
+      break;
+    case 'dev':
+      customerData = customers.slice(0, 10);
+      break;
+    case 'full':
+      customerData = customers;
+      break;
+    case 'bulk':
+      customerData = [...customers, ...bulkTestCustomers];
+      break;
     }
 
     try {
@@ -128,42 +128,42 @@ class TestDataPopulator {
     let productData = [];
     
     switch (this.preset) {
-      case 'minimal':
-        productData = [
-          ...categories.sandwiches.slice(0, 3),
-          ...categories.beverages.slice(0, 2),
-          ...categories.sides.slice(0, 2)
-        ];
-        break;
-      case 'dev':
-        productData = [
-          ...categories.sandwiches.slice(0, 5),
-          ...categories.beverages.slice(0, 4),
-          ...categories.sides.slice(0, 3),
-          ...categories.desserts.slice(0, 2)
-        ];
-        break;
-      case 'full':
-        productData = [
-          ...categories.sandwiches,
-          ...categories.beverages,
-          ...categories.sides,
-          ...categories.desserts,
-          ...categories.seasonal,
-          ...lowStockItems
-        ];
-        break;
-      case 'bulk':
-        productData = [
-          ...categories.sandwiches,
-          ...categories.beverages,
-          ...categories.sides,
-          ...categories.desserts,
-          ...categories.seasonal,
-          ...bulkProducts,
-          ...lowStockItems
-        ];
-        break;
+    case 'minimal':
+      productData = [
+        ...categories.sandwiches.slice(0, 3),
+        ...categories.beverages.slice(0, 2),
+        ...categories.sides.slice(0, 2),
+      ];
+      break;
+    case 'dev':
+      productData = [
+        ...categories.sandwiches.slice(0, 5),
+        ...categories.beverages.slice(0, 4),
+        ...categories.sides.slice(0, 3),
+        ...categories.desserts.slice(0, 2),
+      ];
+      break;
+    case 'full':
+      productData = [
+        ...categories.sandwiches,
+        ...categories.beverages,
+        ...categories.sides,
+        ...categories.desserts,
+        ...categories.seasonal,
+        ...lowStockItems,
+      ];
+      break;
+    case 'bulk':
+      productData = [
+        ...categories.sandwiches,
+        ...categories.beverages,
+        ...categories.sides,
+        ...categories.desserts,
+        ...categories.seasonal,
+        ...bulkProducts,
+        ...lowStockItems,
+      ];
+      break;
     }
 
     try {
@@ -180,20 +180,20 @@ class TestDataPopulator {
     let pendingData = pendingSellers.map(seller => ({
       ...seller,
       dateOfBirth: new Date(seller.dateOfBirth),
-      createdBy: "Self" // Indicates created by script, not a real seller
+      createdBy: 'Self', // Indicates created by script, not a real seller
     }));
     
     switch (this.preset) {
-      case 'minimal':
-        pendingData = pendingData.slice(0, 2);
-        break;
-      case 'dev':
-        pendingData = pendingData.slice(0, 4);
-        break;
-      case 'full':
-      case 'bulk':
-        // Use all pending sellers
-        break;
+    case 'minimal':
+      pendingData = pendingData.slice(0, 2);
+      break;
+    case 'dev':
+      pendingData = pendingData.slice(0, 4);
+      break;
+    case 'full':
+    case 'bulk':
+      // Use all pending sellers
+      break;
     }
 
     try {
@@ -223,18 +223,18 @@ class TestDataPopulator {
     let salesData = [];
     
     switch (this.preset) {
-      case 'minimal':
-        salesData = salesTemplates.slice(0, 3);
-        break;
-      case 'dev':
-        salesData = [...salesTemplates.slice(0, 6), ...partialPaymentScenarios.slice(0, 1)];
-        break;
-      case 'full':
-        salesData = [...salesTemplates, ...partialPaymentScenarios];
-        break;
-      case 'bulk':
-        salesData = [...salesTemplates, ...partialPaymentScenarios, ...bulkTestSales];
-        break;
+    case 'minimal':
+      salesData = salesTemplates.slice(0, 3);
+      break;
+    case 'dev':
+      salesData = [...salesTemplates.slice(0, 6), ...partialPaymentScenarios.slice(0, 1)];
+      break;
+    case 'full':
+      salesData = [...salesTemplates, ...partialPaymentScenarios];
+      break;
+    case 'bulk':
+      salesData = [...salesTemplates, ...partialPaymentScenarios, ...bulkTestSales];
+      break;
     }
 
     // Convert template sales to real sales with actual IDs
@@ -278,7 +278,7 @@ class TestDataPopulator {
         realProducts.push({
           productId: product._id,
           quantity: quantity,
-          priceAtSale: priceAtSale
+          priceAtSale: priceAtSale,
         });
         
         totalAmount += priceAtSale * quantity;
@@ -291,7 +291,7 @@ class TestDataPopulator {
         products: realProducts,
         totalAmount: totalAmount,
         amountPaid: template.amountPaid,
-        settled: template.amountPaid >= totalAmount
+        settled: template.amountPaid >= totalAmount,
       };
       
       realSales.push(realSale);
@@ -310,7 +310,7 @@ class TestDataPopulator {
       'FRESH_BREWED_COFFEE_ID': 'Fresh Brewed Coffee',
       'PREMIUM_LATTE_ID': 'Premium Latte',
       'KETTLE_CHIPS_ID': 'Kettle Chips',
-      'CHOCOLATE_CHIP_COOKIE_ID': 'Chocolate Chip Cookie'
+      'CHOCOLATE_CHIP_COOKIE_ID': 'Chocolate Chip Cookie',
     };
     
     const productName = productMappings[templateId];
@@ -329,20 +329,20 @@ class TestDataPopulator {
         customers: this.createdData.customers.length,
         products: this.createdData.products.length,
         sales: this.createdData.sales.length,
-        pendingSellers: this.createdData.pendingSellers.length
+        pendingSellers: this.createdData.pendingSellers.length,
       },
       sampleIds: {
         firstCustomer: this.createdData.customers[0]?._id,
         firstProduct: this.createdData.products[0]?._id,
-        firstSale: this.createdData.sales[0]?._id
+        firstSale: this.createdData.sales[0]?._id,
       },
       statistics: {
         totalSalesValue: this.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0),
         averageOrderValue: this.createdData.sales.length > 0 ? 
           (this.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0) / this.createdData.sales.length).toFixed(2) : 0,
         settledSales: this.createdData.sales.filter(sale => sale.settled).length,
-        unsettledSales: this.createdData.sales.filter(sale => !sale.settled).length
-      }
+        unsettledSales: this.createdData.sales.filter(sale => !sale.settled).length,
+      },
     };
     
     // Write summary to file
@@ -408,7 +408,7 @@ async function main() {
   const options = {
     preset: 'minimal',
     clean: false,
-    verbose: false
+    verbose: false,
   };
   
   args.forEach(arg => {

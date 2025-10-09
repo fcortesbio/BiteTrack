@@ -1,6 +1,6 @@
 const Product = require('../models/Product');
 
-const listProducts = async (req, res) => {
+const listProducts = async(req, res) => {
   try {
     const products = await Product.find({});
     res.json(products);
@@ -9,7 +9,7 @@ const listProducts = async (req, res) => {
   }
 };
 
-const createProduct = async (req, res) => {
+const createProduct = async(req, res) => {
   try {
     const { productName, description, count, price } = req.body;
 
@@ -17,7 +17,7 @@ const createProduct = async (req, res) => {
       productName,
       description,
       count,
-      price
+      price,
     });
 
     await product.save();
@@ -27,7 +27,7 @@ const createProduct = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
+const updateProduct = async(req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -35,14 +35,14 @@ const updateProduct = async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       id,
       updates,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!product) {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Product not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -52,7 +52,7 @@ const updateProduct = async (req, res) => {
   }
 };
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async(req, res) => {
   try {
     const { id } = req.params;
 
@@ -61,7 +61,7 @@ const deleteProduct = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Product not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -76,5 +76,5 @@ module.exports = {
   listProducts,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
 };

@@ -8,7 +8,7 @@ const {
   getSale,
   settleSale,
   importSalesFromCSV,
-  uploadCSV
+  uploadCSV,
 } = require('../controllers/saleController');
 
 // All routes require authentication

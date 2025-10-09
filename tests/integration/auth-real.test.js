@@ -13,7 +13,7 @@ describe('BiteTrack Authentication Routes', () => {
 
   describe('POST /bitetrack/auth/login', () => {
     describe('Success scenarios', () => {
-      it('should authenticate seller with valid credentials', async () => {
+      it('should authenticate seller with valid credentials', async() => {
         // Arrange - Create an active seller directly in DB
         const sellerData = {
           firstName: 'Login',
@@ -22,7 +22,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'LoginPassword123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -33,7 +33,7 @@ describe('BiteTrack Authentication Routes', () => {
           .post('/bitetrack/auth/login')
           .send({
             email: sellerData.email,
-            password: sellerData.password
+            password: sellerData.password,
           });
 
         // Assert
@@ -44,7 +44,7 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body.seller).not.toHaveProperty('password');
       });
 
-      it('should return valid JWT token structure', async () => {
+      it('should return valid JWT token structure', async() => {
         // Arrange - Create an active seller
         const sellerData = {
           firstName: 'JWT',
@@ -53,7 +53,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'JWTPassword123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -64,7 +64,7 @@ describe('BiteTrack Authentication Routes', () => {
           .post('/bitetrack/auth/login')
           .send({
             email: sellerData.email,
-            password: sellerData.password
+            password: sellerData.password,
           });
 
         // Assert
@@ -84,7 +84,7 @@ describe('BiteTrack Authentication Routes', () => {
     });
 
     describe('Authentication failures', () => {
-      it('should reject invalid password', async () => {
+      it('should reject invalid password', async() => {
         // Arrange - Create an active seller
         const sellerData = {
           firstName: 'Invalid',
@@ -93,7 +93,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'CorrectPassword123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -104,7 +104,7 @@ describe('BiteTrack Authentication Routes', () => {
           .post('/bitetrack/auth/login')
           .send({
             email: sellerData.email,
-            password: 'WrongPassword123!'
+            password: 'WrongPassword123!',
           });
 
         // Assert
@@ -114,13 +114,13 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body).not.toHaveProperty('token');
       });
 
-      it('should reject non-existent user', async () => {
+      it('should reject non-existent user', async() => {
         // Act
         const response = await request(app)
           .post('/bitetrack/auth/login')
           .send({
             email: 'nonexistent@example.com',
-            password: 'SomePassword123!'
+            password: 'SomePassword123!',
           });
 
         // Assert
@@ -130,7 +130,7 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body).not.toHaveProperty('token');
       });
 
-      it('should reject missing credentials', async () => {
+      it('should reject missing credentials', async() => {
         // Test missing email
         let response = await request(app)
           .post('/bitetrack/auth/login')
@@ -160,14 +160,14 @@ describe('BiteTrack Authentication Routes', () => {
 
   describe('POST /bitetrack/auth/activate', () => {
     describe('Success scenarios', () => {
-      it('should activate pending seller with valid data', async () => {
+      it('should activate pending seller with valid data', async() => {
         // Arrange - Create a pending seller first
         const pendingSellerData = {
           firstName: 'John',
           lastName: 'Doe',
           email: 'john.doe@test.com',
           dateOfBirth: new Date('1990-01-01'),
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const pendingSeller = new PendingSeller(pendingSellerData);
@@ -177,7 +177,7 @@ describe('BiteTrack Authentication Routes', () => {
           email: pendingSellerData.email,
           lastName: pendingSellerData.lastName,
           dateOfBirth: '1990-01-01',
-          password: 'SecurePassword123!'
+          password: 'SecurePassword123!',
         };
 
         // Act
@@ -201,14 +201,14 @@ describe('BiteTrack Authentication Routes', () => {
         expect(updatedPending.activatedAt).toBeTruthy();
       });
 
-      it('should hash password before storing', async () => {
+      it('should hash password before storing', async() => {
         // Arrange - Create a pending seller first
         const pendingSellerData = {
           firstName: 'Jane',
           lastName: 'Smith',
           email: 'jane.smith@test.com',
           dateOfBirth: new Date('1995-05-15'),
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const pendingSeller = new PendingSeller(pendingSellerData);
@@ -218,7 +218,7 @@ describe('BiteTrack Authentication Routes', () => {
           email: pendingSellerData.email,
           lastName: pendingSellerData.lastName,
           dateOfBirth: '1995-05-15',
-          password: 'TestPassword123!'
+          password: 'TestPassword123!',
         };
 
         // Act
@@ -237,7 +237,7 @@ describe('BiteTrack Authentication Routes', () => {
     });
 
     describe('Validation errors', () => {
-      it('should reject activation with invalid pending seller data', async () => {
+      it('should reject activation with invalid pending seller data', async() => {
         // Act - Try to activate without matching pending seller
         const response = await request(app)
           .post('/bitetrack/auth/activate')
@@ -245,7 +245,7 @@ describe('BiteTrack Authentication Routes', () => {
             email: 'nonexistent@example.com',
             lastName: 'Test',
             dateOfBirth: '1990-01-01',
-            password: 'ValidPassword123!'
+            password: 'ValidPassword123!',
           });
 
         // Assert
@@ -254,7 +254,7 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body.message).toContain('Pending seller not found');
       });
 
-      it('should reject activation of already activated seller', async () => {
+      it('should reject activation of already activated seller', async() => {
         // Arrange - Create and activate a pending seller
         const pendingSellerData = {
           firstName: 'Already',
@@ -262,7 +262,7 @@ describe('BiteTrack Authentication Routes', () => {
           email: 'already.activated@test.com',
           dateOfBirth: new Date('1990-01-01'),
           createdBy: testUtils.generateObjectId(),
-          activatedAt: new Date() // Already activated
+          activatedAt: new Date(), // Already activated
         };
 
         const pendingSeller = new PendingSeller(pendingSellerData);
@@ -275,7 +275,7 @@ describe('BiteTrack Authentication Routes', () => {
             email: pendingSellerData.email,
             lastName: pendingSellerData.lastName,
             dateOfBirth: '1990-01-01',
-            password: 'ValidPassword123!'
+            password: 'ValidPassword123!',
           });
 
         // Assert
@@ -288,7 +288,7 @@ describe('BiteTrack Authentication Routes', () => {
 
   describe('GET /bitetrack/auth/seller-status', () => {
     describe('Success scenarios', () => {
-      it('should return active status for active seller', async () => {
+      it('should return active status for active seller', async() => {
         // Arrange - Create an active seller
         const sellerData = {
           firstName: 'Active',
@@ -297,7 +297,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'Password123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -314,14 +314,14 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body.status).toBe('active');
       });
 
-      it('should return pending status for pending seller', async () => {
+      it('should return pending status for pending seller', async() => {
         // Arrange - Create a pending seller
         const pendingSellerData = {
           firstName: 'Pending',
           lastName: 'Seller',
           email: 'pending.seller@example.com',
           dateOfBirth: new Date('1990-01-01'),
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const pendingSeller = new PendingSeller(pendingSellerData);
@@ -338,7 +338,7 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body.status).toBe('pending');
       });
 
-      it('should return 404 for non-existent seller', async () => {
+      it('should return 404 for non-existent seller', async() => {
         // Act
         const response = await request(app)
           .get('/bitetrack/auth/seller-status')
@@ -352,7 +352,7 @@ describe('BiteTrack Authentication Routes', () => {
     });
 
     describe('Validation errors', () => {
-      it('should reject missing email query parameter', async () => {
+      it('should reject missing email query parameter', async() => {
         // Act
         const response = await request(app)
           .get('/bitetrack/auth/seller-status');
@@ -366,7 +366,7 @@ describe('BiteTrack Authentication Routes', () => {
 
   describe('POST /bitetrack/auth/reset', () => {
     describe('Success scenarios', () => {
-      it('should reset password with valid token and seller details', async () => {
+      it('should reset password with valid token and seller details', async() => {
         // Arrange - Create seller and reset token
         const sellerData = {
           firstName: 'Reset',
@@ -375,7 +375,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'OldPassword123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -384,7 +384,7 @@ describe('BiteTrack Authentication Routes', () => {
         const resetToken = new PasswordResetToken({
           token: 'valid-reset-token',
           sellerId: seller._id,
-          expiresAt: new Date(Date.now() + 3600000) // 1 hour from now
+          expiresAt: new Date(Date.now() + 3600000), // 1 hour from now
         });
         await resetToken.save();
 
@@ -395,7 +395,7 @@ describe('BiteTrack Authentication Routes', () => {
             token: 'valid-reset-token',
             email: sellerData.email,
             dateOfBirth: '1990-01-01',
-            newPassword: 'NewPassword123!'
+            newPassword: 'NewPassword123!',
           });
 
         // Assert
@@ -414,7 +414,7 @@ describe('BiteTrack Authentication Routes', () => {
     });
 
     describe('Validation errors', () => {
-      it('should reject invalid or expired token', async () => {
+      it('should reject invalid or expired token', async() => {
         // Act
         const response = await request(app)
           .post('/bitetrack/auth/reset')
@@ -422,7 +422,7 @@ describe('BiteTrack Authentication Routes', () => {
             token: 'invalid-token',
             email: 'test@example.com',
             dateOfBirth: '1990-01-01',
-            newPassword: 'NewPassword123!'
+            newPassword: 'NewPassword123!',
           });
 
         // Assert
@@ -431,7 +431,7 @@ describe('BiteTrack Authentication Routes', () => {
         expect(response.body.message).toContain('invalid or expired');
       });
 
-      it('should reject reset with mismatched seller details', async () => {
+      it('should reject reset with mismatched seller details', async() => {
         // Arrange - Create seller and reset token
         const sellerData = {
           firstName: 'Mismatch',
@@ -440,7 +440,7 @@ describe('BiteTrack Authentication Routes', () => {
           password: 'Password123!',
           dateOfBirth: new Date('1990-01-01'),
           role: 'user',
-          createdBy: testUtils.generateObjectId()
+          createdBy: testUtils.generateObjectId(),
         };
 
         const seller = new Seller(sellerData);
@@ -449,7 +449,7 @@ describe('BiteTrack Authentication Routes', () => {
         const resetToken = new PasswordResetToken({
           token: 'valid-token',
           sellerId: seller._id,
-          expiresAt: new Date(Date.now() + 3600000)
+          expiresAt: new Date(Date.now() + 3600000),
         });
         await resetToken.save();
 
@@ -460,7 +460,7 @@ describe('BiteTrack Authentication Routes', () => {
             token: 'valid-token',
             email: 'wrong@example.com',
             dateOfBirth: '1990-01-01',
-            newPassword: 'NewPassword123!'
+            newPassword: 'NewPassword123!',
           });
 
         // Assert

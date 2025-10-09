@@ -12,7 +12,7 @@ const Seller = require('../../models/Seller');
  * @param {Object} credentials - Login credentials
  * @returns {Promise<Object>} Login response with token
  */
-const loginUser = async (app, credentials) => {
+const loginUser = async(app, credentials) => {
   const response = await request(app)
     .post('/bitetrack/auth/login')
     .send(credentials);
@@ -26,7 +26,7 @@ const loginUser = async (app, credentials) => {
  * @param {Object} userData - User registration data
  * @returns {Promise<string>} JWT token
  */
-const getAuthToken = async (app, userData = null) => {
+const getAuthToken = async(app, userData = null) => {
   // Use provided data or create default test user
   const defaultUserData = userData || testUtils.createTestUser();
   
@@ -38,7 +38,7 @@ const getAuthToken = async (app, userData = null) => {
   // Login user
   const loginResponse = await loginUser(app, {
     email: defaultUserData.email,
-    password: defaultUserData.password
+    password: defaultUserData.password,
   });
   
   if (loginResponse.status === 200 && loginResponse.body.token) {
@@ -54,18 +54,18 @@ const getAuthToken = async (app, userData = null) => {
  * @param {string} role - User role ('seller', 'admin', 'superadmin')
  * @returns {Promise<string>} JWT token
  */
-const getAuthTokenForRole = async (app, role = 'seller') => {
+const getAuthTokenForRole = async(app, role = 'seller') => {
   let userData;
   
   switch (role) {
-    case 'admin':
-    case 'superadmin':
-      userData = testUtils.createAdminUser();
-      userData.role = role;
-      break;
-    default:
-      userData = testUtils.createTestUser();
-      userData.role = role;
+  case 'admin':
+  case 'superadmin':
+    userData = testUtils.createAdminUser();
+    userData.role = role;
+    break;
+  default:
+    userData = testUtils.createTestUser();
+    userData.role = role;
   }
   
   return await getAuthToken(app, userData);
@@ -86,7 +86,7 @@ const createAuthenticatedRequest = (requestObject, token) => {
  * @param {Object} userData - User data
  * @returns {Promise<Object>} Created user object
  */
-const createUserDirectly = async (userData = null) => {
+const createUserDirectly = async(userData = null) => {
   const defaultUserData = userData || testUtils.createTestUser();
   
   const user = new Seller(defaultUserData);
@@ -100,7 +100,7 @@ const createUserDirectly = async (userData = null) => {
  * @param {string} role - Admin role ('admin' or 'superadmin')
  * @returns {Promise<Object>} Created admin user object
  */
-const createAdminUserDirectly = async (role = 'admin') => {
+const createAdminUserDirectly = async(role = 'admin') => {
   const adminData = testUtils.createAdminUser();
   adminData.role = role;
   
@@ -161,11 +161,11 @@ const createExpiredToken = (payload = {}) => {
     userId: testUtils.generateObjectId(),
     email: 'test@example.com',
     role: 'seller',
-    ...payload
+    ...payload,
   };
   
   return jwt.sign(expiredPayload, process.env.JWT_SECRET || 'test-jwt-secret-key-for-testing-only-not-for-production', {
-    expiresIn: '-1h' // Expired 1 hour ago
+    expiresIn: '-1h', // Expired 1 hour ago
   });
 };
 
@@ -188,5 +188,5 @@ module.exports = {
   getUserIdFromToken,
   isTokenExpired,
   createExpiredToken,
-  createMalformedToken
+  createMalformedToken,
 };

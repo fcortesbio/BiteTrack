@@ -2,7 +2,7 @@ const Seller = require('../models/Seller');
 const PendingSeller = require('../models/PendingSeller');
 const bcrypt = require('bcryptjs');
 
-const listSellers = async (req, res) => {
+const listSellers = async(req, res) => {
   try {
     const sellers = await Seller.find({});
     res.json(sellers);
@@ -11,7 +11,7 @@ const listSellers = async (req, res) => {
   }
 };
 
-const createPendingSeller = async (req, res) => {
+const createPendingSeller = async(req, res) => {
   try {
     const { firstName, lastName, email, dateOfBirth } = req.body;
 
@@ -21,7 +21,7 @@ const createPendingSeller = async (req, res) => {
       return res.status(400).json({
         error: 'Duplicate Error',
         message: 'Seller with this email already exists',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -31,7 +31,7 @@ const createPendingSeller = async (req, res) => {
       return res.status(400).json({
         error: 'Duplicate Error',
         message: 'Pending seller with this email already exists',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -40,7 +40,7 @@ const createPendingSeller = async (req, res) => {
       lastName,
       email,
       dateOfBirth: new Date(dateOfBirth),
-      createdBy: req.user._id
+      createdBy: req.user._id,
     });
 
     await pendingSeller.save();
@@ -50,7 +50,7 @@ const createPendingSeller = async (req, res) => {
   }
 };
 
-const updateSeller = async (req, res) => {
+const updateSeller = async(req, res) => {
   try {
     const { id } = req.params;
     const { firstName, lastName, email, dateOfBirth, oldPassword, newPassword } = req.body;
@@ -60,7 +60,7 @@ const updateSeller = async (req, res) => {
       return res.status(403).json({
         error: 'Forbidden',
         message: 'You can only update your own profile',
-        statusCode: 403
+        statusCode: 403,
       });
     }
 
@@ -69,7 +69,7 @@ const updateSeller = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Seller not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -81,7 +81,7 @@ const updateSeller = async (req, res) => {
         return res.status(400).json({
           error: 'Validation Error',
           message: 'Old password required for sensitive updates',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -90,7 +90,7 @@ const updateSeller = async (req, res) => {
         return res.status(403).json({
           error: 'Forbidden',
           message: 'Invalid old password',
-          statusCode: 403
+          statusCode: 403,
         });
       }
 
@@ -107,18 +107,18 @@ const updateSeller = async (req, res) => {
           return res.status(403).json({
             error: 'Forbidden',
             message: 'Must provide current email or date of birth for verification',
-            statusCode: 403
+            statusCode: 403,
           });
         }
       }
     }
 
     // Update fields
-    if (firstName !== undefined) seller.firstName = firstName;
-    if (lastName !== undefined) seller.lastName = lastName;
-    if (email !== undefined) seller.email = email;
-    if (dateOfBirth !== undefined) seller.dateOfBirth = new Date(dateOfBirth);
-    if (newPassword !== undefined) seller.password = newPassword;
+    if (firstName !== undefined) {seller.firstName = firstName;}
+    if (lastName !== undefined) {seller.lastName = lastName;}
+    if (email !== undefined) {seller.email = email;}
+    if (dateOfBirth !== undefined) {seller.dateOfBirth = new Date(dateOfBirth);}
+    if (newPassword !== undefined) {seller.password = newPassword;}
 
     await seller.save();
     res.json(seller.toJSON());
@@ -127,7 +127,7 @@ const updateSeller = async (req, res) => {
   }
 };
 
-const changeRole = async (req, res) => {
+const changeRole = async(req, res) => {
   try {
     const { id } = req.params;
     const { role } = req.body;
@@ -137,7 +137,7 @@ const changeRole = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Seller not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -150,7 +150,7 @@ const changeRole = async (req, res) => {
   }
 };
 
-const deactivateSeller = async (req, res) => {
+const deactivateSeller = async(req, res) => {
   try {
     const { id } = req.params;
 
@@ -159,7 +159,7 @@ const deactivateSeller = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Seller not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -175,5 +175,5 @@ module.exports = {
   createPendingSeller,
   updateSeller,
   changeRole,
-  deactivateSeller
+  deactivateSeller,
 };

@@ -4,23 +4,23 @@ const pendingSellerSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   lastName: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
     lowercase: true,
-    trim: true
+    trim: true,
   },
   dateOfBirth: {
     type: Date,
-    required: true
+    required: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.Mixed, // Allow both ObjectId and String
@@ -28,25 +28,25 @@ const pendingSellerSchema = new mongoose.Schema({
     validate: {
       validator: function(value) {
         // Allow the special "Self" string for bootstrap superadmin
-        if (value === "Self") {
+        if (value === 'Self') {
           return true;
         }
         // Otherwise, validate as ObjectId
         return mongoose.Types.ObjectId.isValid(value);
       },
-      message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts'
+      message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts',
     },
     // Set reference only when it's an ObjectId
     refPath: function() {
-      return this.createdBy === "Self" ? null : "Seller";
-    }
+      return this.createdBy === 'Self' ? null : 'Seller';
+    },
   },
   activatedAt: {
     type: Date,
-    default: null
-  }
+    default: null,
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
 // Transform output
@@ -56,7 +56,7 @@ pendingSellerSchema.set('toJSON', {
     delete ret._id;
     delete ret.__v;
     return ret;
-  }
+  },
 });
 
 module.exports = mongoose.model('PendingSeller', pendingSellerSchema);

@@ -6,7 +6,7 @@ const csv = require('csv-parser');
 const multer = require('multer');
 const { Readable } = require('stream');
 
-const listSales = async (req, res, next) => {
+const listSales = async(req, res, next) => {
   try {
     const { 
       customerId, 
@@ -17,15 +17,15 @@ const listSales = async (req, res, next) => {
       dateField = 'createdAt',
       page = 1, 
       limit = 50,
-      sort = '-createdAt'
+      sort = '-createdAt',
     } = req.query;
     
     const filter = {};
     
     // Existing filters
-    if (customerId) filter.customerId = customerId;
-    if (sellerId) filter.sellerId = sellerId;
-    if (settled !== undefined) filter.settled = settled === 'true';
+    if (customerId) {filter.customerId = customerId;}
+    if (sellerId) {filter.sellerId = sellerId;}
+    if (settled !== undefined) {filter.settled = settled === 'true';}
     
     // Date range filtering
     if (startDate || endDate) {
@@ -37,7 +37,7 @@ const listSales = async (req, res, next) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid startDate format. Use YYYY-MM-DD or ISO 8601 format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         // Set to start of day (00:00:00.000Z)
@@ -51,7 +51,7 @@ const listSales = async (req, res, next) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid endDate format. Use YYYY-MM-DD or ISO 8601 format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         // Set to end of day (23:59:59.999Z)
@@ -64,7 +64,7 @@ const listSales = async (req, res, next) => {
         return res.status(400).json({
           error: 'Bad Request',
           message: 'Invalid dateField. Must be "createdAt" or "updatedAt"',
-          statusCode: 400
+          statusCode: 400,
         });
       }
       
@@ -79,7 +79,7 @@ const listSales = async (req, res, next) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'Page must be greater than 0',
-        statusCode: 400
+        statusCode: 400,
       });
     }
     
@@ -87,7 +87,7 @@ const listSales = async (req, res, next) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'Limit must be between 1 and 100',
-        statusCode: 400
+        statusCode: 400,
       });
     }
     
@@ -133,7 +133,7 @@ const listSales = async (req, res, next) => {
         totalSales,
         limit: limitNum,
         hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
+        hasPrevPage: pageNum > 1,
       },
       filters: {
         customerId: customerId || null,
@@ -142,21 +142,21 @@ const listSales = async (req, res, next) => {
         dateRange: {
           startDate: startDate || null,
           endDate: endDate || null,
-          dateField
+          dateField,
         },
-        sort
-      }
+        sort,
+      },
     });
   } catch (error) {
     return next(error);
   }
 };
 
-const createSale = async (req, res, next) => {
+const createSale = async(req, res, next) => {
   const session = await mongoose.startSession();
   
   try {
-    await session.withTransaction(async () => {
+    await session.withTransaction(async() => {
       const { customerId, products, amountPaid } = req.body;
 
       // Verify customer exists
@@ -186,7 +186,7 @@ const createSale = async (req, res, next) => {
         saleProducts.push({
           productId: item.productId,
           quantity: item.quantity,
-          priceAtSale: product.price
+          priceAtSale: product.price,
         });
 
         // Decrement inventory
@@ -201,7 +201,7 @@ const createSale = async (req, res, next) => {
         products: saleProducts,
         totalAmount,
         amountPaid,
-        settled: amountPaid >= totalAmount
+        settled: amountPaid >= totalAmount,
       });
 
       await sale.save({ session });
@@ -217,7 +217,7 @@ const createSale = async (req, res, next) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: error.message,
-        statusCode: 400
+        statusCode: 400,
       });
     }
     return next(error);
@@ -226,7 +226,7 @@ const createSale = async (req, res, next) => {
   }
 };
 
-const getSale = async (req, res, next) => {
+const getSale = async(req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -235,7 +235,7 @@ const getSale = async (req, res, next) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Sale not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -245,7 +245,7 @@ const getSale = async (req, res, next) => {
   }
 };
 
-const settleSale = async (req, res, next) => {
+const settleSale = async(req, res, next) => {
   try {
     const { id } = req.params;
     const { amountPaid } = req.body;
@@ -255,7 +255,7 @@ const settleSale = async (req, res, next) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Sale not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -305,7 +305,7 @@ const parseContact = (contact) => {
 };
 
 // Helper function to find customer by contact
-const findCustomerByContact = async (contact) => {
+const findCustomerByContact = async(contact) => {
   const parsedContact = parseContact(contact);
   
   if (parsedContact.type === 'email') {
@@ -316,9 +316,9 @@ const findCustomerByContact = async (contact) => {
 };
 
 // Helper function to find product by name (case-insensitive)
-const findProductByName = async (productName) => {
+const findProductByName = async(productName) => {
   return await Product.findOne({
-    productName: { $regex: new RegExp(`^${productName.trim()}$`, 'i') }
+    productName: { $regex: new RegExp(`^${productName.trim()}$`, 'i') },
   });
 };
 
@@ -336,7 +336,7 @@ const normalizeCSVRow = (row) => {
     'Quantity': 'quantity',
     'Unit Price': 'unitPrice',
     'Total Amount': 'totalAmount',
-    'Amount Paid': 'amountPaid'
+    'Amount Paid': 'amountPaid',
   };
   
   // Apply mapping
@@ -388,13 +388,13 @@ const validateCSVRow = (row) => {
   return { errors, normalized };
 };
 
-const importSalesFromCSV = async (req, res, next) => {
+const importSalesFromCSV = async(req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'No CSV file provided',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -440,7 +440,7 @@ const importSalesFromCSV = async (req, res, next) => {
               row: rowNumber,
               data: row,
               skip_reason: 'required_field_missing',
-              errors: validationErrors
+              errors: validationErrors,
             });
             continue;
           }
@@ -454,7 +454,7 @@ const importSalesFromCSV = async (req, res, next) => {
               row: rowNumber,
               data: row,
               skip_reason: 'invalid_date_format',
-              errors: [{ field: 'timestamp', message: error.message }]
+              errors: [{ field: 'timestamp', message: error.message }],
             });
             continue;
           }
@@ -466,7 +466,7 @@ const importSalesFromCSV = async (req, res, next) => {
               row: rowNumber,
               data: row,
               skip_reason: 'customer_not_found',
-              errors: [{ field: 'contact', message: `No customer found with contact: ${normalized.contact}` }]
+              errors: [{ field: 'contact', message: `No customer found with contact: ${normalized.contact}` }],
             });
             continue;
           }
@@ -474,7 +474,7 @@ const importSalesFromCSV = async (req, res, next) => {
           // Duplicate detection
           const existingSale = await Sale.findOne({
             customerId: customer._id,
-            originalCreatedAt: parsedTimestamp
+            originalCreatedAt: parsedTimestamp,
           });
           
           if (existingSale) {
@@ -487,9 +487,9 @@ const importSalesFromCSV = async (req, res, next) => {
                 message: `Sale already exists for this customer at ${parsedTimestamp.toISOString()}`,
                 existingSale: {
                   id: existingSale._id,
-                  timestamp: existingSale.originalCreatedAt || existingSale.createdAt
-                }
-              }]
+                  timestamp: existingSale.originalCreatedAt || existingSale.createdAt,
+                },
+              }],
             });
             continue;
           }
@@ -501,7 +501,7 @@ const importSalesFromCSV = async (req, res, next) => {
               row: rowNumber,
               data: row,
               skip_reason: 'product_not_found',
-              errors: [{ field: 'productName', message: `Product not found: ${normalized.productName}` }]
+              errors: [{ field: 'productName', message: `Product not found: ${normalized.productName}` }],
             });
             continue;
           }
@@ -510,8 +510,8 @@ const importSalesFromCSV = async (req, res, next) => {
           const quantity = parseInt(normalized.quantity);
           const totalAmount = product.price * quantity;
           const amountPaid = normalized.amountPaid && normalized.amountPaid.toString().trim() !== '' 
-                           ? parseFloat(normalized.amountPaid) 
-                           : 0;
+            ? parseFloat(normalized.amountPaid) 
+            : 0;
 
           // Payment validation
           if (amountPaid < 0) {
@@ -519,7 +519,7 @@ const importSalesFromCSV = async (req, res, next) => {
               row: rowNumber,
               data: row,
               skip_reason: 'negative_payment',
-              errors: [{ field: 'amountPaid', message: 'Payment amount cannot be negative' }]
+              errors: [{ field: 'amountPaid', message: 'Payment amount cannot be negative' }],
             });
             continue;
           }
@@ -531,7 +531,7 @@ const importSalesFromCSV = async (req, res, next) => {
             products: [{
               productId: product._id,
               quantity: quantity,
-              priceAtSale: product.price
+              priceAtSale: product.price,
             }],
             totalAmount: totalAmount,
             amountPaid: amountPaid,
@@ -542,12 +542,12 @@ const importSalesFromCSV = async (req, res, next) => {
             importedAt: importedAt,
             externalSale: true,
             receiptUrl: row.receiptUrl && row.receiptUrl.toString().trim() !== '' 
-                       ? row.receiptUrl.toString().trim() 
-                       : null,
+              ? row.receiptUrl.toString().trim() 
+              : null,
             importBatch: importBatch,
             paymentMethod: row.paymentMethod && row.paymentMethod.toString().trim() !== '' 
-                          ? row.paymentMethod.toString().trim() 
-                          : null
+              ? row.paymentMethod.toString().trim() 
+              : null,
           };
 
           // Create and save sale
@@ -568,9 +568,9 @@ const importSalesFromCSV = async (req, res, next) => {
             row: rowNumber,
             customer: {
               name: `${customer.firstName} ${customer.lastName}`,
-              contact: normalized.contact
+              contact: normalized.contact,
             },
-            sale: sale.toJSON()
+            sale: sale.toJSON(),
           });
 
           // Add warnings for edge cases
@@ -588,7 +588,7 @@ const importSalesFromCSV = async (req, res, next) => {
             row: rowNumber,
             data: row,
             skip_reason: 'processing_error',
-            errors: [{ field: 'general', message: error.message || 'Unexpected error occurred' }]
+            errors: [{ field: 'general', message: error.message || 'Unexpected error occurred' }],
           });
         }
       }
@@ -602,15 +602,15 @@ const importSalesFromCSV = async (req, res, next) => {
         totalRows: results.length,
         imported: successfulImports.length,
         skipped: skippedRows.length,
-        importBatchId: importBatch
+        importBatchId: importBatch,
       },
       importedSales: successfulImports.slice(0, 10), // Limit to first 10 for response size
       skippedRows: skippedRows.slice(0, 20), // Limit to first 20 failures
       warnings: warnings,
       truncated: {
         importedSales: successfulImports.length > 10,
-        skippedRows: skippedRows.length > 20
-      }
+        skippedRows: skippedRows.length > 20,
+      },
     });
 
   } catch (error) {
@@ -631,7 +631,7 @@ const uploadCSV = multer({
     } else {
       cb(new Error('Only CSV files are allowed'));
     }
-  }
+  },
 });
 
 module.exports = {
@@ -640,5 +640,5 @@ module.exports = {
   getSale,
   settleSale,
   importSalesFromCSV,
-  uploadCSV
+  uploadCSV,
 };

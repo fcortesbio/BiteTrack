@@ -9,7 +9,7 @@ const {
   deleteCustomer,
   getCustomerTransactions,
   importCustomersFromCSV,
-  upload
+  upload,
 } = require('../controllers/customerController');
 
 // All routes require authentication

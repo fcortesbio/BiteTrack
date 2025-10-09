@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const sellerSchema = new mongoose.Schema(
   {
@@ -31,8 +31,8 @@ const sellerSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "superadmin"],
-      default: "user",
+      enum: ['user', 'admin', 'superadmin'],
+      default: 'user',
     },
     createdBy: {
       type: mongoose.Schema.Types.Mixed, // Allow both ObjectId and String
@@ -40,18 +40,18 @@ const sellerSchema = new mongoose.Schema(
       validate: {
         validator: function(value) {
           // Allow the special "Self" string for bootstrap superadmin
-          if (value === "Self") {
+          if (value === 'Self') {
             return true;
           }
           // Otherwise, validate as ObjectId
           return mongoose.Types.ObjectId.isValid(value);
         },
-        message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts'
+        message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts',
       },
       // Set reference only when it's an ObjectId
       refPath: function() {
-        return this.createdBy === "Self" ? null : "Seller";
-      }
+        return this.createdBy === 'Self' ? null : 'Seller';
+      },
     },
     activatedAt: {
       type: Date,
@@ -64,8 +64,8 @@ const sellerSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-sellerSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+sellerSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {return next();}
 
   try {
     const salt = await bcrypt.genSalt(12);
@@ -77,13 +77,13 @@ sellerSchema.pre("save", async function (next) {
 });
 
 // Compare password method
-sellerSchema.methods.comparePassword = async function (candidatePassword) {
+sellerSchema.methods.comparePassword = async function(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
 // Transform output to exclude password and add id
-sellerSchema.set("toJSON", {
-  transform: function (doc, ret) {
+sellerSchema.set('toJSON', {
+  transform: function(doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -92,4 +92,4 @@ sellerSchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("Seller", sellerSchema);
+module.exports = mongoose.model('Seller', sellerSchema);

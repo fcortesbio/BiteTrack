@@ -22,8 +22,8 @@ const loadOpenAPISpec = (port, host = 'localhost') => {
     spec.servers = [
       {
         url: `http://${host}:${port}/bitetrack`,
-        description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`
-      }
+        description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`,
+      },
     ];
     
     // Enhanced with additional Swagger UI customizations
@@ -75,12 +75,12 @@ const loadOpenAPISpec = (port, host = 'localhost') => {
       contact: {
         name: 'BiteTrack API Support',
         url: 'https://github.com/fcortesbio/BiteTrack',
-        email: 'support@bitetrack.api'
+        email: 'support@bitetrack.api',
       },
       license: {
         name: 'MIT License',
-        url: 'https://github.com/fcortesbio/BiteTrack/blob/main/LICENSE'
-      }
+        url: 'https://github.com/fcortesbio/BiteTrack/blob/main/LICENSE',
+      },
     };
     
     return spec;
@@ -93,14 +93,14 @@ const loadOpenAPISpec = (port, host = 'localhost') => {
       info: {
         title: 'BiteTrack API',
         version: '2.0.0',
-        description: 'Professional food business management platform with business intelligence'
+        description: 'Professional food business management platform with business intelligence',
       },
       servers: [
         {
           url: `http://${host}:${port}/bitetrack`,
-          description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`
-        }
-      ]
+          description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`,
+        },
+      ],
     };
   }
 };
@@ -163,8 +163,8 @@ const swaggerOptions = {
     persistAuthorization: true,
     // Show request duration
     showExtensions: true,
-    showCommonExtensions: true
-  }
+    showCommonExtensions: true,
+  },
 };
 
 module.exports = {
@@ -195,5 +195,5 @@ module.exports = {
     
     // Return the spec for potential use elsewhere
     return swaggerSpec;
-  }
+  },
 };

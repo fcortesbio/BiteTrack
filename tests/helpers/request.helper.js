@@ -102,7 +102,7 @@ const requestBuilders = {
     });
     
     return req;
-  }
+  },
 };
 
 /**
@@ -118,24 +118,24 @@ const requestValidators = {
    * @param {Object} data - Request body data (for POST/PUT)
    * @returns {Promise<Object>} Response object
    */
-  testAuthenticationRequired: async (app, method, endpoint, data = {}) => {
+  testAuthenticationRequired: async(app, method, endpoint, data = {}) => {
     let request;
     
     switch (method.toUpperCase()) {
-      case 'GET':
-        request = requestBuilders.unauthenticatedGet(app, endpoint);
-        break;
-      case 'POST':
-        request = requestBuilders.unauthenticatedPost(app, endpoint, data);
-        break;
-      case 'PUT':
-        request = requestBuilders.unauthenticatedPut(app, endpoint, data);
-        break;
-      case 'DELETE':
-        request = requestBuilders.unauthenticatedDelete(app, endpoint);
-        break;
-      default:
-        throw new Error(`Unsupported HTTP method: ${method}`);
+    case 'GET':
+      request = requestBuilders.unauthenticatedGet(app, endpoint);
+      break;
+    case 'POST':
+      request = requestBuilders.unauthenticatedPost(app, endpoint, data);
+      break;
+    case 'PUT':
+      request = requestBuilders.unauthenticatedPut(app, endpoint, data);
+      break;
+    case 'DELETE':
+      request = requestBuilders.unauthenticatedDelete(app, endpoint);
+      break;
+    default:
+      throw new Error(`Unsupported HTTP method: ${method}`);
     }
     
     return await request;
@@ -150,28 +150,28 @@ const requestValidators = {
    * @param {Object} data - Request body data
    * @returns {Promise<Object>} Response object
    */
-  testAuthorizationRequired: async (app, method, endpoint, token, data = {}) => {
+  testAuthorizationRequired: async(app, method, endpoint, token, data = {}) => {
     let request;
     
     switch (method.toUpperCase()) {
-      case 'GET':
-        request = requestBuilders.authenticatedGet(app, endpoint, token);
-        break;
-      case 'POST':
-        request = requestBuilders.authenticatedPost(app, endpoint, data, token);
-        break;
-      case 'PUT':
-        request = requestBuilders.authenticatedPut(app, endpoint, data, token);
-        break;
-      case 'DELETE':
-        request = requestBuilders.authenticatedDelete(app, endpoint, token);
-        break;
-      default:
-        throw new Error(`Unsupported HTTP method: ${method}`);
+    case 'GET':
+      request = requestBuilders.authenticatedGet(app, endpoint, token);
+      break;
+    case 'POST':
+      request = requestBuilders.authenticatedPost(app, endpoint, data, token);
+      break;
+    case 'PUT':
+      request = requestBuilders.authenticatedPut(app, endpoint, data, token);
+      break;
+    case 'DELETE':
+      request = requestBuilders.authenticatedDelete(app, endpoint, token);
+      break;
+    default:
+      throw new Error(`Unsupported HTTP method: ${method}`);
     }
     
     return await request;
-  }
+  },
 };
 
 /**
@@ -192,7 +192,7 @@ const commonTestScenarios = {
     /**
      * Test first page with default limit
      */
-    testFirstPage: async () => {
+    testFirstPage: async() => {
       const req = token 
         ? requestBuilders.authenticatedGet(app, endpoint, token, { page: 1 })
         : requestBuilders.unauthenticatedGet(app, endpoint, { page: 1 });
@@ -203,7 +203,7 @@ const commonTestScenarios = {
     /**
      * Test custom page size
      */
-    testCustomPageSize: async (limit = 5) => {
+    testCustomPageSize: async(limit = 5) => {
       const req = token 
         ? requestBuilders.authenticatedGet(app, endpoint, token, { page: 1, limit })
         : requestBuilders.unauthenticatedGet(app, endpoint, { page: 1, limit });
@@ -214,13 +214,13 @@ const commonTestScenarios = {
     /**
      * Test invalid pagination parameters
      */
-    testInvalidPagination: async () => {
+    testInvalidPagination: async() => {
       const req = token 
         ? requestBuilders.authenticatedGet(app, endpoint, token, { page: -1, limit: 0 })
         : requestBuilders.unauthenticatedGet(app, endpoint, { page: -1, limit: 0 });
       
       return await req;
-    }
+    },
   }),
 
   /**
@@ -236,49 +236,49 @@ const commonTestScenarios = {
     /**
      * Test resource creation
      */
-    testCreate: async (data = testData.valid) => {
+    testCreate: async(data = testData.valid) => {
       return await requestBuilders.authenticatedPost(app, baseEndpoint, data, token);
     },
 
     /**
      * Test resource retrieval by ID
      */
-    testGetById: async (resourceId) => {
+    testGetById: async(resourceId) => {
       return await requestBuilders.authenticatedGet(app, `${baseEndpoint}/${resourceId}`, token);
     },
 
     /**
      * Test resource list retrieval
      */
-    testGetAll: async (query = {}) => {
+    testGetAll: async(query = {}) => {
       return await requestBuilders.authenticatedGet(app, baseEndpoint, token, query);
     },
 
     /**
      * Test resource update
      */
-    testUpdate: async (resourceId, updateData = testData.update) => {
+    testUpdate: async(resourceId, updateData = testData.update) => {
       return await requestBuilders.authenticatedPut(app, `${baseEndpoint}/${resourceId}`, updateData, token);
     },
 
     /**
      * Test resource deletion
      */
-    testDelete: async (resourceId) => {
+    testDelete: async(resourceId) => {
       return await requestBuilders.authenticatedDelete(app, `${baseEndpoint}/${resourceId}`, token);
     },
 
     /**
      * Test resource creation with invalid data
      */
-    testCreateWithInvalidData: async (invalidData = testData.invalid) => {
+    testCreateWithInvalidData: async(invalidData = testData.invalid) => {
       return await requestBuilders.authenticatedPost(app, baseEndpoint, invalidData, token);
     },
 
     /**
      * Test non-existent resource access
      */
-    testNonExistentResource: async () => {
+    testNonExistentResource: async() => {
       const fakeId = '507f1f77bcf86cd799439011'; // Valid ObjectId format but non-existent
       return await requestBuilders.authenticatedGet(app, `${baseEndpoint}/${fakeId}`, token);
     },
@@ -286,11 +286,11 @@ const commonTestScenarios = {
     /**
      * Test invalid ObjectId format
      */
-    testInvalidObjectId: async () => {
+    testInvalidObjectId: async() => {
       const invalidId = 'invalid-object-id';
       return await requestBuilders.authenticatedGet(app, `${baseEndpoint}/${invalidId}`, token);
-    }
-  })
+    },
+  }),
 };
 
 /**
@@ -304,7 +304,7 @@ const performanceTestHelpers = {
    * @param {number} iterations - Number of iterations to run
    * @returns {Promise<Object>} Performance metrics
    */
-  measureResponseTime: async (requestFunction, iterations = 10) => {
+  measureResponseTime: async(requestFunction, iterations = 10) => {
     const times = [];
     
     for (let i = 0; i < iterations; i++) {
@@ -323,7 +323,7 @@ const performanceTestHelpers = {
       minimum: minTime,
       maximum: maxTime,
       iterations,
-      allTimes: times
+      allTimes: times,
     };
   },
 
@@ -333,7 +333,7 @@ const performanceTestHelpers = {
    * @param {number} concurrentRequests - Number of concurrent requests
    * @returns {Promise<Object>} Concurrency test results
    */
-  testConcurrency: async (requestFunction, concurrentRequests = 5) => {
+  testConcurrency: async(requestFunction, concurrentRequests = 5) => {
     const startTime = Date.now();
     
     const promises = Array.from({ length: concurrentRequests }, () => requestFunction());
@@ -351,14 +351,14 @@ const performanceTestHelpers = {
       successful,
       failed,
       successRate: (successful / concurrentRequests) * 100,
-      results
+      results,
     };
-  }
+  },
 };
 
 module.exports = {
   requestBuilders,
   requestValidators,
   commonTestScenarios,
-  performanceTestHelpers
+  performanceTestHelpers,
 };

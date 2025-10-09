@@ -1,14 +1,14 @@
-const express = require("express");
-const { body, param, query } = require("express-validator");
-const { authenticate, authorize } = require("../middleware/auth");
+const express = require('express');
+const { body, param, query } = require('express-validator');
+const { authenticate, authorize } = require('../middleware/auth');
 const {
   dropInventory,
   undoInventoryDrop,
   listInventoryDrops,
   getUndoableDrops,
   getDropAnalytics,
-  getInventoryDropById
-} = require("../controllers/inventoryDropController");
+  getInventoryDropById,
+} = require('../controllers/inventoryDropController');
 
 const router = express.Router();
 
@@ -20,37 +20,37 @@ router.use(authenticate);
  * Drop inventory for a product (admin/superadmin only)
  */
 router.post(
-  "/",
-  authorize("admin", "superadmin"),
+  '/',
+  authorize('admin', 'superadmin'),
   [
-    body("productId")
+    body('productId')
       .isMongoId()
-      .withMessage("Product ID must be a valid MongoDB ObjectId"),
-    body("quantityToDrop")
+      .withMessage('Product ID must be a valid MongoDB ObjectId'),
+    body('quantityToDrop')
       .isInt({ min: 1 })
-      .withMessage("Quantity to drop must be a positive integer"),
-    body("reason")
+      .withMessage('Quantity to drop must be a positive integer'),
+    body('reason')
       .optional()
-      .isIn(["expired", "end_of_day", "quality_issue", "damaged", "contaminated", "overproduction", "other"])
-      .withMessage("Invalid drop reason"),
-    body("notes")
+      .isIn(['expired', 'end_of_day', 'quality_issue', 'damaged', 'contaminated', 'overproduction', 'other'])
+      .withMessage('Invalid drop reason'),
+    body('notes')
       .optional()
       .isLength({ max: 500 })
-      .withMessage("Notes cannot exceed 500 characters"),
-    body("productionDate")
+      .withMessage('Notes cannot exceed 500 characters'),
+    body('productionDate')
       .optional()
       .isISO8601()
-      .withMessage("Production date must be a valid date"),
-    body("expirationDate")
+      .withMessage('Production date must be a valid date'),
+    body('expirationDate')
       .optional()
       .isISO8601()
-      .withMessage("Expiration date must be a valid date"),
-    body("batchId")
+      .withMessage('Expiration date must be a valid date'),
+    body('batchId')
       .optional()
       .isLength({ max: 100 })
-      .withMessage("Batch ID cannot exceed 100 characters"),
+      .withMessage('Batch ID cannot exceed 100 characters'),
   ],
-  dropInventory
+  dropInventory,
 );
 
 /**
@@ -58,18 +58,18 @@ router.post(
  * Undo an inventory drop (admin/superadmin only)
  */
 router.post(
-  "/:dropId/undo",
-  authorize("admin", "superadmin"),
+  '/:dropId/undo',
+  authorize('admin', 'superadmin'),
   [
-    param("dropId")
+    param('dropId')
       .isMongoId()
-      .withMessage("Drop ID must be a valid MongoDB ObjectId"),
-    body("undoReason")
+      .withMessage('Drop ID must be a valid MongoDB ObjectId'),
+    body('undoReason')
       .optional()
       .isLength({ max: 300 })
-      .withMessage("Undo reason cannot exceed 300 characters"),
+      .withMessage('Undo reason cannot exceed 300 characters'),
   ],
-  undoInventoryDrop
+  undoInventoryDrop,
 );
 
 /**
@@ -77,43 +77,43 @@ router.post(
  * List inventory drops with filtering and pagination
  */
 router.get(
-  "/",
-  authorize("admin", "superadmin"),
+  '/',
+  authorize('admin', 'superadmin'),
   [
-    query("page")
+    query('page')
       .optional()
       .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-    query("limit")
+      .withMessage('Page must be a positive integer'),
+    query('limit')
       .optional()
       .isInt({ min: 1, max: 100 })
-      .withMessage("Limit must be between 1 and 100"),
-    query("productId")
+      .withMessage('Limit must be between 1 and 100'),
+    query('productId')
       .optional()
       .isMongoId()
-      .withMessage("Product ID must be a valid MongoDB ObjectId"),
-    query("reason")
+      .withMessage('Product ID must be a valid MongoDB ObjectId'),
+    query('reason')
       .optional()
-      .isIn(["expired", "end_of_day", "quality_issue", "damaged", "contaminated", "overproduction", "other"])
-      .withMessage("Invalid drop reason"),
-    query("droppedBy")
+      .isIn(['expired', 'end_of_day', 'quality_issue', 'damaged', 'contaminated', 'overproduction', 'other'])
+      .withMessage('Invalid drop reason'),
+    query('droppedBy')
       .optional()
       .isMongoId()
-      .withMessage("Dropped by must be a valid MongoDB ObjectId"),
-    query("startDate")
+      .withMessage('Dropped by must be a valid MongoDB ObjectId'),
+    query('startDate')
       .optional()
       .isISO8601()
-      .withMessage("Start date must be a valid date"),
-    query("endDate")
+      .withMessage('Start date must be a valid date'),
+    query('endDate')
       .optional()
       .isISO8601()
-      .withMessage("End date must be a valid date"),
-    query("includeUndone")
+      .withMessage('End date must be a valid date'),
+    query('includeUndone')
       .optional()
-      .isIn(["true", "false"])
+      .isIn(['true', 'false'])
       .withMessage("Include undone must be 'true' or 'false'"),
   ],
-  listInventoryDrops
+  listInventoryDrops,
 );
 
 /**
@@ -121,15 +121,15 @@ router.get(
  * Get drops that can still be undone
  */
 router.get(
-  "/undoable",
-  authorize("admin", "superadmin"),
+  '/undoable',
+  authorize('admin', 'superadmin'),
   [
-    query("userId")
+    query('userId')
       .optional()
       .isMongoId()
-      .withMessage("User ID must be a valid MongoDB ObjectId"),
+      .withMessage('User ID must be a valid MongoDB ObjectId'),
   ],
-  getUndoableDrops
+  getUndoableDrops,
 );
 
 /**
@@ -137,31 +137,31 @@ router.get(
  * Get inventory drop analytics and summaries
  */
 router.get(
-  "/analytics",
-  authorize("admin", "superadmin"),
+  '/analytics',
+  authorize('admin', 'superadmin'),
   [
-    query("startDate")
+    query('startDate')
       .optional()
       .isISO8601()
-      .withMessage("Start date must be a valid date"),
-    query("endDate")
+      .withMessage('Start date must be a valid date'),
+    query('endDate')
       .optional()
       .isISO8601()
-      .withMessage("End date must be a valid date"),
-    query("productId")
+      .withMessage('End date must be a valid date'),
+    query('productId')
       .optional()
       .isMongoId()
-      .withMessage("Product ID must be a valid MongoDB ObjectId"),
-    query("reason")
+      .withMessage('Product ID must be a valid MongoDB ObjectId'),
+    query('reason')
       .optional()
-      .isIn(["expired", "end_of_day", "quality_issue", "damaged", "contaminated", "overproduction", "other"])
-      .withMessage("Invalid drop reason"),
-    query("droppedBy")
+      .isIn(['expired', 'end_of_day', 'quality_issue', 'damaged', 'contaminated', 'overproduction', 'other'])
+      .withMessage('Invalid drop reason'),
+    query('droppedBy')
       .optional()
       .isMongoId()
-      .withMessage("Dropped by must be a valid MongoDB ObjectId"),
+      .withMessage('Dropped by must be a valid MongoDB ObjectId'),
   ],
-  getDropAnalytics
+  getDropAnalytics,
 );
 
 /**
@@ -169,14 +169,14 @@ router.get(
  * Get inventory drop details by ID
  */
 router.get(
-  "/:dropId",
-  authorize("admin", "superadmin"),
+  '/:dropId',
+  authorize('admin', 'superadmin'),
   [
-    param("dropId")
+    param('dropId')
       .isMongoId()
-      .withMessage("Drop ID must be a valid MongoDB ObjectId"),
+      .withMessage('Drop ID must be a valid MongoDB ObjectId'),
   ],
-  getInventoryDropById
+  getInventoryDropById,
 );
 
 module.exports = router;

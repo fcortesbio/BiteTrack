@@ -3,7 +3,7 @@ const router = express.Router();
 const { authenticate } = require('../middleware/auth');
 const {
   getSalesAnalytics,
-  exportSalesCSV
+  exportSalesCSV,
 } = require('../controllers/reportingController');
 
 // All reporting routes require authentication

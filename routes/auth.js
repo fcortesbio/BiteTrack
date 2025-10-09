@@ -7,7 +7,7 @@ const {
   activate,
   recover,
   reset,
-  getSellerByEmail
+  getSellerByEmail,
 } = require('../controllers/authController');
 
 // Public routes
@@ -20,7 +20,7 @@ router.get('/seller-status', validationRules.getSellerByEmail, validate, getSell
 router.post('/recover', 
   authenticate, 
   authorize('superadmin'), 
-  recover
+  recover,
 );
 
 module.exports = router;

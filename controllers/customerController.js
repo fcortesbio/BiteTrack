@@ -4,7 +4,7 @@ const csv = require('csv-parser');
 const multer = require('multer');
 const { Readable } = require('stream');
 
-const listCustomers = async (req, res) => {
+const listCustomers = async(req, res) => {
   try {
     const customers = await Customer.find({});
     res.json(customers);
@@ -13,7 +13,7 @@ const listCustomers = async (req, res) => {
   }
 };
 
-const createCustomer = async (req, res) => {
+const createCustomer = async(req, res) => {
   try {
     const { firstName, lastName, phoneNumber, email } = req.body;
 
@@ -30,9 +30,9 @@ const createCustomer = async (req, res) => {
           existingCustomer: {
             id: existingCustomerByPhone._id,
             name: `${existingCustomerByPhone.firstName} ${existingCustomerByPhone.lastName}`,
-            phoneNumber: existingCustomerByPhone.phoneNumber
-          }
-        }]
+            phoneNumber: existingCustomerByPhone.phoneNumber,
+          },
+        }],
       });
     }
 
@@ -50,9 +50,9 @@ const createCustomer = async (req, res) => {
             existingCustomer: {
               id: existingCustomerByEmail._id,
               name: `${existingCustomerByEmail.firstName} ${existingCustomerByEmail.lastName}`,
-              email: existingCustomerByEmail.email
-            }
-          }]
+              email: existingCustomerByEmail.email,
+            },
+          }],
         });
       }
     }
@@ -62,7 +62,7 @@ const createCustomer = async (req, res) => {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       phoneNumber: phoneNumber.trim(),
-      email: email && email.trim() !== '' ? email.toLowerCase().trim() : undefined
+      email: email && email.trim() !== '' ? email.toLowerCase().trim() : undefined,
     });
 
     await customer.save();
@@ -79,8 +79,8 @@ const createCustomer = async (req, res) => {
         statusCode: 409,
         details: [{
           field: duplicateField,
-          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`
-        }]
+          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
+        }],
       });
     }
     
@@ -88,14 +88,14 @@ const createCustomer = async (req, res) => {
     if (error.name === 'ValidationError') {
       const details = Object.values(error.errors).map(err => ({
         field: err.path,
-        message: err.message
+        message: err.message,
       }));
       
       return res.status(400).json({
         error: 'Validation Error',
         message: 'Customer data validation failed',
         statusCode: 400,
-        details
+        details,
       });
     }
     
@@ -103,7 +103,7 @@ const createCustomer = async (req, res) => {
   }
 };
 
-const updateCustomer = async (req, res) => {
+const updateCustomer = async(req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -114,7 +114,7 @@ const updateCustomer = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Customer not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -122,7 +122,7 @@ const updateCustomer = async (req, res) => {
     if (updates.phoneNumber && updates.phoneNumber.trim() !== existingCustomer.phoneNumber) {
       const duplicatePhoneCustomer = await Customer.findOne({ 
         phoneNumber: updates.phoneNumber.trim(),
-        _id: { $ne: id } // Exclude current customer
+        _id: { $ne: id }, // Exclude current customer
       });
       
       if (duplicatePhoneCustomer) {
@@ -136,9 +136,9 @@ const updateCustomer = async (req, res) => {
             existingCustomer: {
               id: duplicatePhoneCustomer._id,
               name: `${duplicatePhoneCustomer.firstName} ${duplicatePhoneCustomer.lastName}`,
-              phoneNumber: duplicatePhoneCustomer.phoneNumber
-            }
-          }]
+              phoneNumber: duplicatePhoneCustomer.phoneNumber,
+            },
+          }],
         });
       }
     }
@@ -148,7 +148,7 @@ const updateCustomer = async (req, res) => {
         updates.email.toLowerCase().trim() !== existingCustomer.email) {
       const duplicateEmailCustomer = await Customer.findOne({ 
         email: updates.email.toLowerCase().trim(),
-        _id: { $ne: id } // Exclude current customer
+        _id: { $ne: id }, // Exclude current customer
       });
       
       if (duplicateEmailCustomer) {
@@ -162,9 +162,9 @@ const updateCustomer = async (req, res) => {
             existingCustomer: {
               id: duplicateEmailCustomer._id,
               name: `${duplicateEmailCustomer.firstName} ${duplicateEmailCustomer.lastName}`,
-              email: duplicateEmailCustomer.email
-            }
-          }]
+              email: duplicateEmailCustomer.email,
+            },
+          }],
         });
       }
     }
@@ -173,9 +173,9 @@ const updateCustomer = async (req, res) => {
     const cleanUpdates = { ...updates };
     
     // Clean and normalize data
-    if (cleanUpdates.firstName) cleanUpdates.firstName = cleanUpdates.firstName.trim();
-    if (cleanUpdates.lastName) cleanUpdates.lastName = cleanUpdates.lastName.trim();
-    if (cleanUpdates.phoneNumber) cleanUpdates.phoneNumber = cleanUpdates.phoneNumber.trim();
+    if (cleanUpdates.firstName) {cleanUpdates.firstName = cleanUpdates.firstName.trim();}
+    if (cleanUpdates.lastName) {cleanUpdates.lastName = cleanUpdates.lastName.trim();}
+    if (cleanUpdates.phoneNumber) {cleanUpdates.phoneNumber = cleanUpdates.phoneNumber.trim();}
     
     // Handle email normalization
     if (cleanUpdates.email === '' || cleanUpdates.email === null) {
@@ -187,7 +187,7 @@ const updateCustomer = async (req, res) => {
     const customer = await Customer.findByIdAndUpdate(
       id,
       cleanUpdates,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     res.json(customer.toJSON());
@@ -203,8 +203,8 @@ const updateCustomer = async (req, res) => {
         statusCode: 409,
         details: [{
           field: duplicateField,
-          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`
-        }]
+          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
+        }],
       });
     }
     
@@ -212,14 +212,14 @@ const updateCustomer = async (req, res) => {
     if (error.name === 'ValidationError') {
       const details = Object.values(error.errors).map(err => ({
         field: err.path,
-        message: err.message
+        message: err.message,
       }));
       
       return res.status(400).json({
         error: 'Validation Error',
         message: 'Customer data validation failed',
         statusCode: 400,
-        details
+        details,
       });
     }
     
@@ -227,7 +227,7 @@ const updateCustomer = async (req, res) => {
   }
 };
 
-const deleteCustomer = async (req, res) => {
+const deleteCustomer = async(req, res) => {
   try {
     const { id } = req.params;
 
@@ -236,7 +236,7 @@ const deleteCustomer = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Customer not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -247,7 +247,7 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
-const getCustomerTransactions = async (req, res) => {
+const getCustomerTransactions = async(req, res) => {
   try {
     // Parameter extraction & Setup
     const { id } = req.params;
@@ -262,7 +262,7 @@ const getCustomerTransactions = async (req, res) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'Limit must be between 1 and 100',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -270,7 +270,7 @@ const getCustomerTransactions = async (req, res) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'Page must be greater than 0',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -280,7 +280,7 @@ const getCustomerTransactions = async (req, res) => {
       return res.status(404).json({
         error: 'Not Found',
         message: 'Customer not found',
-        statusCode: 404
+        statusCode: 404,
       });
     }
 
@@ -311,8 +311,8 @@ const getCustomerTransactions = async (req, res) => {
         totalTransactions,
         limit: limitNum,
         hasNextPage: pageNum < totalPages,
-        hasPrevPage: pageNum > 1
-      }
+        hasPrevPage: pageNum > 1,
+      },
     });
   } catch (error) {
     throw error;
@@ -346,7 +346,7 @@ const validateCustomerData = (data) => {
 };
 
 // Helper function to check for existing customers
-const checkForConflicts = async (customerData) => {
+const checkForConflicts = async(customerData) => {
   const conflicts = [];
   const phoneNumber = customerData.phoneNumber.toString().trim();
   const email = customerData.email ? customerData.email.toString().toLowerCase().trim() : null;
@@ -360,8 +360,8 @@ const checkForConflicts = async (customerData) => {
       existingCustomer: {
         id: existingByPhone._id,
         name: `${existingByPhone.firstName} ${existingByPhone.lastName}`,
-        phoneNumber: existingByPhone.phoneNumber
-      }
+        phoneNumber: existingByPhone.phoneNumber,
+      },
     });
   }
   
@@ -375,8 +375,8 @@ const checkForConflicts = async (customerData) => {
         existingCustomer: {
           id: existingByEmail._id,
           name: `${existingByEmail.firstName} ${existingByEmail.lastName}`,
-          email: existingByEmail.email
-        }
+          email: existingByEmail.email,
+        },
       });
     }
   }
@@ -384,13 +384,13 @@ const checkForConflicts = async (customerData) => {
   return conflicts;
 };
 
-const importCustomersFromCSV = async (req, res) => {
+const importCustomersFromCSV = async(req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'No CSV file provided',
-        statusCode: 400
+        statusCode: 400,
       });
     }
 
@@ -424,7 +424,7 @@ const importCustomersFromCSV = async (req, res) => {
           failures.push({
             row: rowNumber,
             data: row,
-            errors: validationErrors
+            errors: validationErrors,
           });
           continue;
         }
@@ -435,7 +435,7 @@ const importCustomersFromCSV = async (req, res) => {
           failures.push({
             row: rowNumber,
             data: row,
-            errors: conflicts
+            errors: conflicts,
           });
           continue;
         }
@@ -446,7 +446,7 @@ const importCustomersFromCSV = async (req, res) => {
           lastName: row.lastName.toString().trim(),
           phoneNumber: row.phoneNumber.toString().trim(),
           email: row.email && row.email.toString().trim() !== '' ? 
-                 row.email.toString().toLowerCase().trim() : undefined
+            row.email.toString().toLowerCase().trim() : undefined,
         };
 
         const customer = new Customer(customerData);
@@ -454,7 +454,7 @@ const importCustomersFromCSV = async (req, res) => {
         
         successfulImports.push({
           row: rowNumber,
-          customer: customer.toJSON()
+          customer: customer.toJSON(),
         });
 
       } catch (error) {
@@ -462,13 +462,13 @@ const importCustomersFromCSV = async (req, res) => {
         const errorMessage = error.name === 'ValidationError' ? 
           Object.values(error.errors).map(err => ({
             field: err.path,
-            message: err.message
+            message: err.message,
           })) : [{ field: 'general', message: error.message || 'Unexpected error occurred' }];
         
         failures.push({
           row: rowNumber,
           data: row,
-          errors: errorMessage
+          errors: errorMessage,
         });
       }
     }
@@ -480,14 +480,14 @@ const importCustomersFromCSV = async (req, res) => {
       summary: {
         totalRows: results.length,
         successful: successfulImports.length,
-        failed: failures.length
+        failed: failures.length,
       },
       successfulImports: successfulImports.slice(0, 10), // Limit to first 10 for response size
       failures: failures.slice(0, 20), // Limit to first 20 failures
       truncated: {
         successfulImports: successfulImports.length > 10,
-        failures: failures.length > 20
-      }
+        failures: failures.length > 20,
+      },
     });
 
   } catch (error) {
@@ -496,7 +496,7 @@ const importCustomersFromCSV = async (req, res) => {
       error: 'Internal Server Error',
       message: 'Failed to process CSV file',
       statusCode: 500,
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -513,7 +513,7 @@ const upload = multer({
     } else {
       cb(new Error('Only CSV files are allowed'));
     }
-  }
+  },
 });
 
 module.exports = {
@@ -523,5 +523,5 @@ module.exports = {
   deleteCustomer,
   getCustomerTransactions,
   importCustomersFromCSV,
-  upload
+  upload,
 };

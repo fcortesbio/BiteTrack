@@ -1,7 +1,7 @@
 const { verifyToken } = require('../utils/jwt');
 const Seller = require('../models/Seller');
 
-const authenticate = async (req, res, next) => {
+const authenticate = async(req, res, next) => {
   try {
     const authHeader = req.header('Authorization');
     
@@ -9,7 +9,7 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'Access token is required',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -21,7 +21,7 @@ const authenticate = async (req, res, next) => {
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'Invalid token',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -31,7 +31,7 @@ const authenticate = async (req, res, next) => {
     return res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid token',
-      statusCode: 401
+      statusCode: 401,
     });
   }
 };
@@ -42,7 +42,7 @@ const authorize = (...roles) => {
       return res.status(401).json({
         error: 'Unauthorized',
         message: 'Authentication required',
-        statusCode: 401
+        statusCode: 401,
       });
     }
 
@@ -50,7 +50,7 @@ const authorize = (...roles) => {
       return res.status(403).json({
         error: 'Forbidden',
         message: 'Insufficient permissions',
-        statusCode: 403
+        statusCode: 403,
       });
     }
 
@@ -60,5 +60,5 @@ const authorize = (...roles) => {
 
 module.exports = {
   authenticate,
-  authorize
+  authorize,
 };

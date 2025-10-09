@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
     url: req.originalUrl,
     ip: req.ip,
     userAgent: req.get('User-Agent'),
-    timestamp
+    timestamp,
   };
   
   console.error(`\n🚨 ERROR [${timestamp}]`);
@@ -36,7 +36,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(e => ({
       field: e.path,
-      message: e.message
+      message: e.message,
     }));
     
     console.error('🔍 Validation Details:', errors);
@@ -46,7 +46,7 @@ const errorHandler = (err, req, res, next) => {
       message: 'Invalid input data',
       details: errors,
       statusCode: 400,
-      timestamp
+      timestamp,
     });
   }
 
@@ -59,7 +59,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'Duplicate Error',
       message: `${field} already exists`,
       statusCode: 400,
-      timestamp
+      timestamp,
     });
   }
 
@@ -71,7 +71,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'Invalid ID',
       message: 'Invalid resource ID format',
       statusCode: 400,
-      timestamp
+      timestamp,
     });
   }
 
@@ -83,7 +83,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'Unauthorized',
       message: 'Invalid token',
       statusCode: 401,
-      timestamp
+      timestamp,
     });
   }
 
@@ -94,7 +94,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'Unauthorized',
       message: 'Token expired',
       statusCode: 401,
-      timestamp
+      timestamp,
     });
   }
   
@@ -106,7 +106,7 @@ const errorHandler = (err, req, res, next) => {
       error: 'File Upload Error',
       message: 'File size exceeds the allowed limit',
       statusCode: 400,
-      timestamp
+      timestamp,
     });
   }
   
@@ -118,7 +118,7 @@ const errorHandler = (err, req, res, next) => {
       error: err.name || 'Application Error',
       message: err.message,
       statusCode: err.statusCode || 400,
-      timestamp
+      timestamp,
     });
   }
   
@@ -135,7 +135,7 @@ const errorHandler = (err, req, res, next) => {
     message,
     statusCode,
     timestamp,
-    ...(isDevelopment && { errorType: err.name, details: err.message })
+    ...(isDevelopment && { errorType: err.name, details: err.message }),
   });
 };
 

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema(
   {
@@ -34,9 +34,9 @@ productSchema.virtual('name').get(function() {
 });
 
 // Transform output with virtuals enabled
-productSchema.set("toJSON", {
+productSchema.set('toJSON', {
   virtuals: true,
-  transform: function (doc, ret) {
+  transform: function(doc, ret) {
     ret.id = ret._id;
     ret.name = ret.productName; // Ensure name field is available for API consistency
     delete ret._id;
@@ -45,4 +45,4 @@ productSchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.model('Product', productSchema);

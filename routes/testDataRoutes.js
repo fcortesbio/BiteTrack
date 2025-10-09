@@ -9,7 +9,7 @@ const {
   populateTestData,
   cleanTestData,
   getTestDataStatus,
-  resetToScenario
+  resetToScenario,
 } = require('../controllers/testDataController');
 
 /**

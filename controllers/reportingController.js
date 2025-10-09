@@ -10,13 +10,13 @@ const path = require('path');
  * Generate comprehensive sales analytics for a given time period
  * Includes totals, averages, top products, customer analytics, etc.
  */
-const getSalesAnalytics = async (req, res) => {
+const getSalesAnalytics = async(req, res) => {
   try {
     const {
       startDate,
       endDate,
       dateField = 'createdAt',
-      groupBy = 'day' // day, week, month, year
+      groupBy = 'day', // day, week, month, year
     } = req.query;
 
     // Build date filter - use originalCreatedAt when available, fallback to createdAt
@@ -30,15 +30,15 @@ const getSalesAnalytics = async (req, res) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid startDate format. Use YYYY-MM-DD or ISO 8601 format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         start.setUTCHours(0, 0, 0, 0);
         filter.push({
           $gte: [
-            { $ifNull: [`$originalCreatedAt`, `$${dateField}`] },
-            start
-          ]
+            { $ifNull: ['$originalCreatedAt', `$${dateField}`] },
+            start,
+          ],
         });
       }
       
@@ -48,15 +48,15 @@ const getSalesAnalytics = async (req, res) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid endDate format. Use YYYY-MM-DD or ISO 8601 format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         end.setUTCHours(23, 59, 59, 999);
         filter.push({
           $lte: [
-            { $ifNull: [`$originalCreatedAt`, `$${dateField}`] },
-            end
-          ]
+            { $ifNull: ['$originalCreatedAt', `$${dateField}`] },
+            end,
+          ],
         });
       }
       
@@ -71,7 +71,7 @@ const getSalesAnalytics = async (req, res) => {
       timeSeriesData,
       topProducts,
       customerStats,
-      settlementStats
+      settlementStats,
     ] = await Promise.all([
       // Basic sales statistics
       Sale.aggregate([
@@ -83,9 +83,9 @@ const getSalesAnalytics = async (req, res) => {
             totalRevenue: { $sum: '$totalAmount' },
             totalAmountPaid: { $sum: '$amountPaid' },
             averageOrderValue: { $avg: '$totalAmount' },
-            averageItemsPerOrder: { $avg: { $size: '$products' } }
-          }
-        }
+            averageItemsPerOrder: { $avg: { $size: '$products' } },
+          },
+        },
       ]),
 
       // Time series data for trend analysis
@@ -93,18 +93,18 @@ const getSalesAnalytics = async (req, res) => {
         { $match: dateFilter },
         {
           $addFields: {
-            effectiveDate: { $ifNull: ['$originalCreatedAt', `$${dateField}`] }
-          }
+            effectiveDate: { $ifNull: ['$originalCreatedAt', `$${dateField}`] },
+          },
         },
         {
           $group: {
             _id: getGroupByDateExpression(groupBy, '$effectiveDate'),
             salesCount: { $sum: 1 },
             revenue: { $sum: '$totalAmount' },
-            averageOrderValue: { $avg: '$totalAmount' }
-          }
+            averageOrderValue: { $avg: '$totalAmount' },
+          },
         },
-        { $sort: { _id: 1 } }
+        { $sort: { _id: 1 } },
       ]),
 
       // Top products by quantity and revenue
@@ -116,8 +116,8 @@ const getSalesAnalytics = async (req, res) => {
             _id: '$products.productId',
             totalQuantitySold: { $sum: '$products.quantity' },
             totalRevenue: { $sum: { $multiply: ['$products.quantity', '$products.priceAtSale'] } },
-            salesCount: { $sum: 1 }
-          }
+            salesCount: { $sum: 1 },
+          },
         },
         { $sort: { totalRevenue: -1 } },
         { $limit: 10 },
@@ -126,8 +126,8 @@ const getSalesAnalytics = async (req, res) => {
             from: 'products',
             localField: '_id',
             foreignField: '_id',
-            as: 'product'
-          }
+            as: 'product',
+          },
         },
         { $unwind: '$product' },
         {
@@ -137,9 +137,9 @@ const getSalesAnalytics = async (req, res) => {
             totalQuantitySold: 1,
             totalRevenue: 1,
             salesCount: 1,
-            averagePrice: { $divide: ['$totalRevenue', '$totalQuantitySold'] }
-          }
-        }
+            averagePrice: { $divide: ['$totalRevenue', '$totalQuantitySold'] },
+          },
+        },
       ]),
 
       // Customer analytics
@@ -150,17 +150,17 @@ const getSalesAnalytics = async (req, res) => {
             _id: '$customerId',
             totalSpent: { $sum: '$totalAmount' },
             orderCount: { $sum: 1 },
-            averageOrderValue: { $avg: '$totalAmount' }
-          }
+            averageOrderValue: { $avg: '$totalAmount' },
+          },
         },
         {
           $group: {
             _id: null,
             uniqueCustomers: { $sum: 1 },
             averageCustomerSpent: { $avg: '$totalSpent' },
-            averageOrdersPerCustomer: { $avg: '$orderCount' }
-          }
-        }
+            averageOrdersPerCustomer: { $avg: '$orderCount' },
+          },
+        },
       ]),
 
       // Settlement statistics
@@ -171,10 +171,10 @@ const getSalesAnalytics = async (req, res) => {
             _id: '$settled',
             count: { $sum: 1 },
             totalAmount: { $sum: '$totalAmount' },
-            totalPaid: { $sum: '$amountPaid' }
-          }
-        }
-      ])
+            totalPaid: { $sum: '$amountPaid' },
+          },
+        },
+      ]),
     ]);
 
     // Format the response
@@ -183,26 +183,26 @@ const getSalesAnalytics = async (req, res) => {
         startDate: startDate || null,
         endDate: endDate || null,
         dateField,
-        groupBy
+        groupBy,
       },
       summary: basicStats[0] || {
         totalSales: 0,
         totalRevenue: 0,
         totalAmountPaid: 0,
         averageOrderValue: 0,
-        averageItemsPerOrder: 0
+        averageItemsPerOrder: 0,
       },
       timeSeries: timeSeriesData,
       topProducts,
       customerAnalytics: customerStats[0] || {
         uniqueCustomers: 0,
         averageCustomerSpent: 0,
-        averageOrdersPerCustomer: 0
+        averageOrdersPerCustomer: 0,
       },
       paymentAnalytics: {
         settled: settlementStats.find(s => s._id === true) || { count: 0, totalAmount: 0, totalPaid: 0 },
-        unsettled: settlementStats.find(s => s._id === false) || { count: 0, totalAmount: 0, totalPaid: 0 }
-      }
+        unsettled: settlementStats.find(s => s._id === false) || { count: 0, totalAmount: 0, totalPaid: 0 },
+      },
     };
 
     res.json(analytics);
@@ -215,7 +215,7 @@ const getSalesAnalytics = async (req, res) => {
  * Export sales data as CSV
  * Supports various export formats and filtering options
  */
-const exportSalesCSV = async (req, res) => {
+const exportSalesCSV = async(req, res) => {
   try {
     const {
       startDate,
@@ -224,7 +224,7 @@ const exportSalesCSV = async (req, res) => {
       format = 'detailed', // detailed, summary, products
       customerId,
       sellerId,
-      settled
+      settled,
     } = req.query;
 
     // Build filter for sales query
@@ -240,7 +240,7 @@ const exportSalesCSV = async (req, res) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid startDate format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         start.setUTCHours(0, 0, 0, 0);
@@ -253,7 +253,7 @@ const exportSalesCSV = async (req, res) => {
           return res.status(400).json({
             error: 'Bad Request',
             message: 'Invalid endDate format',
-            statusCode: 400
+            statusCode: 400,
           });
         }
         end.setUTCHours(23, 59, 59, 999);
@@ -264,9 +264,9 @@ const exportSalesCSV = async (req, res) => {
     }
 
     // Additional filters
-    if (customerId) filter.customerId = customerId;
-    if (sellerId) filter.sellerId = sellerId;
-    if (settled !== undefined) filter.settled = settled === 'true';
+    if (customerId) {filter.customerId = customerId;}
+    if (sellerId) {filter.sellerId = sellerId;}
+    if (settled !== undefined) {filter.settled = settled === 'true';}
 
     // Generate filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -287,7 +287,7 @@ const exportSalesCSV = async (req, res) => {
       return res.status(400).json({
         error: 'Bad Request',
         message: 'Invalid format. Use: detailed, summary, or products',
-        statusCode: 400
+        statusCode: 400,
       });
     }
   } catch (error) {
@@ -296,7 +296,7 @@ const exportSalesCSV = async (req, res) => {
       res.status(500).json({
         error: 'Internal Server Error',
         message: 'Failed to generate CSV export',
-        statusCode: 500
+        statusCode: 500,
       });
     }
   }
@@ -305,7 +305,7 @@ const exportSalesCSV = async (req, res) => {
 /**
  * Helper function to export detailed sales data as CSV
  */
-const exportDetailedSalesCSV = async (filter, res) => {
+const exportDetailedSalesCSV = async(filter, res) => {
   const csvStream = csv.format({ headers: true });
   csvStream.pipe(res);
 
@@ -333,7 +333,7 @@ const exportDetailedSalesCSV = async (filter, res) => {
           'Sale Total': sale.totalAmount.toFixed(2),
           'Amount Paid': sale.amountPaid.toFixed(2),
           'Balance Due': (sale.totalAmount - sale.amountPaid).toFixed(2),
-          'Settled': sale.settled ? 'Yes' : 'No'
+          'Settled': sale.settled ? 'Yes' : 'No',
         });
       }
     }
@@ -348,7 +348,7 @@ const exportDetailedSalesCSV = async (filter, res) => {
 /**
  * Helper function to export summary sales data as CSV
  */
-const exportSummaryCSV = async (filter, res) => {
+const exportSummaryCSV = async(filter, res) => {
   const csvStream = csv.format({ headers: true });
   csvStream.pipe(res);
 
@@ -370,7 +370,7 @@ const exportSummaryCSV = async (filter, res) => {
         'Total Amount': sale.totalAmount.toFixed(2),
         'Amount Paid': sale.amountPaid.toFixed(2),
         'Balance Due': (sale.totalAmount - sale.amountPaid).toFixed(2),
-        'Settled': sale.settled ? 'Yes' : 'No'
+        'Settled': sale.settled ? 'Yes' : 'No',
       });
     }
 
@@ -384,7 +384,7 @@ const exportSummaryCSV = async (filter, res) => {
 /**
  * Helper function to export product performance data as CSV
  */
-const exportProductsCSV = async (filter, res) => {
+const exportProductsCSV = async(filter, res) => {
   const csvStream = csv.format({ headers: true });
   csvStream.pipe(res);
 
@@ -400,19 +400,19 @@ const exportProductsCSV = async (filter, res) => {
           salesCount: { $sum: 1 },
           averagePrice: { $avg: '$products.priceAtSale' },
           minPrice: { $min: '$products.priceAtSale' },
-          maxPrice: { $max: '$products.priceAtSale' }
-        }
+          maxPrice: { $max: '$products.priceAtSale' },
+        },
       },
       {
         $lookup: {
           from: 'products',
           localField: '_id',
           foreignField: '_id',
-          as: 'product'
-        }
+          as: 'product',
+        },
       },
       { $unwind: '$product' },
-      { $sort: { totalRevenue: -1 } }
+      { $sort: { totalRevenue: -1 } },
     ]);
 
     for (const stat of productStats) {
@@ -425,7 +425,7 @@ const exportProductsCSV = async (filter, res) => {
         'Average Sale Price': stat.averagePrice.toFixed(2),
         'Minimum Sale Price': stat.minPrice.toFixed(2),
         'Maximum Sale Price': stat.maxPrice.toFixed(2),
-        'Revenue per Unit': (stat.totalRevenue / stat.totalQuantitySold).toFixed(2)
+        'Revenue per Unit': (stat.totalRevenue / stat.totalQuantitySold).toFixed(2),
       });
     }
 
@@ -441,41 +441,41 @@ const exportProductsCSV = async (filter, res) => {
  */
 const getGroupByDateExpression = (groupBy, dateField) => {
   switch (groupBy) {
-    case 'hour':
-      return {
-        year: { $year: dateField },
-        month: { $month: dateField },
-        day: { $dayOfMonth: dateField },
-        hour: { $hour: dateField }
-      };
-    case 'day':
-      return {
-        year: { $year: dateField },
-        month: { $month: dateField },
-        day: { $dayOfMonth: dateField }
-      };
-    case 'week':
-      return {
-        year: { $year: dateField },
-        week: { $week: dateField }
-      };
-    case 'month':
-      return {
-        year: { $year: dateField },
-        month: { $month: dateField }
-      };
-    case 'year':
-      return { year: { $year: dateField } };
-    default:
-      return {
-        year: { $year: dateField },
-        month: { $month: dateField },
-        day: { $dayOfMonth: dateField }
-      };
+  case 'hour':
+    return {
+      year: { $year: dateField },
+      month: { $month: dateField },
+      day: { $dayOfMonth: dateField },
+      hour: { $hour: dateField },
+    };
+  case 'day':
+    return {
+      year: { $year: dateField },
+      month: { $month: dateField },
+      day: { $dayOfMonth: dateField },
+    };
+  case 'week':
+    return {
+      year: { $year: dateField },
+      week: { $week: dateField },
+    };
+  case 'month':
+    return {
+      year: { $year: dateField },
+      month: { $month: dateField },
+    };
+  case 'year':
+    return { year: { $year: dateField } };
+  default:
+    return {
+      year: { $year: dateField },
+      month: { $month: dateField },
+      day: { $dayOfMonth: dateField },
+    };
   }
 };
 
 module.exports = {
   getSalesAnalytics,
-  exportSalesCSV
+  exportSalesCSV,
 };

@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const inventoryDropSchema = new mongoose.Schema(
   {
     // Product information (snapshot at time of drop)
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: [true, "Product ID is required"],
+      ref: 'Product',
+      required: [true, 'Product ID is required'],
       index: true,
     },
     productName: {
       type: String,
-      required: [true, "Product name is required"],
+      required: [true, 'Product name is required'],
       trim: true,
     },
     category: {
@@ -22,60 +22,60 @@ const inventoryDropSchema = new mongoose.Schema(
     // Drop details
     quantityDropped: {
       type: Number,
-      required: [true, "Quantity dropped is required"],
-      min: [0, "Quantity dropped must be non-negative"],
+      required: [true, 'Quantity dropped is required'],
+      min: [0, 'Quantity dropped must be non-negative'],
     },
     originalQuantity: {
       type: Number,
-      required: [true, "Original quantity before drop is required"],
-      min: [0, "Original quantity must be non-negative"],
+      required: [true, 'Original quantity before drop is required'],
+      min: [0, 'Original quantity must be non-negative'],
     },
     remainingQuantity: {
       type: Number,
-      required: [true, "Remaining quantity after drop is required"],
-      min: [0, "Remaining quantity must be non-negative"],
+      required: [true, 'Remaining quantity after drop is required'],
+      min: [0, 'Remaining quantity must be non-negative'],
     },
     pricePerUnit: {
       type: Number,
-      required: [true, "Price per unit is required"],
-      min: [0, "Price per unit must be non-negative"],
+      required: [true, 'Price per unit is required'],
+      min: [0, 'Price per unit must be non-negative'],
     },
     
     // Financial impact
     totalValueLost: {
       type: Number,
-      min: [0, "Total value must be non-negative"],
+      min: [0, 'Total value must be non-negative'],
     },
     
     // Drop reason and context
     reason: {
       type: String,
-      required: [true, "Drop reason is required"],
+      required: [true, 'Drop reason is required'],
       enum: {
         values: [
-          "expired", 
-          "end_of_day", 
-          "quality_issue", 
-          "damaged", 
-          "contaminated",
-          "overproduction",
-          "other"
+          'expired', 
+          'end_of_day', 
+          'quality_issue', 
+          'damaged', 
+          'contaminated',
+          'overproduction',
+          'other',
         ],
-        message: "Invalid drop reason"
+        message: 'Invalid drop reason',
       },
-      default: "end_of_day",
+      default: 'end_of_day',
     },
     notes: {
       type: String,
       trim: true,
-      maxlength: [500, "Notes cannot exceed 500 characters"],
+      maxlength: [500, 'Notes cannot exceed 500 characters'],
     },
     
     // Tracking information
     droppedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Seller",
-      required: [true, "Dropped by user is required"],
+      ref: 'Seller',
+      required: [true, 'Dropped by user is required'],
       index: true,
     },
     droppedAt: {
@@ -102,7 +102,7 @@ const inventoryDropSchema = new mongoose.Schema(
     },
     undoneBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Seller",
+      ref: 'Seller',
     },
     undoneAt: {
       type: Date,
@@ -110,7 +110,7 @@ const inventoryDropSchema = new mongoose.Schema(
     undoReason: {
       type: String,
       trim: true,
-      maxlength: [300, "Undo reason cannot exceed 300 characters"],
+      maxlength: [300, 'Undo reason cannot exceed 300 characters'],
     },
     
     // Production context for food safety compliance
@@ -134,7 +134,7 @@ const inventoryDropSchema = new mongoose.Schema(
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Indexes for performance and analytics
@@ -146,7 +146,7 @@ inventoryDropSchema.index({ isUndone: 1, droppedAt: -1 });
 
 // Virtual for drop efficiency percentage
 inventoryDropSchema.virtual('dropPercentage').get(function() {
-  if (this.originalQuantity === 0) return 0;
+  if (this.originalQuantity === 0) {return 0;}
   return ((this.quantityDropped / this.originalQuantity) * 100).toFixed(2);
 });
 
@@ -157,7 +157,7 @@ inventoryDropSchema.virtual('undoAvailable').get(function() {
 
 // Virtual for time remaining for undo (in minutes)
 inventoryDropSchema.virtual('undoTimeRemaining').get(function() {
-  if (!this.undoAvailable) return 0;
+  if (!this.undoAvailable) {return 0;}
   const diffMs = this.undoExpiresAt - new Date();
   return Math.max(0, Math.floor(diffMs / (1000 * 60))); // minutes
 });
@@ -169,7 +169,7 @@ inventoryDropSchema.virtual('isPartialDrop').get(function() {
 
 // Virtual for days since production (food safety metric)
 inventoryDropSchema.virtual('daysSinceProduction').get(function() {
-  if (!this.productionDate) return null;
+  if (!this.productionDate) {return null;}
   const diffTime = Math.abs(this.droppedAt - this.productionDate);
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
@@ -215,9 +215,9 @@ inventoryDropSchema.methods.undoDrop = async function(undoneByUserId, undoReason
 };
 
 // Transform output for API
-inventoryDropSchema.set("toJSON", {
+inventoryDropSchema.set('toJSON', {
   virtuals: true,
-  transform: function (doc, ret) {
+  transform: function(doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -229,7 +229,7 @@ inventoryDropSchema.set("toJSON", {
 inventoryDropSchema.statics.getDropAnalytics = async function(startDate, endDate, filters = {}) {
   const match = {
     droppedAt: { $gte: startDate, $lte: endDate },
-    isUndone: false // Exclude undone drops from analytics
+    isUndone: false, // Exclude undone drops from analytics
   };
   
   // Apply additional filters
@@ -248,42 +248,42 @@ inventoryDropSchema.statics.getDropAnalytics = async function(startDate, endDate
     {
       $group: {
         _id: {
-          reason: "$reason",
-          productId: "$productId",
-          productName: "$productName"
+          reason: '$reason',
+          productId: '$productId',
+          productName: '$productName',
         },
-        totalQuantityDropped: { $sum: "$quantityDropped" },
-        totalValueLost: { $sum: "$totalValueLost" },
+        totalQuantityDropped: { $sum: '$quantityDropped' },
+        totalValueLost: { $sum: '$totalValueLost' },
         dropCount: { $sum: 1 },
-        avgQuantityPerDrop: { $avg: "$quantityDropped" },
+        avgQuantityPerDrop: { $avg: '$quantityDropped' },
         partialDrops: { 
           $sum: { 
-            $cond: [{ $gt: ["$remainingQuantity", 0] }, 1, 0] 
-          } 
-        }
-      }
+            $cond: [{ $gt: ['$remainingQuantity', 0] }, 1, 0], 
+          }, 
+        },
+      },
     },
     {
       $group: {
-        _id: "$_id.reason",
+        _id: '$_id.reason',
         products: {
           $push: {
-            productId: "$_id.productId",
-            productName: "$_id.productName",
-            totalQuantityDropped: "$totalQuantityDropped",
-            totalValueLost: "$totalValueLost",
-            dropCount: "$dropCount",
-            avgQuantityPerDrop: "$avgQuantityPerDrop",
-            partialDrops: "$partialDrops"
-          }
+            productId: '$_id.productId',
+            productName: '$_id.productName',
+            totalQuantityDropped: '$totalQuantityDropped',
+            totalValueLost: '$totalValueLost',
+            dropCount: '$dropCount',
+            avgQuantityPerDrop: '$avgQuantityPerDrop',
+            partialDrops: '$partialDrops',
+          },
         },
-        totalQuantityDropped: { $sum: "$totalQuantityDropped" },
-        totalValueLost: { $sum: "$totalValueLost" },
-        totalDropCount: { $sum: "$dropCount" },
-        totalPartialDrops: { $sum: "$partialDrops" }
-      }
+        totalQuantityDropped: { $sum: '$totalQuantityDropped' },
+        totalValueLost: { $sum: '$totalValueLost' },
+        totalDropCount: { $sum: '$dropCount' },
+        totalPartialDrops: { $sum: '$partialDrops' },
+      },
     },
-    { $sort: { totalValueLost: -1 } }
+    { $sort: { totalValueLost: -1 } },
   ]);
 };
 
@@ -299,35 +299,35 @@ inventoryDropSchema.statics.getDailyDropSummary = async function(date) {
     {
       $match: {
         droppedAt: { $gte: startOfDay, $lte: endOfDay },
-        isUndone: false
-      }
+        isUndone: false,
+      },
     },
     {
       $group: {
-        _id: "$reason",
-        totalQuantity: { $sum: "$quantityDropped" },
-        totalValue: { $sum: "$totalValueLost" },
+        _id: '$reason',
+        totalQuantity: { $sum: '$quantityDropped' },
+        totalValue: { $sum: '$totalValueLost' },
         dropCount: { $sum: 1 },
-        products: { $addToSet: "$productName" },
+        products: { $addToSet: '$productName' },
         partialDrops: { 
           $sum: { 
-            $cond: [{ $gt: ["$remainingQuantity", 0] }, 1, 0] 
-          } 
-        }
-      }
+            $cond: [{ $gt: ['$remainingQuantity', 0] }, 1, 0], 
+          }, 
+        },
+      },
     },
     {
       $project: {
-        reason: "$_id",
+        reason: '$_id',
         totalQuantity: 1,
         totalValue: 1,
         dropCount: 1,
         partialDrops: 1,
-        uniqueProducts: { $size: "$products" },
-        _id: 0
-      }
+        uniqueProducts: { $size: '$products' },
+        _id: 0,
+      },
     },
-    { $sort: { totalValue: -1 } }
+    { $sort: { totalValue: -1 } },
   ]);
 };
 
@@ -336,7 +336,7 @@ inventoryDropSchema.statics.getUndoableDrops = async function(userId = null) {
   const match = {
     canBeUndone: true,
     isUndone: false,
-    undoExpiresAt: { $gt: new Date() }
+    undoExpiresAt: { $gt: new Date() },
   };
   
   if (userId) {
@@ -349,6 +349,6 @@ inventoryDropSchema.statics.getUndoableDrops = async function(userId = null) {
     .sort({ droppedAt: -1 });
 };
 
-const InventoryDrop = mongoose.model("InventoryDrop", inventoryDropSchema);
+const InventoryDrop = mongoose.model('InventoryDrop', inventoryDropSchema);
 
 module.exports = InventoryDrop;

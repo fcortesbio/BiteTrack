@@ -6,7 +6,7 @@ const {
   listProducts,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
 } = require('../controllers/productController');
 
 // All routes require authentication

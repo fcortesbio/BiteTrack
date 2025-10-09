@@ -1,23 +1,23 @@
-require("dotenv").config();
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const morgan = require("morgan");
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 
 // Import routes
-const authRoutes = require("./routes/auth");
-const sellerRoutes = require("./routes/sellers");
-const customerRoutes = require("./routes/customers");
-const productRoutes = require("./routes/products");
-const salesRoutes = require("./routes/sales");
-const inventoryDropRoutes = require("./routes/inventoryDrops");
-const testDataRoutes = require("./routes/testDataRoutes");
-const reportingRoutes = require("./routes/reporting");
+const authRoutes = require('./routes/auth');
+const sellerRoutes = require('./routes/sellers');
+const customerRoutes = require('./routes/customers');
+const productRoutes = require('./routes/products');
+const salesRoutes = require('./routes/sales');
+const inventoryDropRoutes = require('./routes/inventoryDrops');
+const testDataRoutes = require('./routes/testDataRoutes');
+const reportingRoutes = require('./routes/reporting');
 
 // Import middleware
-const errorHandler = require("./middleware/errorHandler");
+const errorHandler = require('./middleware/errorHandler');
 
 // Import Swagger documentation configuration
 const { setupSwaggerUI } = require('./config/swagger');
@@ -49,7 +49,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 };
 app.use(cors(corsOptions));
 
@@ -58,15 +58,15 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: {
-    error: "Too Many Requests",
-    message: "Too many requests from this IP, please try again later",
+    error: 'Too Many Requests',
+    message: 'Too many requests from this IP, please try again later',
     statusCode: 429,
   },
 });
 app.use(limiter);
 
 // Body parsing middleware
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Logging middleware - enhanced verbosity for development
@@ -94,14 +94,14 @@ mongoose
       console.log(`🔌 MongoDB host: ${connectionInfo.host}:${connectionInfo.port}`);
       console.log(`🔢 MongoDB connection ID: ${connectionInfo.id}`);
     } else {
-      console.log("Connected to MongoDB");
+      console.log('Connected to MongoDB');
     }
   })
   .catch((error) => {
-    console.error("🔴 MongoDB connection error:", error);
+    console.error('🔴 MongoDB connection error:', error);
     if (isDevelopment) {
-      console.error("🧪 Check your .env.development file and MongoDB service status");
-      console.error("📌 MongoDB URI format should be: mongodb://username:password@host:port/database");
+      console.error('🧪 Check your .env.development file and MongoDB service status');
+      console.error('📌 MongoDB URI format should be: mongodb://username:password@host:port/database');
     }
     process.exit(1);
   });
@@ -120,12 +120,12 @@ app.get('/', (req, res) => {
     server: {
       host: host,
       port: PORT,
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'development',
     },
     documentation: {
       interactive: `${protocol}://${host}/bitetrack/api-docs`,
       json: `${protocol}://${host}/bitetrack/api-docs.json`,
-      static: 'https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md'
+      static: 'https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md',
     },
     capabilities: {
       endpoints: '36 professional API endpoints',
@@ -135,43 +135,43 @@ app.get('/', (req, res) => {
         'Food Waste Management & Compliance',
         'Multi-role Authentication & Security',
         'Atomic Transactions & Inventory Management',
-        'Professional Testing Infrastructure'
-      ]
+        'Professional Testing Infrastructure',
+      ],
     },
     quickStart: {
       step1: 'Visit /bitetrack/api-docs for interactive documentation',
       step2: 'Use POST /bitetrack/auth/login to get JWT token',
       step3: 'Add Bearer token to Authorization header',
-      step4: 'Explore all 36 endpoints with live testing'
+      step4: 'Explore all 36 endpoints with live testing',
     },
-    health: `${req.protocol}://${req.get('host')}/bitetrack/health`
+    health: `${req.protocol}://${req.get('host')}/bitetrack/health`,
   });
 });
 
 // Health check endpoint
-app.get("/bitetrack/health", (req, res) => {
+app.get('/bitetrack/health', (req, res) => {
   res.json({
-    status: "OK",
+    status: 'OK',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
   });
 });
 
 // API routes
-app.use("/bitetrack/auth", authRoutes);
-app.use("/bitetrack/sellers", sellerRoutes);
-app.use("/bitetrack/customers", customerRoutes);
-app.use("/bitetrack/products", productRoutes);
-app.use("/bitetrack/sales", salesRoutes);
-app.use("/bitetrack/inventory-drops", inventoryDropRoutes);
-app.use("/bitetrack/test-data", testDataRoutes);
-app.use("/bitetrack/reporting", reportingRoutes);
+app.use('/bitetrack/auth', authRoutes);
+app.use('/bitetrack/sellers', sellerRoutes);
+app.use('/bitetrack/customers', customerRoutes);
+app.use('/bitetrack/products', productRoutes);
+app.use('/bitetrack/sales', salesRoutes);
+app.use('/bitetrack/inventory-drops', inventoryDropRoutes);
+app.use('/bitetrack/test-data', testDataRoutes);
+app.use('/bitetrack/reporting', reportingRoutes);
 
 // 404 handler
-app.use("*", (req, res) => {
+app.use('*', (req, res) => {
   res.status(404).json({
-    error: "Not Found",
-    message: "The requested resource was not found",
+    error: 'Not Found',
+    message: 'The requested resource was not found',
     statusCode: 404,
   });
 });
@@ -269,7 +269,7 @@ process.on('SIGINT', () => {
 // Start server with enhanced development information
 const server = app.listen(PORT, () => {
   console.log(`\n🚀 BiteTrack API server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('🛡️  Global error handlers installed');
   
   if (isDevelopment) {

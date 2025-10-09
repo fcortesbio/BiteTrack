@@ -7,7 +7,7 @@ const {
   createPendingSeller,
   updateSeller,
   changeRole,
-  deactivateSeller
+  deactivateSeller,
 } = require('../controllers/sellerController');
 
 // All routes require authentication
@@ -21,14 +21,14 @@ router.post('/pending',
   authorize('admin', 'superadmin'),
   validationRules.createPendingSeller,
   validate,
-  createPendingSeller
+  createPendingSeller,
 );
 
 // Update seller (self-update)
 router.patch('/:id',
   validationRules.updateSeller,
   validate,
-  updateSeller
+  updateSeller,
 );
 
 // Change role (superadmin only)
@@ -36,13 +36,13 @@ router.patch('/:id/role',
   authorize('superadmin'),
   validationRules.changeRole,
   validate,
-  changeRole
+  changeRole,
 );
 
 // Deactivate seller (superadmin only)
 router.delete('/:id',
   authorize('superadmin'),
-  deactivateSeller
+  deactivateSeller,
 );
 
 module.exports = router;

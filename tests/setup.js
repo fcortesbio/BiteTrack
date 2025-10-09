@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 let mongoServer;
 
 // Setup before all tests
-beforeAll(async () => {
+beforeAll(async() => {
   // Start MongoDB Memory Server
   mongoServer = await MongoMemoryServer.create({
     binary: {
@@ -28,7 +28,7 @@ beforeAll(async () => {
 });
 
 // Cleanup after all tests
-afterAll(async () => {
+afterAll(async() => {
   // Close mongoose connection
   await mongoose.connection.close();
   
@@ -39,7 +39,7 @@ afterAll(async () => {
 });
 
 // Clear database between tests to ensure isolation
-afterEach(async () => {
+afterEach(async() => {
   if (mongoose.connection.readyState === 1) {
     const collections = mongoose.connection.collections;
     
@@ -58,7 +58,7 @@ global.testUtils = {
     lastName: 'User',
     email: 'test@example.com',
     password: 'TestPassword123!',
-    role: 'seller'
+    role: 'seller',
   }),
 
   // Helper to create admin user
@@ -67,7 +67,7 @@ global.testUtils = {
     lastName: 'User',
     email: 'admin@example.com', 
     password: 'AdminPassword123!',
-    role: 'admin'
+    role: 'admin',
   }),
 
   // Helper to create test product
@@ -75,7 +75,7 @@ global.testUtils = {
     productName: 'Test Sandwich',
     description: 'A test sandwich for testing purposes',
     price: 9.99,
-    count: 50
+    count: 50,
   }),
 
   // Helper to create test customer
@@ -83,14 +83,14 @@ global.testUtils = {
     firstName: 'Test',
     lastName: 'Customer',
     email: 'customer@example.com',
-    phone: '+1234567890'
+    phone: '+1234567890',
   }),
 
   // Generate valid MongoDB ObjectId string
   generateObjectId: () => new mongoose.Types.ObjectId().toString(),
   
   // Wait helper for async operations
-  wait: (ms) => new Promise(resolve => setTimeout(resolve, ms))
+  wait: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
 };
 
 // Console logging for test debugging

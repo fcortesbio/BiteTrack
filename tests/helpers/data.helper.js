@@ -20,7 +20,7 @@ const dataGenerators = {
     email: `user${Date.now()}@example.com`,
     password: 'StrongPassword123!',
     role: 'seller',
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -34,7 +34,7 @@ const dataGenerators = {
     email: `admin${Date.now()}@example.com`,
     password: 'AdminPassword123!',
     role: 'admin',
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -48,7 +48,7 @@ const dataGenerators = {
     email: `superadmin${Date.now()}@example.com`,
     password: 'SuperAdminPassword123!',
     role: 'superadmin',
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -61,7 +61,7 @@ const dataGenerators = {
     description: 'A delicious test product for testing purposes',
     price: 12.99,
     count: 50,
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -74,7 +74,7 @@ const dataGenerators = {
     lastName: 'Test',
     email: `customer${Date.now()}@example.com`,
     phone: '+1234567890',
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -90,11 +90,11 @@ const dataGenerators = {
       {
         productId: new mongoose.Types.ObjectId().toString(),
         quantity: 2,
-        unitPrice: 12.99
-      }
+        unitPrice: 12.99,
+      },
     ],
     paymentMethod: 'cash',
-    ...overrides
+    ...overrides,
   }),
 
   /**
@@ -108,8 +108,8 @@ const dataGenerators = {
     quantityToDrop: 5,
     reason: 'end_of_day',
     notes: 'Test inventory drop',
-    ...overrides
-  })
+    ...overrides,
+  }),
 };
 
 /**
@@ -125,7 +125,7 @@ const invalidDataGenerators = {
     invalidEmail: () => ({ firstName: 'Test', lastName: 'User', email: 'invalid-email', password: 'Password123!' }),
     weakPassword: () => ({ firstName: 'Test', lastName: 'User', email: 'test@example.com', password: '123' }),
     missingFirstName: () => ({ lastName: 'User', email: 'test@example.com', password: 'Password123!' }),
-    invalidRole: () => ({ firstName: 'Test', lastName: 'User', email: 'test@example.com', password: 'Password123!', role: 'invalid_role' })
+    invalidRole: () => ({ firstName: 'Test', lastName: 'User', email: 'test@example.com', password: 'Password123!', role: 'invalid_role' }),
   },
 
   /**
@@ -135,7 +135,7 @@ const invalidDataGenerators = {
     missingName: () => ({ description: 'Test description', price: 12.99, count: 50 }),
     negativePrice: () => ({ productName: 'Test Product', description: 'Test description', price: -5.99, count: 50 }),
     negativeCount: () => ({ productName: 'Test Product', description: 'Test description', price: 12.99, count: -10 }),
-    invalidPriceType: () => ({ productName: 'Test Product', description: 'Test description', price: 'invalid', count: 50 })
+    invalidPriceType: () => ({ productName: 'Test Product', description: 'Test description', price: 'invalid', count: 50 }),
   },
 
   /**
@@ -144,8 +144,8 @@ const invalidDataGenerators = {
   customerValidationErrors: {
     missingEmail: () => ({ firstName: 'Customer', lastName: 'Test', phone: '+1234567890' }),
     invalidEmail: () => ({ firstName: 'Customer', lastName: 'Test', email: 'invalid-email', phone: '+1234567890' }),
-    invalidPhone: () => ({ firstName: 'Customer', lastName: 'Test', email: 'customer@example.com', phone: 'invalid-phone' })
-  }
+    invalidPhone: () => ({ firstName: 'Customer', lastName: 'Test', email: 'customer@example.com', phone: 'invalid-phone' }),
+  },
 };
 
 /**
@@ -179,7 +179,7 @@ const dbTestUtils = {
    */
   generateObjectIds: (count = 1) => {
     return Array.from({ length: count }, () => new mongoose.Types.ObjectId().toString());
-  }
+  },
 };
 
 /**
@@ -253,7 +253,7 @@ const responseTestUtils = {
     expect(response.status).toBe(403);
     expect(response.body).toHaveProperty('error');
     expect(response.body.message).toMatch(/forbidden|permission|authorization/i);
-  }
+  },
 };
 
 /**
@@ -271,7 +271,7 @@ const paginationTestUtils = {
   createPaginationParams: (page = 1, limit = 10, additionalParams = {}) => ({
     page,
     limit,
-    ...additionalParams
+    ...additionalParams,
   }),
   
   /**
@@ -295,7 +295,7 @@ const paginationTestUtils = {
     expect(typeof pagination.totalCount).toBe('number');
     expect(typeof pagination.hasNextPage).toBe('boolean');
     expect(typeof pagination.hasPrevPage).toBe('boolean');
-  }
+  },
 };
 
 module.exports = {
@@ -303,5 +303,5 @@ module.exports = {
   invalidDataGenerators,
   dbTestUtils,
   responseTestUtils,
-  paginationTestUtils
+  paginationTestUtils,
 };

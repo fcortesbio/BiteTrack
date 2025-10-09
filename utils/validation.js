@@ -13,7 +13,7 @@ const validationRules = {
       .withMessage('Valid email is required'),
     body('password')
       .notEmpty()
-      .withMessage('Password is required')
+      .withMessage('Password is required'),
   ],
 
   activate: [
@@ -31,7 +31,7 @@ const validationRules = {
       .withMessage('Last name is required'),
     body('password')
       .matches(passwordRegex)
-      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols')
+      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols'),
   ],
 
   resetPassword: [
@@ -48,14 +48,14 @@ const validationRules = {
       .withMessage('Valid date of birth is required'),
     body('newPassword')
       .matches(passwordRegex)
-      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols')
+      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols'),
   ],
 
   getSellerByEmail: [
     query('email')
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email is required')
+      .withMessage('Valid email is required'),
   ],
 
   // Seller validations
@@ -75,7 +75,7 @@ const validationRules = {
     body('dateOfBirth')
       .isISO8601()
       .toDate()
-      .withMessage('Valid date of birth is required')
+      .withMessage('Valid date of birth is required'),
   ],
 
   updateSeller: [
@@ -102,13 +102,13 @@ const validationRules = {
     body('newPassword')
       .optional()
       .matches(passwordRegex)
-      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols')
+      .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols'),
   ],
 
   changeRole: [
     body('role')
       .isIn(['user', 'admin', 'superadmin'])
-      .withMessage('Role must be user, admin, or superadmin')
+      .withMessage('Role must be user, admin, or superadmin'),
   ],
 
   // Customer validations
@@ -131,7 +131,7 @@ const validationRules = {
       .optional()
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email is required')
+      .withMessage('Valid email is required'),
   ],
 
   updateCustomer: [
@@ -156,7 +156,7 @@ const validationRules = {
       .optional()
       .isEmail()
       .normalizeEmail()
-      .withMessage('Valid email is required')
+      .withMessage('Valid email is required'),
   ],
 
   // Product validations
@@ -173,7 +173,7 @@ const validationRules = {
       .withMessage('Count must be a non-negative integer'),
     body('price')
       .isFloat({ min: 0 })
-      .withMessage('Price must be a non-negative number')
+      .withMessage('Price must be a non-negative number'),
   ],
 
   updateProduct: [
@@ -192,7 +192,7 @@ const validationRules = {
     body('price')
       .optional()
       .isFloat({ min: 0 })
-      .withMessage('Price must be a non-negative number')
+      .withMessage('Price must be a non-negative number'),
   ],
 
   // Sales validations
@@ -211,14 +211,14 @@ const validationRules = {
       .withMessage('Quantity must be at least 1'),
     body('amountPaid')
       .isFloat({ min: 0 })
-      .withMessage('Amount paid must be non-negative')
+      .withMessage('Amount paid must be non-negative'),
   ],
 
   settleSale: [
     body('amountPaid')
       .isFloat({ min: 0 })
-      .withMessage('Amount paid must be non-negative')
-  ]
+      .withMessage('Amount paid must be non-negative'),
+  ],
 };
 
 // Validation middleware
@@ -230,9 +230,9 @@ const validate = (req, res, next) => {
       message: 'Invalid input data',
       details: errors.array().map(err => ({
         field: err.path,
-        message: err.msg
+        message: err.msg,
       })),
-      statusCode: 400
+      statusCode: 400,
     });
   }
   next();
@@ -240,5 +240,5 @@ const validate = (req, res, next) => {
 
 module.exports = {
   validationRules,
-  validate
+  validate,
 };

@@ -1,8 +1,8 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // Helper function to normalize phone numbers
 const normalizePhoneNumber = (phone) => {
-  if (!phone) return phone;
+  if (!phone) {return phone;}
   
   // Remove all non-digit characters
   const digitsOnly = phone.toString().replace(/\D/g, '');
@@ -37,8 +37,8 @@ const customerSchema = new mongoose.Schema(
         validator: function(v) {
           return /^\d{10}$/.test(v);
         },
-        message: 'Phone number must be a valid 10-digit US number (formats like (555) 123-4567 are automatically normalized)'
-      }
+        message: 'Phone number must be a valid 10-digit US number (formats like (555) 123-4567 are automatically normalized)',
+      },
     },
     email: {
       type: String,
@@ -77,8 +77,8 @@ customerSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function(nex
 });
 
 // Transform output
-customerSchema.set("toJSON", {
-  transform: function (doc, ret) {
+customerSchema.set('toJSON', {
+  transform: function(doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -86,4 +86,4 @@ customerSchema.set("toJSON", {
   },
 });
 
-module.exports = mongoose.model("Customer", customerSchema);
+module.exports = mongoose.model('Customer', customerSchema);
