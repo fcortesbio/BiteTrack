@@ -4,6 +4,7 @@ const { authenticate, authorize } = require('../middleware/auth');
 const { validationRules, validate } = require('../utils/validation');
 const {
   listSellers,
+  listPendingSellers,
   createPendingSeller,
   updateSeller,
   changeRole,
@@ -15,6 +16,9 @@ router.use(authenticate);
 
 // List sellers (admin/superadmin only)
 router.get('/', authorize('admin', 'superadmin'), listSellers);
+
+// List pending sellers (superadmin only)
+router.get('/pending', authorize('superadmin'), listPendingSellers);
 
 // Create pending seller (admin/superadmin only)
 router.post('/pending', 

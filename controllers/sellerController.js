@@ -150,6 +150,38 @@ const changeRole = async(req, res) => {
   }
 };
 
+const listPendingSellers = async(req, res) => {
+  try {
+    const pendingSellers = await PendingSeller.find({ activatedAt: null })
+      .populate('createdBy', 'firstName lastName email role')
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    const response = {
+      count: pendingSellers.length,
+      pendingSellers: pendingSellers.map(seller => ({
+        _id: seller._id,
+        firstName: seller.firstName,
+        lastName: seller.lastName,
+        email: seller.email,
+        dateOfBirth: seller.dateOfBirth,
+        createdAt: seller.createdAt,
+        createdBy: seller.createdBy ? {
+          _id: seller.createdBy._id,
+          firstName: seller.createdBy.firstName,
+          lastName: seller.createdBy.lastName,
+          email: seller.createdBy.email,
+          role: seller.createdBy.role,
+        } : null,
+      })),
+    };
+
+    res.json(response);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const deactivateSeller = async(req, res) => {
   try {
     const { id } = req.params;
@@ -172,6 +204,7 @@ const deactivateSeller = async(req, res) => {
 
 module.exports = {
   listSellers,
+  listPendingSellers,
   createPendingSeller,
   updateSeller,
   changeRole,
