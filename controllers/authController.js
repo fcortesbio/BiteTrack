@@ -2,7 +2,6 @@ const Seller = require('../models/Seller');
 const PendingSeller = require('../models/PendingSeller');
 const PasswordResetToken = require('../models/PasswordResetToken');
 const { generateToken, generateResetToken } = require('../utils/jwt');
-const bcrypt = require('bcryptjs');
 
 const getSellerByEmail = async(req, res) => {
   try {
@@ -38,7 +37,13 @@ const getSellerByEmail = async(req, res) => {
       statusCode: 404,
     });
   } catch (error) {
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('Error in getSellerByEmail:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred while retrieving seller information',
+      statusCode: 500,
+    });
   }
 };
 
@@ -67,7 +72,13 @@ const login = async(req, res) => {
       seller: sellerResponse,
     });
   } catch (error) {
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('Error in login:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred during login',
+      statusCode: 500,
+    });
   }
 };
 
@@ -110,7 +121,13 @@ const activate = async(req, res) => {
 
     res.status(201).json(seller.toJSON());
   } catch (error) {
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('Error in activate:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred during account activation',
+      statusCode: 500,
+    });
   }
 };
 
@@ -143,7 +160,13 @@ const recover = async(req, res) => {
       expiresAt: resetToken.expiresAt,
     });
   } catch (error) {
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('Error in recover:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred during password recovery',
+      statusCode: 500,
+    });
   }
 };
 
@@ -191,7 +214,13 @@ const reset = async(req, res) => {
       message: 'Password reset successful',
     });
   } catch (error) {
-    throw error;
+    // eslint-disable-next-line no-console
+    console.error('Error in reset:', error);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'An error occurred during password reset',
+      statusCode: 500,
+    });
   }
 };
 
