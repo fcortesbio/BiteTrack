@@ -20,6 +20,7 @@
 const mongoose = require('mongoose');
 const fs = require('fs').promises;
 const path = require('path');
+const dotenv = require('dotenv');
 
 // Import models
 const Customer = require('../models/Customer');
@@ -36,6 +37,7 @@ class TestDataPopulator {
     this.preset = options.preset || 'minimal';
     this.verbose = options.verbose || false;
     this.clean = options.clean || false;
+    this.envFile = options.envFile || null;
     
     this.createdData = {
       customers: [],
@@ -46,6 +48,36 @@ class TestDataPopulator {
     };
     
     this.testData = {};
+  }
+
+  loadEnvironment() {
+    if (this.envFile) {
+      const envPath = path.resolve(this.envFile);
+      
+      try {
+        // Check if env file exists
+        require('fs').accessSync(envPath);
+        
+        // Load the environment file
+        dotenv.config({ path: envPath });
+        
+        this.log(`✅ Loaded environment from: ${envPath}`);
+      } catch (error) {
+        throw new Error(`Failed to load environment file '${envPath}': ${error.message}`);
+      }
+    } else {
+      // Try to load default .env file if it exists
+      const defaultEnvPath = path.join(process.cwd(), '.env');
+      
+      try {
+        require('fs').accessSync(defaultEnvPath);
+        dotenv.config({ path: defaultEnvPath });
+        this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);
+      } catch (error) {
+        // No default .env file found, use process environment only
+        this.log('ℹ️  No .env file found, using process environment variables only');
+      }
+    }
   }
 
   async loadTestData() {
@@ -70,6 +102,13 @@ class TestDataPopulator {
       // Use environment variables or defaults
       const mongoUri = process.env.MONGO_URI || 
                       `mongodb://${process.env.MONGO_ROOT_USERNAME || 'admin'}:${process.env.MONGO_ROOT_PASSWORD || 'supersecret'}@localhost:27017/bitetrack`;
+      
+      // Only show URI in verbose mode for security
+      if (this.verbose) {
+        this.log(`Connecting to MongoDB with URI: ${mongoUri}`);
+      } else {
+        this.log('🔌 Connecting to MongoDB...');
+      }
       
       await mongoose.connect(mongoUri);
       this.log('✅ Connected to MongoDB');
@@ -115,8 +154,17 @@ class TestDataPopulator {
     }
 
     try {
-      this.createdData.customers = await Customer.insertMany(customerData);
-      this.log(`✅ Created ${this.createdData.customers.length} customers`);
+      const createdOrUpdatedCustomers = [];
+      for (const customer of customerData) {
+        const result = await Customer.findOneAndUpdate(
+          { phoneNumber: customer.phoneNumber },
+          customer,
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        createdOrUpdatedCustomers.push(result);
+      }
+      this.createdData.customers = createdOrUpdatedCustomers;
+      this.log(`✅ Created or updated ${this.createdData.customers.length} customers`);
     } catch (error) {
       throw new Error(`Customer creation failed: ${error.message}`);
     }
@@ -197,7 +245,16 @@ class TestDataPopulator {
     }
 
     try {
-      this.createdData.pendingSellers = await PendingSeller.insertMany(pendingData);
+      const createdOrUpdatedPendingSellers = [];
+      for (const pendingSeller of pendingData) {
+        const result = await PendingSeller.findOneAndUpdate(
+          { email: pendingSeller.email },
+          pendingSeller,
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+        createdOrUpdatedPendingSellers.push(result);
+      }
+      this.createdData.pendingSellers = createdOrUpdatedPendingSellers;
       this.log(`✅ Created ${this.createdData.pendingSellers.length} pending sellers`);
     } catch (error) {
       throw new Error(`Pending seller creation failed: ${error.message}`);
@@ -379,6 +436,9 @@ class TestDataPopulator {
     try {
       console.log(`\n🚀 Starting test data population (preset: ${this.preset})\n`);
       
+      // Load environment first
+      this.loadEnvironment();
+      
       await this.loadTestData();
       await this.connectToDatabase();
       await this.cleanDatabase();
@@ -409,11 +469,14 @@ async function main() {
     preset: 'minimal',
     clean: false,
     verbose: false,
+    envFile: null,
   };
   
   args.forEach(arg => {
     if (arg.startsWith('--preset=')) {
       options.preset = arg.split('=')[1];
+    } else if (arg.startsWith('--env-file=')) {
+      options.envFile = arg.split('=')[1];
     } else if (arg === '--clean') {
       options.clean = true;
     } else if (arg === '--verbose') {
@@ -425,10 +488,11 @@ BiteTrack Test Data Population Script
 Usage: node scripts/populate-test-data.js [options]
 
 Options:
-  --preset=<preset>    Data preset (minimal|dev|full|bulk) [default: minimal]
-  --clean             Clean existing data before populating
-  --verbose           Show detailed logging
-  --help              Show this help message
+  --preset=<preset>      Data preset (minimal|dev|full|bulk) [default: minimal]
+  --env-file=<path>      Path to environment file [default: .env]
+  --clean               Clean existing data before populating
+  --verbose             Show detailed logging
+  --help                Show this help message
 
 Presets:
   minimal    Essential data for basic testing (5 customers, 7 products, 3 sales)
@@ -440,6 +504,7 @@ Examples:
   node scripts/populate-test-data.js
   node scripts/populate-test-data.js --preset=full --clean --verbose
   node scripts/populate-test-data.js --preset=bulk --clean
+  node scripts/populate-test-data.js --env-file=.env.development --preset=dev
       `);
       process.exit(0);
     }
