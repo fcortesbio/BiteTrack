@@ -4,11 +4,17 @@ info:
   version: 2.1.0
   description: >
     BiteTrack is a comprehensive food business management platform with enterprise-grade
-    features including CSV data import, advanced analytics, and production-ready error handling.
-    Features JWT-based authentication with role-based access control, inventory management,
-    sales processing, and business intelligence capabilities.
+    features including inventory drops/waste management, CSV data import, advanced analytics, 
+    and production-ready error handling. Features JWT-based authentication with role-based 
+    access control, inventory management, sales processing, business intelligence capabilities,
+    and regulatory compliance tools.
+    
+    **Complete API Coverage:** 40 professional endpoints across 9 business categories
+    including Authentication, User Management, Customer Relations, Product Management, 
+    Sales Processing, Business Intelligence, Food Waste Management, Test Data Management,
+    and System Health monitoring.
 servers:
-  - url: http://localhost:3001/bitetrack
+  - url: http://localhost:3000/bitetrack
     description: Development server
 
 components:
@@ -299,6 +305,191 @@ components:
             importedSales: { type: boolean }
             skippedRows: { type: boolean }
       required: [success, message, summary, importedSales, skippedRows, warnings, truncated]
+
+    InventoryDrop:
+      type: object
+      properties:
+        id: { type: string }
+        productId:
+          type: object
+          properties:
+            id: { type: string }
+            productName: { type: string }
+            price: { type: number }
+        productName: { type: string }
+        category: { type: string, nullable: true }
+        quantityDropped: { type: integer, minimum: 1 }
+        originalQuantity: { type: integer, minimum: 0 }
+        remainingQuantity: { type: integer, minimum: 0 }
+        pricePerUnit: { type: number, minimum: 0 }
+        totalValueLost: { type: number, minimum: 0 }
+        reason:
+          type: string
+          enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+        notes: { type: string, maxLength: 500, nullable: true }
+        droppedBy:
+          type: object
+          properties:
+            id: { type: string }
+            firstName: { type: string }
+            lastName: { type: string }
+            email: { type: string }
+        droppedAt: { type: string, format: date-time }
+        canBeUndone: { type: boolean }
+        undoExpiresAt: { type: string, format: date-time, nullable: true }
+        isUndone: { type: boolean, default: false }
+        undoneBy:
+          type: object
+          nullable: true
+          properties:
+            id: { type: string }
+            firstName: { type: string }
+            lastName: { type: string }
+        undoneAt: { type: string, format: date-time, nullable: true }
+        undoReason: { type: string, maxLength: 300, nullable: true }
+        productionDate: { type: string, format: date-time, nullable: true }
+        expirationDate: { type: string, format: date-time, nullable: true }
+        batchId: { type: string, nullable: true }
+        # Virtual fields
+        dropPercentage: { type: string, description: "Percentage of inventory dropped" }
+        undoAvailable: { type: boolean, description: "Whether drop can still be undone" }
+        undoTimeRemaining: { type: integer, description: "Minutes remaining for undo" }
+        isPartialDrop: { type: boolean, description: "True if not all inventory was dropped" }
+        daysSinceProduction: { type: integer, nullable: true, description: "Days since production date" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+      required:
+        [id, productId, productName, quantityDropped, originalQuantity, remainingQuantity, pricePerUnit, totalValueLost, reason, droppedBy, droppedAt]
+
+    InventoryDropRequest:
+      type: object
+      properties:
+        productId: { type: string, description: "MongoDB ObjectId of the product" }
+        quantityToDrop: { type: integer, minimum: 1, description: "Number of units to drop" }
+        reason:
+          type: string
+          enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+          default: end_of_day
+          description: "Reason for dropping inventory"
+        notes: { type: string, maxLength: 500, description: "Additional context (optional)" }
+        productionDate: { type: string, format: date-time, description: "When product was made (optional)" }
+        expirationDate: { type: string, format: date-time, description: "Product expiration date (optional)" }
+        batchId: { type: string, maxLength: 100, description: "Batch/lot identifier (optional)" }
+      required: [productId, quantityToDrop]
+
+    InventoryDropResponse:
+      type: object
+      properties:
+        message: { type: string }
+        drop: { $ref: "#/components/schemas/InventoryDrop" }
+        updatedProduct:
+          type: object
+          properties:
+            id: { type: string }
+            productName: { type: string }
+            previousQuantity: { type: integer }
+            newQuantity: { type: integer }
+            quantityDropped: { type: integer }
+        undoInfo:
+          type: object
+          properties:
+            canUndo: { type: boolean }
+            undoExpiresAt: { type: string, format: date-time }
+            timeRemainingMinutes: { type: integer }
+      required: [message, drop, updatedProduct, undoInfo]
+
+    UndoDropRequest:
+      type: object
+      properties:
+        undoReason: { type: string, maxLength: 300, description: "Reason for undoing the drop (optional)" }
+
+    UndoDropResponse:
+      type: object
+      properties:
+        message: { type: string }
+        drop: { $ref: "#/components/schemas/InventoryDrop" }
+        restoredProduct:
+          type: object
+          properties:
+            id: { type: string }
+            productName: { type: string }
+            previousQuantity: { type: integer }
+            newQuantity: { type: integer }
+            quantityRestored: { type: integer }
+      required: [message, drop, restoredProduct]
+
+    InventoryDropsListResponse:
+      type: object
+      properties:
+        drops:
+          type: array
+          items: { $ref: "#/components/schemas/InventoryDrop" }
+        pagination:
+          type: object
+          properties:
+            currentPage: { type: integer, minimum: 1 }
+            totalPages: { type: integer, minimum: 0 }
+            totalCount: { type: integer, minimum: 0 }
+            hasNextPage: { type: boolean }
+            hasPrevPage: { type: boolean }
+      required: [drops, pagination]
+
+    UndoableDropsResponse:
+      type: object
+      properties:
+        message: { type: string }
+        undoableDrops:
+          type: array
+          items: { $ref: "#/components/schemas/InventoryDrop" }
+        currentTime: { type: string, format: date-time }
+      required: [message, undoableDrops, currentTime]
+
+    DropAnalyticsResponse:
+      type: object
+      properties:
+        period:
+          type: object
+          properties:
+            startDate: { type: string, format: date-time }
+            endDate: { type: string, format: date-time }
+            durationDays: { type: integer }
+        summary:
+          type: object
+          properties:
+            totalQuantityDropped: { type: integer }
+            totalValueLost: { type: number }
+            totalDropCount: { type: integer }
+            avgValuePerDrop: { type: number }
+        analyticsByReason:
+          type: array
+          items:
+            type: object
+            properties:
+              _id: { type: string }
+              products:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productId: { type: string }
+                    productName: { type: string }
+                    totalQuantityDropped: { type: integer }
+                    totalValueLost: { type: number }
+                    dropCount: { type: integer }
+              totalQuantityDropped: { type: integer }
+              totalValueLost: { type: number }
+              totalDropCount: { type: integer }
+        todaysSummary:
+          type: array
+          items:
+            type: object
+            properties:
+              reason: { type: string }
+              totalQuantity: { type: integer }
+              totalValue: { type: number }
+              dropCount: { type: integer }
+              uniqueProducts: { type: integer }
+      required: [period, summary, analyticsByReason, todaysSummary]
 
     LoginRequest:
       type: object
@@ -839,6 +1030,86 @@ paths:
               schema: { $ref: "#/components/schemas/Error" }
         "404":
           description: Customer not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /customers/import:
+    post:
+      summary: Import customers from CSV file
+      tags: [Customers]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Bulk import customers from a CSV file with comprehensive validation and error handling.
+        Supports detailed reporting of successful imports and failures with conflict detection.
+        
+        **CSV Format Required:**
+        - firstName,lastName,phoneNumber,email
+        
+        **Features:**
+        - Duplicate phone number detection
+        - Email uniqueness validation
+        - Detailed error reporting per row
+        - Non-blocking processing (continues on individual row failures)
+        - Response limiting for large imports
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [csvFile]
+              properties:
+                csvFile:
+                  type: string
+                  format: binary
+                  description: CSV file containing customer data (max 5MB)
+      responses:
+        "200":
+          description: CSV import completed with results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  message: { type: string }
+                  summary:
+                    type: object
+                    properties:
+                      totalRows: { type: integer }
+                      successful: { type: integer }
+                      failed: { type: integer }
+                  successfulImports:
+                    type: array
+                    items: { $ref: "#/components/schemas/Customer" }
+                  failures:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        row: { type: integer }
+                        data: { type: object }
+                        errors:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              field: { type: string }
+                              message: { type: string }
+                  truncated:
+                    type: object
+                    properties:
+                      successfulImports: { type: boolean }
+                      failures: { type: boolean }
+                required: [success, message, summary, successfulImports, failures, truncated]
+        "400":
+          description: No file provided or invalid file format
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413":
+          description: File size exceeds 5MB limit
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
@@ -1549,7 +1820,312 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
-  # Health Check Endpoint
+  # Inventory Drop Endpoints (Food Waste Management)
+  /inventory-drops:
+    post:
+      summary: Drop inventory for a product (admin/superadmin only)
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Drop inventory for expired, damaged, or end-of-day waste. Creates permanent audit record 
+        and updates product inventory atomically. Only accessible by admin and superadmin users.
+        
+        **Features:**
+        - Atomic transaction processing (inventory + audit record)
+        - 8-hour undo window for operational error recovery
+        - Comprehensive financial impact tracking
+        - Food safety compliance with batch/lot tracking
+        - Regulatory audit trail for health department requirements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InventoryDropRequest" }
+      responses:
+        "201":
+          description: Inventory dropped successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InventoryDropResponse" }
+        "400":
+          description: Validation error or insufficient inventory
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "403":
+          description: Insufficient permissions (admin/superadmin required)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    get:
+      summary: List inventory drops with filtering and pagination
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Retrieve inventory drops with comprehensive filtering and pagination options.
+        Only accessible by admin and superadmin users.
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+          description: Page number for pagination
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 10 }
+          description: Number of records per page
+        - name: productId
+          in: query
+          schema: { type: string }
+          description: Filter by specific product ID
+        - name: reason
+          in: query
+          schema: 
+            type: string
+            enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+          description: Filter by drop reason
+        - name: droppedBy
+          in: query
+          schema: { type: string }
+          description: Filter by user who dropped the inventory
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Filter drops after this date (ISO 8601)
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Filter drops before this date (ISO 8601)
+        - name: includeUndone
+          in: query
+          schema: { type: boolean, default: false }
+          description: Include undone drops in results
+      responses:
+        "200":
+          description: List of inventory drops with pagination
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InventoryDropsListResponse" }
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /inventory-drops/undoable:
+    get:
+      summary: Get drops that can still be undone (within 8-hour window)
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Retrieve inventory drops that are still within the 8-hour undo window.
+        Useful for showing recovery options to users who may have made mistakes.
+      parameters:
+        - name: userId
+          in: query
+          schema: { type: string }
+          description: Filter by specific user (optional)
+      responses:
+        "200":
+          description: List of drops that can be undone
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UndoableDropsResponse" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /inventory-drops/analytics:
+    get:
+      summary: Get comprehensive inventory drop analytics and cost reporting
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Generate comprehensive waste analytics and cost reporting for business intelligence.
+        Includes summaries by reason, product performance, and financial impact analysis.
+      parameters:
+        - name: startDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Analytics period start date (default: 30 days ago)
+        - name: endDate
+          in: query
+          schema: { type: string, format: date-time }
+          description: Analytics period end date (default: now)
+        - name: productId
+          in: query
+          schema: { type: string }
+          description: Filter by specific product
+        - name: reason
+          in: query
+          schema: 
+            type: string
+            enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+          description: Filter by drop reason
+        - name: droppedBy
+          in: query
+          schema: { type: string }
+          description: Filter by specific user
+      responses:
+        "200":
+          description: Comprehensive drop analytics and cost reporting
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DropAnalyticsResponse" }
+        "400":
+          description: Invalid date format or parameters
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /inventory-drops/{dropId}:
+    get:
+      summary: Get detailed information about a specific inventory drop
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Retrieve detailed information about a specific inventory drop including
+        undo availability and time remaining.
+      parameters:
+        - name: dropId
+          in: path
+          required: true
+          schema: { type: string }
+          description: Inventory drop ID
+      responses:
+        "200":
+          description: Detailed inventory drop information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  drop: { $ref: "#/components/schemas/InventoryDrop" }
+                  canUndo: { type: boolean }
+                  timeRemainingForUndo: { type: integer, description: "Minutes remaining for undo" }
+                required: [drop, canUndo, timeRemainingForUndo]
+        "404":
+          description: Inventory drop not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /inventory-drops/{dropId}/undo:
+    post:
+      summary: Undo an inventory drop (within 8-hour window)
+      tags: [Inventory Drops]
+      security: [{ bearerAuth: [] }]
+      description: |
+        Undo an inventory drop within the 8-hour recovery window. Restores inventory 
+        to the product and marks the drop as undone for audit purposes.
+        
+        **Business Rules:**
+        - Must be within 8 hours of original drop
+        - Drop must not already be undone
+        - Product must still exist
+        - Atomic operation (inventory + audit record)
+      parameters:
+        - name: dropId
+          in: path
+          required: true
+          schema: { type: string }
+          description: Inventory drop ID to undo
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UndoDropRequest" }
+      responses:
+        "200":
+          description: Inventory drop undone successfully
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UndoDropResponse" }
+        "400":
+          description: Cannot undo drop (expired, already undone, or invalid)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404":
+          description: Drop record or associated product not found
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403":
+          description: Insufficient permissions
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  # API Overview & Health Check Endpoints
+  /:
+    get:
+      summary: API overview and capabilities
+      tags: [Health]
+      description: |
+        Get comprehensive information about the BiteTrack API including capabilities,
+        documentation links, and quick start guide. No authentication required.
+      responses:
+        "200":
+          description: API overview and capabilities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  version: { type: string }
+                  server:
+                    type: object
+                    properties:
+                      host: { type: string }
+                      port: { type: integer }
+                      environment: { type: string }
+                  documentation:
+                    type: object
+                    properties:
+                      interactive: { type: string, description: "Swagger UI URL" }
+                      json: { type: string, description: "OpenAPI JSON spec URL" }
+                      static: { type: string, description: "Static documentation URL" }
+                  capabilities:
+                    type: object
+                    properties:
+                      endpoints: { type: string }
+                      categories: { type: string }
+                      features: 
+                        type: array
+                        items: { type: string }
+                  quickStart:
+                    type: object
+                    properties:
+                      step1: { type: string }
+                      step2: { type: string }
+                      step3: { type: string }
+                      step4: { type: string }
+                  health: { type: string, description: "Health check endpoint URL" }
+                required: [message, version, server, documentation, capabilities, quickStart, health]
+  
   /health:
     get:
       summary: API health check

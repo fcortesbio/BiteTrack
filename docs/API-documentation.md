@@ -1,6 +1,7 @@
 # BiteTrack API Documentation
 
 ## Overview
+
 BiteTrack is a RESTful API for small food businesses to manage sellers, products, customers, sales, and food waste. All API endpoints are prefixed with `/bitetrack/` and use JWT-based authentication with role-based access control.
 
 **Base URL:** `http://localhost:3000/bitetrack`
@@ -8,11 +9,13 @@ BiteTrack is a RESTful API for small food businesses to manage sellers, products
 ## Authentication
 
 All endpoints (except login and activate) require a JWT token in the Authorization header:
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 ### Role-Based Access Control
+
 - **user**: Basic CRUD operations on products, customers, and sales; self-update profile
 - **admin**: All user permissions + create pending sellers
 - **superadmin**: All admin permissions + role management + password recovery
@@ -22,16 +25,19 @@ Authorization: Bearer <jwt_token>
 ## Authentication Endpoints
 
 ### 🔐 Login
+
 **Endpoint:** `POST /auth/login`
 
 **Description:** Authenticate a seller and receive JWT token.
 
 **Request Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "email": "john.doe@example.com",
@@ -40,6 +46,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -58,6 +65,7 @@ Content-Type: application/json
 ```
 
 **Error Responses:**
+
 ```json
 // 401 Unauthorized
 {
@@ -81,11 +89,13 @@ Content-Type: application/json
 ```
 
 ### 🔓 Activate Account
+
 **Endpoint:** `POST /auth/activate`
 
 **Description:** Activate a pending seller account by providing security information and setting a password.
 
 **Request Body:**
+
 ```json
 {
   "email": "jane.smith@example.com",
@@ -96,6 +106,7 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439013",
@@ -111,17 +122,20 @@ Content-Type: application/json
 ```
 
 ### 🔄 Password Recovery
+
 **Endpoint:** `POST /auth/recover` (superadmin only)
 
 **Description:** Generate a password reset token for a seller.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <superadmin_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "sellerId": "507f1f77bcf86cd799439013"
@@ -129,6 +143,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "token": "reset_abc123def456ghi789",
@@ -138,11 +153,13 @@ Content-Type: application/json
 ```
 
 ### 🔑 Reset Password
+
 **Endpoint:** `POST /auth/reset`
 
 **Description:** Reset password using a valid reset token.
 
 **Request Body:**
+
 ```json
 {
   "token": "reset_abc123def456ghi789",
@@ -153,6 +170,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Password reset successful"
@@ -160,16 +178,19 @@ Content-Type: application/json
 ```
 
 ### 🔍 Check Seller Account Status
+
 **Endpoint:** `GET /auth/seller-status`
 
 **Description:** Check if an email address has an active or pending seller account. Useful for client-side login flows to determine whether to show activation form or regular login.
 
 **Query Parameters:**
+
 - `email` (required): Email address to check
 
 **Example:** `GET /auth/seller-status?email=user@example.com`
 
 **Response (200 OK) - Active Account:**
+
 ```json
 {
   "email": "user@example.com",
@@ -178,6 +199,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK) - Pending Account:**
+
 ```json
 {
   "email": "user@example.com",
@@ -186,6 +208,7 @@ Content-Type: application/json
 ```
 
 **Error Responses:**
+
 ```json
 // 404 Not Found - No account exists
 {
@@ -213,16 +236,19 @@ Content-Type: application/json
 ## Seller Management
 
 ### 👥 List Sellers
+
 **Endpoint:** `GET /sellers` (admin/superadmin only)
 
 **Description:** Retrieve all active sellers.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <admin_jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -240,17 +266,20 @@ Authorization: Bearer <admin_jwt_token>
 ```
 
 ### ➕ Create Pending Seller
+
 **Endpoint:** `POST /sellers/pending` (admin/superadmin only)
 
 **Description:** Create a new pending seller account.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <admin_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "firstName": "Alice",
@@ -261,6 +290,7 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439014",
@@ -275,17 +305,20 @@ Content-Type: application/json
 ```
 
 ### ✏️ Update Seller Information
+
 **Endpoint:** `PATCH /sellers/{id}`
 
 **Description:** Update seller's own information (requires old password for sensitive changes).
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <user_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "firstName": "John Updated",
@@ -296,6 +329,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439011",
@@ -311,17 +345,20 @@ Content-Type: application/json
 ```
 
 ### 🔄 Change Seller Role
+
 **Endpoint:** `PATCH /sellers/{id}/role` (superadmin only)
 
 **Description:** Promote or demote a seller's role.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <superadmin_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "role": "admin"
@@ -329,6 +366,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439013",
@@ -344,11 +382,13 @@ Content-Type: application/json
 ```
 
 ### ❌ Deactivate Seller
+
 **Endpoint:** `DELETE /sellers/{id}` (superadmin only)
 
 **Description:** Deactivate/remove a seller account.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <superadmin_jwt_token>
 ```
@@ -360,16 +400,19 @@ Authorization: Bearer <superadmin_jwt_token>
 ## Customer Management
 
 ### 📋 List Customers
+
 **Endpoint:** `GET /customers`
 
 **Description:** Retrieve all customers.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -386,17 +429,20 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### ➕ Create Customer
+
 **Endpoint:** `POST /customers`
 
 **Description:** Create a new customer.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "firstName": "Carlos",
@@ -407,6 +453,7 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439021",
@@ -421,17 +468,20 @@ Content-Type: application/json
 ```
 
 ### ✏️ Update Customer
+
 **Endpoint:** `PATCH /customers/{id}`
 
 **Description:** Update customer information.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "phoneNumber": "+1-555-0789",
@@ -440,6 +490,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439021",
@@ -454,21 +505,25 @@ Content-Type: application/json
 ```
 
 ### 📈 Get Customer Transaction History
+
 **Endpoint:** `GET /customers/{id}/transactions`
 
 **Description:** Retrieve a customer's transaction history with pagination and filtering options.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `page` (optional, default: 1): Page number for pagination
 - `limit` (optional, default: 10, max: 100): Number of transactions per page
 - `settled` (optional): Filter by settlement status (true/false)
 
 **Examples:**
+
 ```bash
 # Get first 10 transactions
 GET /customers/507f1f77bcf86cd799439020/transactions
@@ -484,6 +539,7 @@ GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "customer": {
@@ -534,6 +590,7 @@ GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
 ```
 
 **Error Responses:**
+
 ```json
 // 404 Not Found - Customer doesn't exist
 {
@@ -551,11 +608,13 @@ GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
 ```
 
 ### ❌ Remove Customer
+
 **Endpoint:** `DELETE /customers/{id}`
 
 **Description:** Remove a customer.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
@@ -563,20 +622,24 @@ Authorization: Bearer <jwt_token>
 **Response (204 No Content):** Empty response body
 
 ### 📥 Import Customers from CSV
+
 **Endpoint:** `POST /customers/import`
 
 **Description:** Bulk import customers from a CSV file. The import process validates each row and provides detailed reporting of successful imports and failures.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: multipart/form-data
 ```
 
 **Request Body (multipart/form-data):**
+
 - `csvFile`: CSV file with customer data
 
 **Expected CSV Format:**
+
 ```csv
 firstName,lastName,phoneNumber,email
 John,Doe,5551234567,john.doe@example.com
@@ -586,6 +649,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 ```
 
 **CSV Requirements:**
+
 - **firstName**: Required, non-empty string
 - **lastName**: Required, non-empty string  
 - **phoneNumber**: Required, exactly 10 digits, must be unique
@@ -594,6 +658,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 - Supported formats: .csv files only
 
 **Response (200 OK) - Successful Import:**
+
 ```json
 {
   "success": true,
@@ -628,6 +693,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 ```
 
 **Response (200 OK) - Import with Errors:**
+
 ```json
 {
   "success": true,
@@ -698,6 +764,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 ```
 
 **Error Responses:**
+
 ```json
 // 400 Bad Request - No file provided
 {
@@ -722,6 +789,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 ```
 
 **Import Behavior:**
+
 - **Non-blocking**: Import continues even when individual rows fail
 - **Detailed reporting**: Each failure includes row number, data, and specific error reasons
 - **Conflict detection**: Identifies duplicate phone numbers and emails with existing customer info
@@ -730,6 +798,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 - **Atomic per row**: Each customer creation is independent; failures don't affect other rows
 
 **Usage Examples:**
+
 ```bash
 # Import customers from CSV file
 curl -X POST http://localhost:3000/bitetrack/customers/import \
@@ -747,16 +816,19 @@ curl -X POST http://localhost:3000/bitetrack/customers/import \
 ## Product Management
 
 ### 📦 List Products
+
 **Endpoint:** `GET /products`
 
 **Description:** Retrieve all products with current inventory.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -772,17 +844,20 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### ➕ Create Product
+
 **Endpoint:** `POST /products`
 
 **Description:** Create a new product.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "productName": "Veggie Wrap",
@@ -793,6 +868,7 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439031",
@@ -806,17 +882,20 @@ Content-Type: application/json
 ```
 
 ### ✏️ Update Product
+
 **Endpoint:** `PATCH /products/{id}`
 
 **Description:** Update product details or inventory count.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "count": 30,
@@ -825,6 +904,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439030",
@@ -838,11 +918,13 @@ Content-Type: application/json
 ```
 
 ### ❌ Remove Product
+
 **Endpoint:** `DELETE /products/{id}`
 
 **Description:** Remove a product from catalog.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
@@ -854,16 +936,19 @@ Authorization: Bearer <jwt_token>
 ## Sales Management
 
 ### 📊 List Sales
+
 **Endpoint:** `GET /sales`
 
 **Description:** Retrieve sales with optional filtering, date range filtering, sorting, and pagination.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `customerId` (optional): Filter by customer
 - `sellerId` (optional): Filter by seller
 - `settled` (optional): Filter by payment status (true/false)
@@ -875,12 +960,14 @@ Authorization: Bearer <jwt_token>
 - `sort` (optional): Sort field and direction (e.g., 'createdAt', '-createdAt', 'totalAmount', '-totalAmount')
 
 **Examples:**
+
 - Basic filtering: `GET /sales?settled=false&customerId=507f1f77bcf86cd799439020`
 - Date range filtering: `GET /sales?startDate=2024-01-01&endDate=2024-01-31&dateField=createdAt`
 - Pagination and sorting: `GET /sales?page=2&limit=25&sort=-createdAt`
 - Combined filtering: `GET /sales?settled=false&startDate=2024-01-01&page=1&limit=10&sort=-totalAmount`
 
 **Response (200 OK):**
+
 ```json
 {
   "sales": [
@@ -943,17 +1030,20 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### ➕ Create Sale
+
 **Endpoint:** `POST /sales`
 
 **Description:** Create a new sale transaction (automatically decrements inventory).
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "customerId": "507f1f77bcf86cd799439020",
@@ -972,6 +1062,7 @@ Content-Type: application/json
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439041",
@@ -998,16 +1089,19 @@ Content-Type: application/json
 ```
 
 ### 📄 Get Sale Details
+
 **Endpoint:** `GET /sales/{id}`
 
 **Description:** Retrieve detailed information about a specific sale.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439040",
@@ -1029,17 +1123,20 @@ Authorization: Bearer <jwt_token>
 ```
 
 ### 💰 Settle Sale
+
 **Endpoint:** `PATCH /sales/{id}/settle`
 
 **Description:** Update payment amount for a sale (marks as settled if fully paid).
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "amountPaid": 31.97
@@ -1047,6 +1144,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439041",
@@ -1077,22 +1175,26 @@ Content-Type: application/json
 ## Sales Reporting & Analytics
 
 ### 📊 Get Sales Analytics
+
 **Endpoint:** `GET /reporting/sales/analytics`
 
 **Description:** Generate comprehensive sales analytics for a given time period including totals, averages, top products, customer analytics, time-series data, and settlement statistics.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `startDate` (optional): Start date for filtering (ISO 8601 format)
 - `endDate` (optional): End date for filtering (ISO 8601 format)
 - `dateField` (optional): Date field to filter by ('createdAt' or 'updatedAt', default: 'createdAt')
 - `groupBy` (optional): Time grouping for time-series data ('hour', 'day', 'week', 'month', 'year', default: 'day')
 
 **Examples:**
+
 ```bash
 # Get analytics for January 2024
 GET /reporting/sales/analytics?startDate=2024-01-01&endDate=2024-01-31
@@ -1105,6 +1207,7 @@ GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "period": {
@@ -1163,16 +1266,19 @@ GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
 ```
 
 ### 📄 Export Sales Data as CSV
+
 **Endpoint:** `GET /reporting/sales/export`
 
 **Description:** Export sales data as CSV file with various formats and filtering options. Supports detailed line items, summary per sale, or product performance exports.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Query Parameters:**
+
 - `startDate` (optional): Start date for filtering (ISO 8601 format)
 - `endDate` (optional): End date for filtering (ISO 8601 format)
 - `dateField` (optional): Date field to filter by ('createdAt' or 'updatedAt', default: 'createdAt')
@@ -1182,11 +1288,13 @@ Authorization: Bearer <jwt_token>
 - `settled` (optional): Filter by settlement status (true/false)
 
 **Export Formats:**
+
 - **detailed**: Individual product line items with full transaction details
 - **summary**: One row per sale with aggregate information
 - **products**: Product performance metrics and sales statistics
 
 **Examples:**
+
 ```bash
 # Export detailed sales data for January 2024
 GET /reporting/sales/export?startDate=2024-01-01&endDate=2024-01-31&format=detailed
@@ -1202,6 +1310,7 @@ GET /reporting/sales/export?customerId=507f1f77bcf86cd799439020&format=detailed
 ```
 
 **Response (200 OK):**
+
 ```
 Content-Type: text/csv
 Content-Disposition: attachment; filename="bitetrack-sales-detailed-2024-01-15T16-30-00-000Z.csv"
@@ -1211,19 +1320,23 @@ Content-Disposition: attachment; filename="bitetrack-sales-detailed-2024-01-15T1
 ```
 
 **Detailed Format CSV Columns:**
+
 - Sale ID, Date, Time, Customer Name, Customer Email, Seller Name
 - Product Name, Quantity, Unit Price, Line Total
 - Sale Total, Amount Paid, Balance Due, Settled
 
 **Summary Format CSV Columns:**
+
 - Sale ID, Date, Time, Customer Name, Customer Email, Seller Name
 - Items Count, Total Amount, Amount Paid, Balance Due, Settled
 
 **Products Format CSV Columns:**
+
 - Product Name, Current Price, Total Quantity Sold, Number of Sales
 - Total Revenue, Average Sale Price, Min/Max Sale Price, Revenue per Unit
 
 **Error Responses:**
+
 ```json
 // 400 Bad Request - Invalid parameters
 {
@@ -1245,6 +1358,7 @@ Content-Disposition: attachment; filename="bitetrack-sales-detailed-2024-01-15T1
 ## Error Handling
 
 ### Common HTTP Status Codes
+
 - **200 OK**: Request successful
 - **201 Created**: Resource created successfully
 - **204 No Content**: Request successful, no response body
@@ -1255,6 +1369,7 @@ Content-Disposition: attachment; filename="bitetrack-sales-detailed-2024-01-15T1
 - **500 Internal Server Error**: Server-side error
 
 ### Error Response Format
+
 All error responses follow this structure:
 
 ```json
@@ -1266,6 +1381,7 @@ All error responses follow this structure:
 ```
 
 ### Validation Error Format
+
 For input validation errors:
 
 ```json
@@ -1291,11 +1407,13 @@ For input validation errors:
 ## Health Check
 
 ### ❤️ API Health Check
+
 **Endpoint:** `GET /bitetrack/health`
 
 **Description:** Check API server status and connectivity. No authentication required.
 
 **Response (200 OK):**
+
 ```json
 {
   "status": "OK",
@@ -1305,11 +1423,13 @@ For input validation errors:
 ```
 
 **Response Fields:**
+
 - `status`: Server status (always "OK" if responding)
 - `timestamp`: Current server timestamp in ISO 8601 format
 - `uptime`: Server uptime in seconds
 
 **Usage:**
+
 - Monitor API availability
 - Load balancer health checks
 - CI/CD pipeline validation
@@ -1322,17 +1442,20 @@ For input validation errors:
 **⚠️ Admin/SuperAdmin Access Only:** All inventory drop endpoints require `admin` or `superadmin` role.
 
 ### 🗑️ Drop Inventory
+
 **Endpoint:** `POST /inventory-drops`
 
 **Description:** Drop inventory for expired, damaged, or end-of-day waste. Creates permanent audit record and updates product inventory atomically.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <admin_or_superadmin_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "productId": "507f1f77bcf86cd799439011",
@@ -1346,10 +1469,12 @@ Content-Type: application/json
 ```
 
 **Required Fields:**
+
 - `productId`: MongoDB ObjectId of the product
 - `quantityToDrop`: Number of units to drop (must be ≤ current inventory)
 
 **Optional Fields:**
+
 - `reason`: Drop reason (`expired`, `end_of_day`, `quality_issue`, `damaged`, `contaminated`, `overproduction`, `other`)
 - `notes`: Additional context (max 500 characters)
 - `productionDate`: When the product was made
@@ -1357,6 +1482,7 @@ Content-Type: application/json
 - `batchId`: Batch/lot identifier (max 100 characters)
 
 **Response (201 Created):**
+
 ```json
 {
   "message": "Inventory dropped successfully",
@@ -1403,17 +1529,20 @@ Content-Type: application/json
 ```
 
 ### ↩️ Undo Inventory Drop
+
 **Endpoint:** `POST /inventory-drops/:dropId/undo`
 
 **Description:** Undo an inventory drop within the 8-hour window. Restores inventory and marks drop as undone.
 
 **Request Headers:**
+
 ```
 Authorization: Bearer <admin_or_superadmin_jwt_token>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "undoReason": "Accidental drop - product was still good"
@@ -1421,6 +1550,7 @@ Content-Type: application/json
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Inventory drop undone successfully",
@@ -1446,11 +1576,13 @@ Content-Type: application/json
 ```
 
 ### 📋 List Inventory Drops
+
 **Endpoint:** `GET /inventory-drops`
 
 **Description:** List inventory drops with filtering and pagination.
 
 **Query Parameters:**
+
 - `page`: Page number (default: 1)
 - `limit`: Items per page (default: 10, max: 100)
 - `productId`: Filter by specific product
@@ -1463,6 +1595,7 @@ Content-Type: application/json
 **Example:** `GET /inventory-drops?reason=end_of_day&startDate=2024-01-15&limit=20`
 
 **Response (200 OK):**
+
 ```json
 {
   "drops": [
@@ -1492,14 +1625,17 @@ Content-Type: application/json
 ```
 
 ### 🔄 Get Undoable Drops
+
 **Endpoint:** `GET /inventory-drops/undoable`
 
 **Description:** Get drops that can still be undone (within 8-hour window).
 
 **Query Parameters:**
+
 - `userId`: Filter by specific user (optional)
 
 **Response (200 OK):**
+
 ```json
 {
   "message": "Found 3 drops that can be undone",
@@ -1519,11 +1655,13 @@ Content-Type: application/json
 ```
 
 ### 📊 Waste Analytics
+
 **Endpoint:** `GET /inventory-drops/analytics`
 
 **Description:** Get comprehensive waste analytics and cost reporting.
 
 **Query Parameters:**
+
 - `startDate`: Analytics period start (default: 30 days ago)
 - `endDate`: Analytics period end (default: now)
 - `productId`: Filter by specific product
@@ -1531,6 +1669,7 @@ Content-Type: application/json
 - `droppedBy`: Filter by user
 
 **Response (200 OK):**
+
 ```json
 {
   "period": {
@@ -1573,11 +1712,13 @@ Content-Type: application/json
 ```
 
 ### 🔍 Get Drop Details
+
 **Endpoint:** `GET /inventory-drops/:dropId`
 
 **Description:** Get detailed information about a specific inventory drop.
 
 **Response (200 OK):**
+
 ```json
 {
   "drop": {
@@ -1606,6 +1747,7 @@ Content-Type: application/json
 ```
 
 **Error Responses:**
+
 ```json
 // 403 Forbidden - Insufficient permissions
 {
@@ -1637,6 +1779,7 @@ Content-Type: application/json
 ```
 
 **Business Rules:**
+
 - **8-Hour Undo Window:** Drops can be undone within 8 hours of creation
 - **Admin Access Only:** Only `admin` and `superadmin` roles can perform drop operations
 - **Atomic Operations:** Inventory updates and drop records are created/updated together
@@ -1650,6 +1793,7 @@ Content-Type: application/json
 ## Password Requirements
 
 All passwords must meet the following criteria:
+
 - Minimum 8 characters
 - At least 1 lowercase letter
 - At least 1 uppercase letter
@@ -1663,6 +1807,7 @@ All passwords must meet the following criteria:
 ## Transaction Safety
 
 Sales operations are atomic using MongoDB transactions:
+
 - If any product has insufficient inventory, the entire sale is rejected
 - Inventory decrements only occur when the sale is successfully created
 - All related database operations either succeed together or fail together
