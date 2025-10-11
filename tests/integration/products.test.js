@@ -53,13 +53,13 @@ describe('Product Management Routes', () => {
   // - POST /products (create product)
   describe('POST /bitetrack/products', () => {
     it('should create a new product with valid data',
-      async () => {
+      async() => {
         // Arrange
         const productData = {
           productName: 'Delicious Sandwich',
           description: 'A mouth-watering sandwich with fresh ingredients',
           price: 12.99,
-          count: 25
+          count: 25,
         };
 
         // Act
@@ -83,10 +83,58 @@ describe('Product Management Routes', () => {
         expect(savedProduct).toBeTruthy();
         expect(savedProduct.productName).toBe(productData.productName);
       });
-    // it('Should create product with minimum required fields',
-    //   async () => {
+    it('Should create product with minimum required fields',
+      async() => {
+        // Arrange
+        const minimalProductData = {
+          productName: 'Simple product',
+          price: 500,
+          count: 10,
+        };
 
-    //   }
-    // )
+        // Act
+        const response = await request(app)
+          .post('/bitetrack/products')
+          .set('Authorization', `Bearer ${authToken}`)
+          .send(minimalProductData);
+
+        // Assert
+        expect(response.status).toBe(201);// response 201
+        expect(response.body.productName).toBe(minimalProductData.productName);
+        expect(response.body.price).toBe(minimalProductData.price);
+        expect(response.body.count).toBe(minimalProductData.count);
+        expect(response.body.description).toBe(''); // TO-DO: should default to an empty string
+
+      });
   });
+
+  describe('Validation errors', () => {
+    it('should reject invalid product data', async() => {
+      // Test missing productName
+      let response = await request(app)
+        .post('/bitetrack/products')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ price: 10, count: 5 });
+      
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('details'); // API returns 'details' array with validation errors
+
+      // Test missing price
+      response = await request(app)
+        .post('/bitetrack/products')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ productName: 'Testing product', count: 5 });
+
+      // Test missing count
+      response = await request(app)
+        .post('/bitetrack/products')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ productName: 'Testing product', price: 10 });
+    });
+
+
+
+  });
+
+
 });
