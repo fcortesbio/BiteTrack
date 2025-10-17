@@ -159,7 +159,7 @@ class TestDataPopulator {
         const result = await Customer.findOneAndUpdate(
           { phoneNumber: customer.phoneNumber },
           customer,
-          { upsert: true, new: true, setDefaultsOnInsert: true }
+          { upsert: true, new: true, setDefaultsOnInsert: true },
         );
         createdOrUpdatedCustomers.push(result);
       }
@@ -250,7 +250,7 @@ class TestDataPopulator {
         const result = await PendingSeller.findOneAndUpdate(
           { email: pendingSeller.email },
           pendingSeller,
-          { upsert: true, new: true, setDefaultsOnInsert: true }
+          { upsert: true, new: true, setDefaultsOnInsert: true },
         );
         createdOrUpdatedPendingSellers.push(result);
       }

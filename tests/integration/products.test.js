@@ -20,7 +20,7 @@ describe('Product Management Routes', () => {
   let testSeller;
 
   // Setup authentication for all tests
-  beforeEach(async () => {
+  beforeEach(async() => {
     // Create a test seller for authentication
     testSeller = new Seller({
       firstName: 'Generic',
