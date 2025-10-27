@@ -3,19 +3,19 @@
  * Tests authentication, activation, and password recovery functions
  */
 
-const authController = require('../../../controllers/authController');
-const Seller = require('../../../models/Seller');
-const PendingSeller = require('../../../models/PendingSeller');
-const PasswordResetToken = require('../../../models/PasswordResetToken');
-const { generateToken, generateResetToken } = require('../../../utils/jwt');
+const authController = require("../../../controllers/authController");
+const Seller = require("../../../models/Seller");
+const PendingSeller = require("../../../models/PendingSeller");
+const PasswordResetToken = require("../../../models/PasswordResetToken");
+const { generateToken, generateResetToken } = require("../../../utils/jwt");
 
 // Mock dependencies
-jest.mock('../../../models/Seller');
-jest.mock('../../../models/PendingSeller');
-jest.mock('../../../models/PasswordResetToken');
-jest.mock('../../../utils/jwt');
+jest.mock("../../../models/Seller");
+jest.mock("../../../models/PendingSeller");
+jest.mock("../../../models/PasswordResetToken");
+jest.mock("../../../utils/jwt");
 
-describe('Auth Controller', () => {
+describe("Auth Controller", () => {
   let mockReq, mockRes;
 
   beforeEach(() => {
@@ -31,54 +31,58 @@ describe('Auth Controller', () => {
     jest.clearAllMocks();
   });
 
-  describe('getSellerByEmail', () => {
-    it('should return active seller status when seller exists', async() => {
+  describe("getSellerByEmail", () => {
+    it("should return active seller status when seller exists", async () => {
       const mockSeller = {
-        email: 'active@example.com',
-        firstName: 'Active',
-        lastName: 'User',
+        email: "active@example.com",
+        firstName: "Active",
+        lastName: "User",
       };
 
-      mockReq.query.email = 'active@example.com';
+      mockReq.query.email = "active@example.com";
       Seller.findOne.mockResolvedValue(mockSeller);
 
       await authController.getSellerByEmail(mockReq, mockRes);
 
-      expect(Seller.findOne).toHaveBeenCalledWith({ email: 'active@example.com' });
+      expect(Seller.findOne).toHaveBeenCalledWith({
+        email: "active@example.com",
+      });
       expect(mockRes.json).toHaveBeenCalledWith({
-        email: 'active@example.com',
-        status: 'active',
+        email: "active@example.com",
+        status: "active",
       });
       expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return pending seller status when no active seller but pending exists', async() => {
+    it("should return pending seller status when no active seller but pending exists", async () => {
       const mockPendingSeller = {
-        email: 'pending@example.com',
-        firstName: 'Pending',
-        lastName: 'User',
+        email: "pending@example.com",
+        firstName: "Pending",
+        lastName: "User",
         activatedAt: null,
       };
 
-      mockReq.query.email = 'pending@example.com';
+      mockReq.query.email = "pending@example.com";
       Seller.findOne.mockResolvedValue(null);
       PendingSeller.findOne.mockResolvedValue(mockPendingSeller);
 
       await authController.getSellerByEmail(mockReq, mockRes);
 
-      expect(Seller.findOne).toHaveBeenCalledWith({ email: 'pending@example.com' });
+      expect(Seller.findOne).toHaveBeenCalledWith({
+        email: "pending@example.com",
+      });
       expect(PendingSeller.findOne).toHaveBeenCalledWith({
-        email: 'pending@example.com',
+        email: "pending@example.com",
         activatedAt: null,
       });
       expect(mockRes.json).toHaveBeenCalledWith({
-        email: 'pending@example.com',
-        status: 'pending',
+        email: "pending@example.com",
+        status: "pending",
       });
     });
 
-    it('should return 404 when no seller exists', async() => {
-      mockReq.query.email = 'nonexistent@example.com';
+    it("should return 404 when no seller exists", async () => {
+      mockReq.query.email = "nonexistent@example.com";
       Seller.findOne.mockResolvedValue(null);
       PendingSeller.findOne.mockResolvedValue(null);
 
@@ -86,24 +90,26 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Not Found',
-        message: 'No account found for this email address',
+        error: "Not Found",
+        message: "No account found for this email address",
         statusCode: 404,
       });
     });
 
-    it('should handle database errors', async() => {
-      mockReq.query.email = 'error@example.com';
-      Seller.findOne.mockRejectedValue(new Error('Database error'));
+    it("should handle database errors", async () => {
+      mockReq.query.email = "error@example.com";
+      Seller.findOne.mockRejectedValue(new Error("Database error"));
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await authController.getSellerByEmail(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal Server Error',
-        message: 'An error occurred while retrieving seller information',
+        error: "Internal Server Error",
+        message: "An error occurred while retrieving seller information",
         statusCode: 500,
       });
 
@@ -111,52 +117,56 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('login', () => {
-    it('should login successfully with valid credentials', async() => {
+  describe("login", () => {
+    it("should login successfully with valid credentials", async () => {
       const mockSeller = {
-        _id: 'seller123',
-        email: 'user@example.com',
-        role: 'user',
+        _id: "seller123",
+        email: "user@example.com",
+        role: "user",
         comparePassword: jest.fn().mockResolvedValue(true),
         toJSON: jest.fn().mockReturnValue({
-          id: 'seller123',
-          email: 'user@example.com',
-          role: 'user',
+          id: "seller123",
+          email: "user@example.com",
+          role: "user",
         }),
       };
 
       mockReq.body = {
-        email: 'user@example.com',
-        password: 'correctPassword',
+        email: "user@example.com",
+        password: "correctPassword",
       };
 
       Seller.findOne.mockReturnValue({
         select: jest.fn().mockResolvedValue(mockSeller),
       });
-      generateToken.mockReturnValue('generated-jwt-token');
+      generateToken.mockReturnValue("generated-jwt-token");
 
       await authController.login(mockReq, mockRes);
 
-      expect(Seller.findOne).toHaveBeenCalledWith({ email: 'user@example.com' });
-      expect(mockSeller.comparePassword).toHaveBeenCalledWith('correctPassword');
+      expect(Seller.findOne).toHaveBeenCalledWith({
+        email: "user@example.com",
+      });
+      expect(mockSeller.comparePassword).toHaveBeenCalledWith(
+        "correctPassword"
+      );
       expect(generateToken).toHaveBeenCalledWith({
-        id: 'seller123',
-        role: 'user',
+        id: "seller123",
+        role: "user",
       });
       expect(mockRes.json).toHaveBeenCalledWith({
-        token: 'generated-jwt-token',
+        token: "generated-jwt-token",
         seller: {
-          id: 'seller123',
-          email: 'user@example.com',
-          role: 'user',
+          id: "seller123",
+          email: "user@example.com",
+          role: "user",
         },
       });
     });
 
-    it('should return 401 for non-existent seller', async() => {
+    it("should return 401 for non-existent seller", async () => {
       mockReq.body = {
-        email: 'nonexistent@example.com',
-        password: 'password',
+        email: "nonexistent@example.com",
+        password: "password",
       };
 
       Seller.findOne.mockReturnValue({
@@ -167,20 +177,20 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(401);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Unauthorized',
-        message: 'Invalid email or password',
+        error: "Unauthorized",
+        message: "Invalid email or password",
         statusCode: 401,
       });
     });
 
-    it('should return 401 for incorrect password', async() => {
+    it("should return 401 for incorrect password", async () => {
       const mockSeller = {
         comparePassword: jest.fn().mockResolvedValue(false),
       };
 
       mockReq.body = {
-        email: 'user@example.com',
-        password: 'wrongPassword',
+        email: "user@example.com",
+        password: "wrongPassword",
       };
 
       Seller.findOne.mockReturnValue({
@@ -191,30 +201,32 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(401);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Unauthorized',
-        message: 'Invalid email or password',
+        error: "Unauthorized",
+        message: "Invalid email or password",
         statusCode: 401,
       });
     });
 
-    it('should handle database errors', async() => {
+    it("should handle database errors", async () => {
       mockReq.body = {
-        email: 'error@example.com',
-        password: 'password',
+        email: "error@example.com",
+        password: "password",
       };
 
       Seller.findOne.mockReturnValue({
-        select: jest.fn().mockRejectedValue(new Error('Database error')),
+        select: jest.fn().mockRejectedValue(new Error("Database error")),
       });
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await authController.login(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal Server Error',
-        message: 'An error occurred during login',
+        error: "Internal Server Error",
+        message: "An error occurred during login",
         statusCode: 500,
       });
 
@@ -222,32 +234,32 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('activate', () => {
-    it('should activate pending seller successfully', async() => {
+  describe("activate", () => {
+    it("should activate pending seller successfully", async () => {
       const mockPendingSeller = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
-        dateOfBirth: new Date('1990-01-01'),
-        createdBy: 'admin123',
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
+        dateOfBirth: new Date("1990-01-01"),
+        createdBy: "admin123",
         save: jest.fn().mockResolvedValue(),
       };
 
       const mockNewSeller = {
         toJSON: jest.fn().mockReturnValue({
-          id: 'newSeller123',
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john@example.com',
+          id: "newSeller123",
+          firstName: "John",
+          lastName: "Doe",
+          email: "john@example.com",
         }),
         save: jest.fn().mockResolvedValue(),
       };
 
       mockReq.body = {
-        email: 'john@example.com',
-        dateOfBirth: '1990-01-01',
-        lastName: 'Doe',
-        password: 'NewPassword123!',
+        email: "john@example.com",
+        dateOfBirth: "1990-01-01",
+        lastName: "Doe",
+        password: "NewPassword123!",
       };
 
       PendingSeller.findOne.mockResolvedValue(mockPendingSeller);
@@ -256,9 +268,9 @@ describe('Auth Controller', () => {
       await authController.activate(mockReq, mockRes);
 
       expect(PendingSeller.findOne).toHaveBeenCalledWith({
-        email: 'john@example.com',
-        dateOfBirth: new Date('1990-01-01'),
-        lastName: 'Doe',
+        email: "john@example.com",
+        dateOfBirth: new Date("1990-01-01"),
+        lastName: "Doe",
         activatedAt: null,
       });
 
@@ -268,19 +280,19 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith({
-        id: 'newSeller123',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john@example.com',
+        id: "newSeller123",
+        firstName: "John",
+        lastName: "Doe",
+        email: "john@example.com",
       });
     });
 
-    it('should return 404 when pending seller not found', async() => {
+    it("should return 404 when pending seller not found", async () => {
       mockReq.body = {
-        email: 'notfound@example.com',
-        dateOfBirth: '1990-01-01',
-        lastName: 'NotFound',
-        password: 'Password123!',
+        email: "notfound@example.com",
+        dateOfBirth: "1990-01-01",
+        lastName: "NotFound",
+        password: "Password123!",
       };
 
       PendingSeller.findOne.mockResolvedValue(null);
@@ -289,30 +301,32 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Not Found',
-        message: 'Pending seller not found or already activated',
+        error: "Not Found",
+        message: "Pending seller not found or already activated",
         statusCode: 404,
       });
     });
 
-    it('should handle database errors during activation', async() => {
+    it("should handle database errors during activation", async () => {
       mockReq.body = {
-        email: 'error@example.com',
-        dateOfBirth: '1990-01-01',
-        lastName: 'Error',
-        password: 'Password123!',
+        email: "error@example.com",
+        dateOfBirth: "1990-01-01",
+        lastName: "Error",
+        password: "Password123!",
       };
 
-      PendingSeller.findOne.mockRejectedValue(new Error('Database error'));
+      PendingSeller.findOne.mockRejectedValue(new Error("Database error"));
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await authController.activate(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal Server Error',
-        message: 'An error occurred during account activation',
+        error: "Internal Server Error",
+        message: "An error occurred during account activation",
         statusCode: 500,
       });
 
@@ -320,44 +334,44 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('recover', () => {
-    it('should generate recovery token successfully', async() => {
+  describe("recover", () => {
+    it("should generate recovery token successfully", async () => {
       const mockSeller = {
-        _id: 'seller123',
-        email: 'user@example.com',
+        _id: "seller123",
+        email: "user@example.com",
       };
 
       const mockResetToken = {
-        token: 'reset_abcdef123456',
-        sellerId: 'seller123',
+        token: "reset_abcdef123456",
+        sellerId: "seller123",
         expiresAt: new Date(Date.now() + 3600000),
         save: jest.fn().mockResolvedValue(),
       };
 
       mockReq.body = {
-        sellerId: 'seller123',
+        sellerId: "seller123",
       };
 
       Seller.findById.mockResolvedValue(mockSeller);
-      generateResetToken.mockReturnValue('reset_abcdef123456');
+      generateResetToken.mockReturnValue("reset_abcdef123456");
       PasswordResetToken.mockImplementation(() => mockResetToken);
 
       await authController.recover(mockReq, mockRes);
 
-      expect(Seller.findById).toHaveBeenCalledWith('seller123');
+      expect(Seller.findById).toHaveBeenCalledWith("seller123");
       expect(generateResetToken).toHaveBeenCalled();
       expect(mockResetToken.save).toHaveBeenCalled();
 
       expect(mockRes.json).toHaveBeenCalledWith({
-        token: 'reset_abcdef123456',
-        sellerId: 'seller123',
+        token: "reset_abcdef123456",
+        sellerId: "seller123",
         expiresAt: mockResetToken.expiresAt,
       });
     });
 
-    it('should return 404 when seller not found for recovery', async() => {
+    it("should return 404 when seller not found for recovery", async () => {
       mockReq.body = {
-        sellerId: 'nonexistent123',
+        sellerId: "nonexistent123",
       };
 
       Seller.findById.mockResolvedValue(null);
@@ -366,27 +380,29 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Not Found',
-        message: 'Seller not found',
+        error: "Not Found",
+        message: "Seller not found",
         statusCode: 404,
       });
     });
 
-    it('should handle errors during recovery token generation', async() => {
+    it("should handle errors during recovery token generation", async () => {
       mockReq.body = {
-        sellerId: 'error123',
+        sellerId: "error123",
       };
 
-      Seller.findById.mockRejectedValue(new Error('Database error'));
+      Seller.findById.mockRejectedValue(new Error("Database error"));
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
 
       await authController.recover(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(500);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Internal Server Error',
-        message: 'An error occurred during password recovery',
+        error: "Internal Server Error",
+        message: "An error occurred during password recovery",
         statusCode: 500,
       });
 
@@ -394,27 +410,27 @@ describe('Auth Controller', () => {
     });
   });
 
-  describe('reset', () => {
-    it('should reset password successfully with valid token', async() => {
+  describe("reset", () => {
+    it("should reset password successfully with valid token", async () => {
       const mockResetToken = {
-        token: 'valid_reset_token',
-        sellerId: 'seller123',
+        token: "valid_reset_token",
+        sellerId: "seller123",
         expiresAt: new Date(Date.now() + 3600000),
       };
 
       const mockSeller = {
-        _id: 'seller123',
-        email: 'user@example.com',
-        dateOfBirth: new Date('1990-01-01'),
-        password: 'oldHashedPassword',
+        _id: "seller123",
+        email: "user@example.com",
+        dateOfBirth: new Date("1990-01-01"),
+        password: "oldHashedPassword",
         save: jest.fn().mockResolvedValue(),
       };
 
       mockReq.body = {
-        token: 'valid_reset_token',
-        email: 'user@example.com',
-        dateOfBirth: '1990-01-01',
-        newPassword: 'NewPassword123!',
+        token: "valid_reset_token",
+        email: "user@example.com",
+        dateOfBirth: "1990-01-01",
+        newPassword: "NewPassword123!",
       };
 
       PasswordResetToken.findOne.mockResolvedValue(mockResetToken);
@@ -425,30 +441,30 @@ describe('Auth Controller', () => {
       await authController.reset(mockReq, mockRes);
 
       expect(PasswordResetToken.findOne).toHaveBeenCalledWith({
-        token: 'valid_reset_token',
+        token: "valid_reset_token",
         expiresAt: { $gt: expect.any(Date) },
       });
 
       expect(Seller.findOne).toHaveBeenCalledWith({
-        _id: 'seller123',
-        email: 'user@example.com',
-        dateOfBirth: new Date('1990-01-01'),
+        _id: "seller123",
+        email: "user@example.com",
+        dateOfBirth: new Date("1990-01-01"),
       });
 
-      expect(mockSeller.password).toBe('NewPassword123!');
+      expect(mockSeller.password).toBe("NewPassword123!");
       expect(mockSeller.save).toHaveBeenCalled();
 
       expect(mockRes.json).toHaveBeenCalledWith({
-        message: 'Password reset successful',
+        message: "Password reset successful",
       });
     });
 
-    it('should return 400 for invalid or expired token', async() => {
+    it("should return 400 for invalid or expired token", async () => {
       mockReq.body = {
-        token: 'invalid_token',
-        email: 'user@example.com',
-        dateOfBirth: '1990-01-01',
-        newPassword: 'NewPassword123!',
+        token: "invalid_token",
+        email: "user@example.com",
+        dateOfBirth: "1990-01-01",
+        newPassword: "NewPassword123!",
       };
 
       PasswordResetToken.findOne.mockResolvedValue(null);
@@ -457,24 +473,24 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Invalid Token',
-        message: 'Reset token is invalid or expired',
+        error: "Invalid Token",
+        message: "Reset token is invalid or expired",
         statusCode: 400,
       });
     });
 
-    it('should return 400 for invalid seller details', async() => {
+    it("should return 400 for invalid seller details", async () => {
       const mockResetToken = {
-        token: 'valid_reset_token',
-        sellerId: 'seller123',
+        token: "valid_reset_token",
+        sellerId: "seller123",
         expiresAt: new Date(Date.now() + 3600000),
       };
 
       mockReq.body = {
-        token: 'valid_reset_token',
-        email: 'wrong@example.com',
-        dateOfBirth: '1990-01-01',
-        newPassword: 'NewPassword123!',
+        token: "valid_reset_token",
+        email: "wrong@example.com",
+        dateOfBirth: "1990-01-01",
+        newPassword: "NewPassword123!",
       };
 
       PasswordResetToken.findOne.mockResolvedValue(mockResetToken);
@@ -486,7 +502,7 @@ describe('Auth Controller', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Invalid Details',
+        error: "Invalid Details",
         message: expect.any(String),
         statusCode: 400,
       });
