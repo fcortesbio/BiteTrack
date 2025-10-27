@@ -1,5 +1,6 @@
 const js = require('@eslint/js');
 const globals = require('globals');
+const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
   // Apply to all JavaScript files
@@ -16,25 +17,13 @@ module.exports = [
       // ESLint recommended rules
       ...js.configs.recommended.rules,
       
-      // Code quality rules
+      // Code quality rules (non-formatting)
       'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       'no-console': 'warn',
       'prefer-const': 'error',
       'no-var': 'error',
       'eqeqeq': ['error', 'always'],
       'curly': ['error', 'all'],
-      
-      // Style consistency rules
-      'indent': ['error', 2],
-      'quotes': ['error', 'single', { avoidEscape: true }],
-      'semi': ['error', 'always'],
-      'comma-dangle': ['error', 'always-multiline'],
-      'object-curly-spacing': ['error', 'always'],
-      'array-bracket-spacing': ['error', 'never'],
-      'space-before-function-paren': ['error', 'never'],
-      'keyword-spacing': ['error', { before: true, after: true }],
-      'space-infix-ops': 'error',
-      'brace-style': ['error', '1tbs', { allowSingleLine: true }],
       
       // Best practices
       'no-throw-literal': 'error',
@@ -45,6 +34,9 @@ module.exports = [
       // Error handling - Node.js style
       'no-process-exit': 'error',
       'no-sync': 'warn',
+      
+      // Disable all formatting rules (handled by Prettier)
+      ...prettierConfig.rules,
     },
   },
   
