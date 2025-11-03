@@ -37,7 +37,7 @@ const getSellerByEmail = async (req, res) => {
       statusCode: 404,
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error("Error in getSellerByEmail:", error);
     return res.status(500).json({
       error: "Internal Server Error",
@@ -72,7 +72,7 @@ const login = async (req, res) => {
       seller: sellerResponse,
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error("Error in login:", error);
     return res.status(500).json({
       error: "Internal Server Error",
@@ -121,7 +121,7 @@ const activate = async (req, res) => {
 
     res.status(201).json(seller.toJSON());
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error("Error in activate:", error);
     return res.status(500).json({
       error: "Internal Server Error",
@@ -160,7 +160,7 @@ const recover = async (req, res) => {
       expiresAt: resetToken.expiresAt,
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error("Error in recover:", error);
     return res.status(500).json({
       error: "Internal Server Error",
@@ -214,7 +214,7 @@ const reset = async (req, res) => {
       message: "Password reset successful",
     });
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error("Error in reset:", error);
     return res.status(500).json({
       error: "Internal Server Error",

@@ -27,7 +27,7 @@ const authenticate = async(req, res, next) => {
 
     req.user = seller;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({
       error: 'Unauthorized',
       message: 'Invalid token',

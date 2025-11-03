@@ -6,13 +6,12 @@ const csv = require('fast-csv');
  * Includes totals, averages, top products, customer analytics, etc.
  */
 const getSalesAnalytics = async(req, res) => {
-  try {
-    const {
-      startDate,
-      endDate,
-      dateField = 'createdAt',
-      groupBy = 'day', // day, week, month, year
-    } = req.query;
+  const {
+    startDate,
+    endDate,
+    dateField = 'createdAt',
+    groupBy = 'day', // day, week, month, year
+  } = req.query;
 
     // Build date filter - use originalCreatedAt when available, fallback to createdAt
     const dateFilter = {};
@@ -201,9 +200,6 @@ const getSalesAnalytics = async(req, res) => {
     };
 
     res.json(analytics);
-  } catch (error) {
-    throw error;
-  }
 };
 
 /**

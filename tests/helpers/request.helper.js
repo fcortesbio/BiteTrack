@@ -187,7 +187,7 @@ const commonTestScenarios = {
    * @param {Object} testData - Test data configuration
    * @returns {Object} Test scenarios for pagination
    */
-  paginationTests: (app, endpoint, token = null, testData = {}) => ({
+  paginationTests: (app, endpoint, token = null, _testData = {}) => ({
     
     /**
      * Test first page with default limit

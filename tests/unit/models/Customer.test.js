@@ -150,7 +150,7 @@ describe('Customer Model', () => {
     describe('normalizePhoneNumber helper function', () => {
       // Access the helper function through the model's static methods or test it indirectly
       const testNormalization = (input, expected) => {
-        const customer = new Customer({
+        const _customer = new Customer({
           firstName: 'Test',
           lastName: 'Customer',
           phoneNumber: input,

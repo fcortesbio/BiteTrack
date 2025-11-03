@@ -126,7 +126,7 @@ const validationRules = {
       .notEmpty().withMessage('Phone number is required')
       .custom((value) => {
         // Only allow digits, spaces, hyphens, parentheses, and + symbol
-        if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
+        if (!/^[\d\s\-()+]+$/.test(value)) {
           throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
         }
         // Remove all non-digit characters for validation
@@ -170,7 +170,7 @@ const validationRules = {
       .notEmpty().withMessage('Phone number cannot be empty')
       .custom((value) => {
         // Only allow digits, spaces, hyphens, parentheses, and + symbol
-        if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
+        if (!/^[\d\s\-()+]+$/.test(value)) {
           throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
         }
         // Remove all non-digit characters for validation

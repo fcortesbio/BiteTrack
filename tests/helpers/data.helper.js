@@ -280,7 +280,7 @@ const paginationTestUtils = {
    * @param {number} expectedPage - Expected current page
    * @param {number} expectedLimit - Expected limit
    */
-  assertPaginationResponse: (response, expectedPage = 1, expectedLimit = 10) => {
+  assertPaginationResponse: (response, expectedPage = 1, _expectedLimit = 10) => {
     expect(response.body).toHaveProperty('pagination');
     
     const pagination = response.body.pagination;

@@ -290,7 +290,7 @@ class ReportingTester {
     try {
       await this.apiCall('/reporting/sales/analytics', { groupBy: 'invalid-group' });
       // This might not fail as the function has a default case, but let's test it
-    } catch (error) {
+    } catch {
       // Expected behavior varies
     }
 

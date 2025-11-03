@@ -85,6 +85,17 @@ module.exports = [
     },
   },
   
+  // Configuration for middleware and controllers that need console for debugging
+  {
+    files: [
+      'middleware/errorHandler.js',
+      'controllers/**/*.js',
+    ],
+    rules: {
+      'no-console': 'off', // Controllers and error handlers use console for debugging
+    },
+  },
+  
   
   // Global ignores
   {

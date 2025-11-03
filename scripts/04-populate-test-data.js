@@ -55,25 +55,27 @@ class TestDataPopulator {
       const envPath = path.resolve(this.envFile);
       
       try {
-        // Check if env file exists
+        // Check if env file exists synchronously (required for script initialization)
+        // eslint-disable-next-line no-sync
         require('fs').accessSync(envPath);
         
         // Load the environment file
         dotenv.config({ path: envPath });
         
         this.log(`✅ Loaded environment from: ${envPath}`);
-      } catch (error) {
-        throw new Error(`Failed to load environment file '${envPath}': ${error.message}`);
+      } catch (err) {
+        throw new Error(`Failed to load environment file '${envPath}': ${err.message}`);
       }
     } else {
       // Try to load default .env file if it exists
       const defaultEnvPath = path.join(process.cwd(), '.env');
       
       try {
+        // eslint-disable-next-line no-sync
         require('fs').accessSync(defaultEnvPath);
         dotenv.config({ path: defaultEnvPath });
         this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);
-      } catch (error) {
+      } catch {
         // No default .env file found, use process environment only
         this.log('ℹ️  No .env file found, using process environment variables only');
       }
