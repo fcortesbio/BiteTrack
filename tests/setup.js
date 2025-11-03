@@ -2,7 +2,7 @@
  * Jest Test Setup Configuration
  * Sets up in-memory MongoDB for isolated testing
  */
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryReplSet } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 
 let mongoServer;
@@ -14,9 +14,11 @@ process.env.NODE_ENV = 'test';
 // Setup before all tests
 beforeAll(async() => {
   // Start MongoDB Memory Server
-  mongoServer = await MongoMemoryServer.create({
-    binary: {
-      version: '8.0.14', // Our Docker Image MongoDB version
+mongoServer = await MongoMemoryReplSet.create({
+    replset: {
+      count: 1,
+      storageEngine: 'wiredTiger',
+      // version: '8.0.14', // Our Docker Image MongoDB version
     },
   });
   

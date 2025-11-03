@@ -76,11 +76,11 @@ describe("Inventory Drop System Routes", () => {
         .send(dropData);
 
       expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty("id");
-      expect(response.body.quantityDropped).toBe(5);
-      expect(response.body.reason).toBe("expired");
-      expect(response.body.undoWindowExpiry).toBeTruthy();
-      expect(response.body.canUndo).toBe(true);
+      expect(response.body.drop).toHaveProperty("id");
+      expect(response.body.drop.quantityDropped).toBe(5);
+      expect(response.body.drop.reason).toBe("expired");
+      expect(response.body.undoInfo.undoExpiresAt).toBeTruthy();
+      expect(response.body.undoInfo.canUndo).toBe(true);
 
       // Verify inventory was decremented
       const updated = await Product.findById(testProduct._id);
@@ -119,7 +119,7 @@ describe("Inventory Drop System Routes", () => {
         .send(dropData);
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("Insufficient inventory");
+      expect(response.body.message).toContain("Cannot drop");
     });
 
     it("should reject drop with invalid product ID", async () => {
@@ -167,7 +167,7 @@ describe("Inventory Drop System Routes", () => {
           });
 
         expect(response.status).toBe(201);
-        expect(response.body.reason).toBe(reason);
+        expect(response.body.drop.reason).toBe(reason);
       }
     });
 
@@ -184,7 +184,7 @@ describe("Inventory Drop System Routes", () => {
         .send(dropData);
 
       expect(response.status).toBe(201);
-      expect(response.body.costOfDrop).toBe(109.9); // 10 * 10.99
+      expect(response.body.drop.totalValueLost).toBe(109.9); // 10 * 10.99
     });
   });
 
@@ -195,7 +195,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 10,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 90,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
       });
@@ -211,8 +213,8 @@ describe("Inventory Drop System Routes", () => {
         .send({ undoReason: "Mistake in entry" });
 
       expect(response.status).toBe(200);
-      expect(response.body.isUndone).toBe(true);
-      expect(response.body.undoReason).toBe("Mistake in entry");
+      expect(response.body.drop.isUndone).toBe(true);
+      expect(response.body.drop.undoReason).toBe("Mistake in entry");
 
       // Verify inventory was restored
       const restored = await Product.findById(testProduct._id);
@@ -224,7 +226,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
       });
@@ -242,7 +246,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
         isUndone: true,
@@ -268,7 +274,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
         droppedAt: oldDate,
@@ -280,7 +288,8 @@ describe("Inventory Drop System Routes", () => {
         .send();
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("undo window has expired");
+      expect(response.body.message).toContain("undo window");
+      expect(response.body.message).toContain("expired");
     });
   });
 
@@ -292,7 +301,9 @@ describe("Inventory Drop System Routes", () => {
           productId: testProduct._id,
           productName: testProduct.productName,
           quantityDropped: 5,
-          priceAtDrop: testProduct.price,
+          originalQuantity: 100,
+          remainingQuantity: 95,
+          pricePerUnit: testProduct.price,
           reason: "expired",
           droppedBy: adminSeller._id,
         },
@@ -300,7 +311,9 @@ describe("Inventory Drop System Routes", () => {
           productId: testProduct._id,
           productName: testProduct.productName,
           quantityDropped: 10,
-          priceAtDrop: testProduct.price,
+          originalQuantity: 95,
+          remainingQuantity: 85,
+          pricePerUnit: testProduct.price,
           reason: "end_of_day",
           droppedBy: adminSeller._id,
         },
@@ -313,11 +326,13 @@ describe("Inventory Drop System Routes", () => {
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(2);
-      expect(response.body[0]).toHaveProperty("quantityDropped");
-      expect(response.body[0]).toHaveProperty("reason");
-      expect(response.body[0]).toHaveProperty("costOfDrop");
+      expect(response.body).toHaveProperty("drops");
+      expect(response.body).toHaveProperty("pagination");
+      expect(Array.isArray(response.body.drops)).toBe(true);
+      expect(response.body.drops.length).toBe(2);
+      expect(response.body.drops[0]).toHaveProperty("quantityDropped");
+      expect(response.body.drops[0]).toHaveProperty("reason");
+      expect(response.body.drops[0]).toHaveProperty("totalValueLost");
     });
 
     it("should reject list request from regular user", async () => {
@@ -336,7 +351,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
       });
@@ -348,7 +365,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 10,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 95,
+        remainingQuantity: 85,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
         droppedAt: oldDate,
@@ -359,9 +378,10 @@ describe("Inventory Drop System Routes", () => {
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(1);
-      expect(response.body[0].quantityDropped).toBe(5);
+      expect(response.body).toHaveProperty("undoableDrops");
+      expect(Array.isArray(response.body.undoableDrops)).toBe(true);
+      expect(response.body.undoableDrops.length).toBe(1);
+      expect(response.body.undoableDrops[0].quantityDropped).toBe(5);
     });
 
     it("should reject request from regular user", async () => {
@@ -381,7 +401,9 @@ describe("Inventory Drop System Routes", () => {
           productId: testProduct._id,
           productName: testProduct.productName,
           quantityDropped: 5,
-          priceAtDrop: 10.99,
+          originalQuantity: 100,
+          remainingQuantity: 95,
+          pricePerUnit: 10.99,
           reason: "expired",
           droppedBy: adminSeller._id,
         },
@@ -389,7 +411,9 @@ describe("Inventory Drop System Routes", () => {
           productId: testProduct._id,
           productName: testProduct.productName,
           quantityDropped: 10,
-          priceAtDrop: 10.99,
+          originalQuantity: 95,
+          remainingQuantity: 85,
+          pricePerUnit: 10.99,
           reason: "end_of_day",
           droppedBy: adminSeller._id,
         },
@@ -402,11 +426,11 @@ describe("Inventory Drop System Routes", () => {
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("totalQuantityDropped");
-      expect(response.body).toHaveProperty("totalCost");
-      expect(response.body).toHaveProperty("dropsByReason");
-      expect(response.body.totalQuantityDropped).toBe(15);
-      expect(response.body.totalCost).toBeCloseTo(164.85, 2);
+      expect(response.body).toHaveProperty("summary");
+      expect(response.body).toHaveProperty("analyticsByReason");
+      expect(response.body).toHaveProperty("period");
+      expect(response.body.summary.totalQuantityDropped).toBe(15);
+      expect(response.body.summary.totalValueLost).toBeCloseTo(164.85, 2);
     });
 
     it("should reject analytics request from regular user", async () => {
@@ -424,7 +448,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         notes: "Test notes",
         droppedBy: adminSeller._id,
@@ -435,10 +461,11 @@ describe("Inventory Drop System Routes", () => {
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body.id).toBe(drop._id.toString());
-      expect(response.body.quantityDropped).toBe(5);
-      expect(response.body.reason).toBe("expired");
-      expect(response.body.notes).toBe("Test notes");
+      expect(response.body.drop).toHaveProperty("id");
+      expect(response.body.drop.id).toBe(drop._id.toString());
+      expect(response.body.drop.quantityDropped).toBe(5);
+      expect(response.body.drop.reason).toBe("expired");
+      expect(response.body.drop.notes).toBe("Test notes");
     });
 
     it("should return 404 for non-existent drop", async () => {
@@ -456,7 +483,9 @@ describe("Inventory Drop System Routes", () => {
         productId: testProduct._id,
         productName: testProduct.productName,
         quantityDropped: 5,
-        priceAtDrop: testProduct.price,
+        originalQuantity: 100,
+        remainingQuantity: 95,
+        pricePerUnit: testProduct.price,
         reason: "expired",
         droppedBy: adminSeller._id,
       });
