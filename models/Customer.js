@@ -88,4 +88,7 @@ customerSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('Customer', customerSchema);
+const Customer = mongoose.model('Customer', customerSchema);
+
+module.exports = Customer;
+module.exports.normalizePhoneNumber = normalizePhoneNumber;

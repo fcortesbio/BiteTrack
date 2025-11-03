@@ -126,6 +126,10 @@ const validationRules = {
       .notEmpty()
       .withMessage('Phone number is required')
       .custom((value) => {
+        // Only allow digits, spaces, hyphens, parentheses, and + symbol
+        if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
+          return false;
+        }
         // Remove all non-digit characters for validation
         const digitsOnly = value.replace(/\D/g, '');
         // Accept Colombian country code +57 (12 digits total) or direct format
@@ -162,6 +166,10 @@ const validationRules = {
       .notEmpty()
       .withMessage('Phone number cannot be empty')
       .custom((value) => {
+        // Only allow digits, spaces, hyphens, parentheses, and + symbol
+        if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
+          return false;
+        }
         // Remove all non-digit characters for validation
         const digitsOnly = value.replace(/\D/g, '');
         // Accept Colombian country code +57 (12 digits total) or direct format

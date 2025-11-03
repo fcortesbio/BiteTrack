@@ -123,7 +123,10 @@ describe("Customer Management Routes", () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("phoneNumber");
+      expect(response.body).toHaveProperty("details");
+      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      expect(phoneError).toBeTruthy();
+      expect(phoneError.message).toContain("Phone number");
     });
 
     it("should reject invalid Colombian phone number - too short", async () => {
@@ -137,7 +140,10 @@ describe("Customer Management Routes", () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("Phone number");
+      expect(response.body).toHaveProperty("details");
+      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      expect(phoneError).toBeTruthy();
+      expect(phoneError.message).toContain("Phone number");
     });
 
     it("should reject invalid Colombian phone number - mobile not starting with 3", async () => {
@@ -151,7 +157,10 @@ describe("Customer Management Routes", () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("Phone number");
+      expect(response.body).toHaveProperty("details");
+      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      expect(phoneError).toBeTruthy();
+      expect(phoneError.message).toContain("Phone number");
     });
 
     it("should reject invalid Colombian phone number - contains letters", async () => {
@@ -165,7 +174,10 @@ describe("Customer Management Routes", () => {
         });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("Phone number");
+      expect(response.body).toHaveProperty("details");
+      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      expect(phoneError).toBeTruthy();
+      expect(phoneError.message).toContain("Colombian");
     });
 
     it("should accept valid Colombian landline - 7 digits", async () => {
@@ -297,7 +309,10 @@ describe("Customer Management Routes", () => {
         .send({ phoneNumber: "12345" }); // Invalid - too short
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toContain("Phone number");
+      expect(response.body).toHaveProperty("details");
+      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      expect(phoneError).toBeTruthy();
+      expect(phoneError.message).toContain("Phone number");
     });
 
     it("should accept Colombian country code format in update", async () => {
@@ -329,8 +344,7 @@ describe("Customer Management Routes", () => {
         .delete(`/bitetrack/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("message");
+      expect(response.status).toBe(204);
 
       // Verify deletion
       const deleted = await Customer.findById(customer._id);
@@ -401,11 +415,14 @@ describe("Customer Management Routes", () => {
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(2);
-      expect(response.body[0]).toHaveProperty("totalAmount");
-      expect(response.body[0]).toHaveProperty("products");
-      expect(response.body[0]).toHaveProperty("settled");
+      expect(response.body).toHaveProperty("customer");
+      expect(response.body).toHaveProperty("transactions");
+      expect(response.body).toHaveProperty("pagination");
+      expect(Array.isArray(response.body.transactions)).toBe(true);
+      expect(response.body.transactions.length).toBe(2);
+      expect(response.body.transactions[0]).toHaveProperty("totalAmount");
+      expect(response.body.transactions[0]).toHaveProperty("products");
+      expect(response.body.transactions[0]).toHaveProperty("settled");
     });
 
     it("should return empty array for customer with no transactions", async () => {
@@ -420,8 +437,11 @@ describe("Customer Management Routes", () => {
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(0);
+      expect(response.body).toHaveProperty("customer");
+      expect(response.body).toHaveProperty("transactions");
+      expect(response.body).toHaveProperty("pagination");
+      expect(Array.isArray(response.body.transactions)).toBe(true);
+      expect(response.body.transactions.length).toBe(0);
     });
 
     it("should return 404 for non-existent customer", async () => {

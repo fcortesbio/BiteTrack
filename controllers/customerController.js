@@ -1,4 +1,5 @@
 const Customer = require('../models/Customer');
+const { normalizePhoneNumber } = require('../models/Customer');
 const Sale = require('../models/Sale');
 const csv = require('csv-parser');
 const multer = require('multer');
@@ -13,8 +14,11 @@ const createCustomer = async(req, res) => {
   try {
     const { firstName, lastName, phoneNumber, email } = req.body;
 
+    // Normalize phone number before checking for duplicates
+    const normalizedPhoneNumber = normalizePhoneNumber(phoneNumber);
+    
     // Check for duplicate phone number
-    const existingCustomerByPhone = await Customer.findOne({ phoneNumber });
+    const existingCustomerByPhone = await Customer.findOne({ phoneNumber: normalizedPhoneNumber });
     if (existingCustomerByPhone) {
       return res.status(409).json({
         error: 'Conflict',
@@ -57,7 +61,7 @@ const createCustomer = async(req, res) => {
     const customer = new Customer({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
-      phoneNumber: phoneNumber.trim(),
+      phoneNumber: normalizedPhoneNumber,
       email: email && email.trim() !== '' ? email.toLowerCase().trim() : undefined,
     });
 
@@ -115,11 +119,13 @@ const updateCustomer = async(req, res) => {
     }
 
     // Check for duplicate phone number if being updated
-    if (updates.phoneNumber && updates.phoneNumber.trim() !== existingCustomer.phoneNumber) {
-      const duplicatePhoneCustomer = await Customer.findOne({ 
-        phoneNumber: updates.phoneNumber.trim(),
-        _id: { $ne: id }, // Exclude current customer
-      });
+    if (updates.phoneNumber) {
+      const normalizedUpdatePhone = normalizePhoneNumber(updates.phoneNumber);
+      if (normalizedUpdatePhone !== existingCustomer.phoneNumber) {
+        const duplicatePhoneCustomer = await Customer.findOne({ 
+          phoneNumber: normalizedUpdatePhone,
+          _id: { $ne: id }, // Exclude current customer
+        });
       
       if (duplicatePhoneCustomer) {
         return res.status(409).json({
@@ -137,7 +143,10 @@ const updateCustomer = async(req, res) => {
           }],
         });
       }
+      // Update the cleanUpdates with normalized phone
+      updates.phoneNumber = normalizedUpdatePhone;
     }
+  }
 
     // Check for duplicate email if being updated
     if (updates.email && updates.email.trim() !== '' && 
@@ -171,7 +180,7 @@ const updateCustomer = async(req, res) => {
     // Clean and normalize data
     if (cleanUpdates.firstName) {cleanUpdates.firstName = cleanUpdates.firstName.trim();}
     if (cleanUpdates.lastName) {cleanUpdates.lastName = cleanUpdates.lastName.trim();}
-    if (cleanUpdates.phoneNumber) {cleanUpdates.phoneNumber = cleanUpdates.phoneNumber.trim();}
+    // phoneNumber already normalized above if present
     
     // Handle email normalization
     if (cleanUpdates.email === '' || cleanUpdates.email === null) {
@@ -336,7 +345,7 @@ const validateCustomerData = (data) => {
 // Helper function to check for existing customers
 const checkForConflicts = async(customerData) => {
   const conflicts = [];
-  const phoneNumber = customerData.phoneNumber.toString().trim();
+  const phoneNumber = normalizePhoneNumber(customerData.phoneNumber.toString());
   const email = customerData.email ? customerData.email.toString().toLowerCase().trim() : null;
   
   // Check for duplicate phone number
@@ -432,7 +441,7 @@ const importCustomersFromCSV = async(req, res) => {
         const customerData = {
           firstName: row.firstName.toString().trim(),
           lastName: row.lastName.toString().trim(),
-          phoneNumber: row.phoneNumber.toString().trim(),
+          phoneNumber: normalizePhoneNumber(row.phoneNumber.toString()),
           email: row.email && row.email.toString().trim() !== '' ? 
             row.email.toString().toLowerCase().trim() : undefined,
         };
