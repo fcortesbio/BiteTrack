@@ -247,11 +247,14 @@ describe("Sales Transaction Routes", () => {
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(2);
-      expect(response.body[0]).toHaveProperty("totalAmount");
-      expect(response.body[0]).toHaveProperty("products");
-      expect(response.body[0]).toHaveProperty("settled");
+      expect(response.body).toHaveProperty("sales");
+      expect(response.body).toHaveProperty("pagination");
+      expect(Array.isArray(response.body.sales)).toBe(true);
+      expect(response.body.sales.length).toBe(2);
+      expect(response.body.sales[0]).toHaveProperty("totalAmount");
+      expect(response.body.sales[0]).toHaveProperty("products");
+      expect(response.body.sales[0]).toHaveProperty("settled");
+      expect(response.body.pagination.totalSales).toBe(2);
     });
 
     it("should return empty array when no sales exist", async () => {
@@ -262,8 +265,10 @@ describe("Sales Transaction Routes", () => {
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(0);
+      expect(response.body).toHaveProperty("sales");
+      expect(Array.isArray(response.body.sales)).toBe(true);
+      expect(response.body.sales.length).toBe(0);
+      expect(response.body.pagination.totalSales).toBe(0);
     });
   });
 

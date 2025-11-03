@@ -43,6 +43,10 @@ const saleSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  settledAt: {
+    type: Date,
+    default: null,
+  },
   
   // CSV Import Fields (all optional for backwards compatibility)
   originalCreatedAt: {

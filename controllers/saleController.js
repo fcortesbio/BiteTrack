@@ -157,12 +157,14 @@ const createSale = async(req, res, next) => {
   
   try {
     await session.withTransaction(async() => {
-      const { customerId, products, amountPaid } = req.body;
+      const { customerId, products, amountPaid = 0 } = req.body;
 
       // Verify customer exists
       const customer = await Customer.findById(customerId).session(session);
       if (!customer) {
-        throw new Error('Customer not found');
+        const error = new Error('Customer not found');
+        error.statusCode = 404;
+        throw error;
       }
 
       // Verify products and calculate total
@@ -172,11 +174,15 @@ const createSale = async(req, res, next) => {
       for (const item of products) {
         const product = await Product.findById(item.productId).session(session);
         if (!product) {
-          throw new Error(`Product ${item.productId} not found`);
+          const error = new Error(`Product ${item.productId} not found`);
+          error.statusCode = 404;
+          throw error;
         }
 
         if (product.count < item.quantity) {
-          throw new Error(`Insufficient inventory for ${product.productName}. Available: ${product.count}, Requested: ${item.quantity}`);
+          const error = new Error(`Insufficient inventory for ${product.productName}. Available: ${product.count}, Requested: ${item.quantity}`);
+          error.statusCode = 400;
+          throw error;
         }
 
         // Calculate price for this item
@@ -213,7 +219,14 @@ const createSale = async(req, res, next) => {
       res.status(201).json(sale.toJSON());
     });
   } catch (error) {
-    if (error.message.includes('not found') || error.message.includes('Insufficient inventory')) {
+    if (error.statusCode === 404) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: error.message,
+        statusCode: 404,
+      });
+    }
+    if (error.statusCode === 400 || error.message.includes('Insufficient inventory')) {
       return res.status(400).json({
         error: 'Bad Request',
         message: error.message,
@@ -259,8 +272,25 @@ const settleSale = async(req, res, next) => {
       });
     }
 
-    sale.amountPaid = amountPaid;
-    sale.settled = amountPaid >= sale.totalAmount;
+    // Check if already settled
+    if (sale.settled) {
+      return res.status(400).json({
+        error: 'Bad Request',
+        message: 'Sale is already settled',
+        statusCode: 400,
+      });
+    }
+
+    // If no amountPaid provided, settle for full amount
+    const paymentAmount = amountPaid !== undefined ? amountPaid : sale.totalAmount;
+    
+    sale.amountPaid = paymentAmount;
+    sale.settled = paymentAmount >= sale.totalAmount;
+    
+    // Set settledAt timestamp if now settled
+    if (sale.settled) {
+      sale.settledAt = new Date();
+    }
 
     await sale.save();
     res.json(sale.toJSON());

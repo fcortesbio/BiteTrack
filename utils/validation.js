@@ -123,12 +123,11 @@ const validationRules = {
       .withMessage('Last name is required'),
     body('phoneNumber')
       .trim()
-      .notEmpty()
-      .withMessage('Phone number is required')
+      .notEmpty().withMessage('Phone number is required')
       .custom((value) => {
         // Only allow digits, spaces, hyphens, parentheses, and + symbol
         if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
-          return false;
+          throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
         }
         // Remove all non-digit characters for validation
         const digitsOnly = value.replace(/\D/g, '');
@@ -136,12 +135,17 @@ const validationRules = {
         if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
           const localNumber = digitsOnly.substring(2);
           // Mobile (10 digits starting with 3) or landline (7 digits)
-          return /^3\d{9}$/.test(localNumber) || /^\d{7}$/.test(localNumber);
+          if (!/^3\d{9}$/.test(localNumber) && !/^\d{7}$/.test(localNumber)) {
+            throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
+          }
+          return true;
         }
         // Direct format: mobile (10 digits starting with 3) or landline (7 digits)
-        return /^3\d{9}$/.test(digitsOnly) || /^\d{7}$/.test(digitsOnly);
-      })
-      .withMessage('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)'),
+        if (!/^3\d{9}$/.test(digitsOnly) && !/^\d{7}$/.test(digitsOnly)) {
+          throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
+        }
+        return true;
+      }),
     body('email')
       .optional()
       .isEmail()
@@ -163,12 +167,11 @@ const validationRules = {
     body('phoneNumber')
       .optional()
       .trim()
-      .notEmpty()
-      .withMessage('Phone number cannot be empty')
+      .notEmpty().withMessage('Phone number cannot be empty')
       .custom((value) => {
         // Only allow digits, spaces, hyphens, parentheses, and + symbol
         if (!/^[\d\s\-\(\)\+]+$/.test(value)) {
-          return false;
+          throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
         }
         // Remove all non-digit characters for validation
         const digitsOnly = value.replace(/\D/g, '');
@@ -176,12 +179,17 @@ const validationRules = {
         if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
           const localNumber = digitsOnly.substring(2);
           // Mobile (10 digits starting with 3) or landline (7 digits)
-          return /^3\d{9}$/.test(localNumber) || /^\d{7}$/.test(localNumber);
+          if (!/^3\d{9}$/.test(localNumber) && !/^\d{7}$/.test(localNumber)) {
+            throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
+          }
+          return true;
         }
         // Direct format: mobile (10 digits starting with 3) or landline (7 digits)
-        return /^3\d{9}$/.test(digitsOnly) || /^\d{7}$/.test(digitsOnly);
-      })
-      .withMessage('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)'),
+        if (!/^3\d{9}$/.test(digitsOnly) && !/^\d{7}$/.test(digitsOnly)) {
+          throw new Error('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)');
+        }
+        return true;
+      }),
     body('email')
       .optional()
       .isEmail()
@@ -240,12 +248,14 @@ const validationRules = {
       .isInt({ min: 1 })
       .withMessage('Quantity must be at least 1'),
     body('amountPaid')
+      .optional()
       .isFloat({ min: 0 })
       .withMessage('Amount paid must be non-negative'),
   ],
 
   settleSale: [
     body('amountPaid')
+      .optional()
       .isFloat({ min: 0 })
       .withMessage('Amount paid must be non-negative'),
   ],

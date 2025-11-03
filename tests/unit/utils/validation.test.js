@@ -23,6 +23,7 @@ jest.mock('express-validator', () => ({
     isFloat: jest.fn().mockReturnThis(),
     isMongoId: jest.fn().mockReturnThis(),
     isArray: jest.fn().mockReturnThis(),
+    custom: jest.fn().mockReturnThis(),
   })),
   query: jest.fn(() => ({
     isEmail: jest.fn().mockReturnThis(),
