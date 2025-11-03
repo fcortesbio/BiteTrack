@@ -39,7 +39,7 @@ describe("Customer Management Routes", () => {
         firstName: "John",
         lastName: "Doe",
         email: "john.doe@example.com",
-        phone: "+1234567890",
+        phoneNumber: "+57 300 123 4567",
       };
 
       const response = await request(app)
@@ -51,7 +51,7 @@ describe("Customer Management Routes", () => {
       expect(response.body.firstName).toBe(customerData.firstName);
       expect(response.body.lastName).toBe(customerData.lastName);
       expect(response.body.email).toBe(customerData.email);
-      expect(response.body.phone).toBe(customerData.phone);
+      expect(response.body.phoneNumber).toBe("3001234567"); // Normalized from +57 300 123 4567
       expect(response.body).toHaveProperty("id");
 
       // Verify in database
@@ -64,6 +64,7 @@ describe("Customer Management Routes", () => {
       const customerData = {
         firstName: "Jane",
         lastName: "Smith",
+        phoneNumber: "3001234567",
       };
 
       const response = await request(app)
@@ -104,9 +105,81 @@ describe("Customer Management Routes", () => {
           firstName: "John",
           lastName: "Doe",
           email: "invalid-email",
+          phoneNumber: "3001234567",
         });
 
       expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("details");
+    });
+
+    it("should reject missing phoneNumber", async () => {
+      const response = await request(app)
+        .post("/bitetrack/customers")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          firstName: "John",
+          lastName: "Doe",
+          email: "john@test.com",
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("phoneNumber");
+    });
+
+    it("should reject invalid Colombian phone number - too short", async () => {
+      const response = await request(app)
+        .post("/bitetrack/customers")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "123456", // Only 6 digits
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("Phone number");
+    });
+
+    it("should reject invalid Colombian phone number - mobile not starting with 3", async () => {
+      const response = await request(app)
+        .post("/bitetrack/customers")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "2001234567", // Starts with 2, not 3
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("Phone number");
+    });
+
+    it("should reject invalid Colombian phone number - contains letters", async () => {
+      const response = await request(app)
+        .post("/bitetrack/customers")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "300ABC4567",
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("Phone number");
+    });
+
+    it("should accept valid Colombian landline - 7 digits", async () => {
+      const response = await request(app)
+        .post("/bitetrack/customers")
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "6012345", // Valid 7-digit landline
+        });
+
+      expect(response.status).toBe(201);
+      expect(response.body.phoneNumber).toBe("6012345");
     });
   });
 
@@ -114,9 +187,9 @@ describe("Customer Management Routes", () => {
     it("should list all customers", async () => {
       // Create test customers
       await Customer.create([
-        { firstName: "Alice", lastName: "Johnson", email: "alice@test.com" },
-        { firstName: "Bob", lastName: "Williams", email: "bob@test.com" },
-        { firstName: "Charlie", lastName: "Brown", phone: "+1234567890" },
+        { firstName: "Alice", lastName: "Johnson", email: "alice@test.com", phoneNumber: "3101234567" },
+        { firstName: "Bob", lastName: "Williams", email: "bob@test.com", phoneNumber: "3209876543" },
+        { firstName: "Charlie", lastName: "Brown", phoneNumber: "3157654321" },
       ]);
 
       const response = await request(app)
@@ -147,6 +220,7 @@ describe("Customer Management Routes", () => {
         firstName: "Original",
         lastName: "Name",
         email: "original@test.com",
+        phoneNumber: "3001234567",
       });
 
       const response = await request(app)
@@ -171,15 +245,16 @@ describe("Customer Management Routes", () => {
       const customer = await Customer.create({
         firstName: "Test",
         lastName: "Customer",
+        phoneNumber: "3012345678",
       });
 
       const response = await request(app)
         .patch(`/bitetrack/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
-        .send({ phone: "+9876543210" });
+        .send({ phoneNumber: "3209876543" });
 
       expect(response.status).toBe(200);
-      expect(response.body.phone).toBe("+9876543210");
+      expect(response.body.phoneNumber).toBe("3209876543");
     });
 
     it("should return 404 for non-existent customer", async () => {
@@ -197,6 +272,7 @@ describe("Customer Management Routes", () => {
       const customer = await Customer.create({
         firstName: "Test",
         lastName: "Customer",
+        phoneNumber: "3001122334",
       });
 
       const response = await request(app)
@@ -205,6 +281,39 @@ describe("Customer Management Routes", () => {
         .send({ email: "invalid-email" });
 
       expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("details");
+    });
+
+    it("should reject invalid phone number in update", async () => {
+      const customer = await Customer.create({
+        firstName: "Test",
+        lastName: "Customer",
+        phoneNumber: "3001122334",
+      });
+
+      const response = await request(app)
+        .patch(`/bitetrack/customers/${customer._id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({ phoneNumber: "12345" }); // Invalid - too short
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("Phone number");
+    });
+
+    it("should accept Colombian country code format in update", async () => {
+      const customer = await Customer.create({
+        firstName: "Test",
+        lastName: "Customer",
+        phoneNumber: "3001122334",
+      });
+
+      const response = await request(app)
+        .patch(`/bitetrack/customers/${customer._id}`)
+        .set("Authorization", `Bearer ${authToken}`)
+        .send({ phoneNumber: "+57 315 987 6543" }); // With country code and spaces
+
+      expect(response.status).toBe(200);
+      expect(response.body.phoneNumber).toBe("3159876543"); // Normalized
     });
   });
 
@@ -213,6 +322,7 @@ describe("Customer Management Routes", () => {
       const customer = await Customer.create({
         firstName: "To",
         lastName: "Delete",
+        phoneNumber: "3005544332",
       });
 
       const response = await request(app)
@@ -244,6 +354,7 @@ describe("Customer Management Routes", () => {
       const customer = await Customer.create({
         firstName: "Test",
         lastName: "Customer",
+        phoneNumber: "3006677889",
       });
 
       const product = await Product.create({
@@ -301,6 +412,7 @@ describe("Customer Management Routes", () => {
       const customer = await Customer.create({
         firstName: "New",
         lastName: "Customer",
+        phoneNumber: "3007788990",
       });
 
       const response = await request(app)

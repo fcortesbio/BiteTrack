@@ -125,8 +125,19 @@ const validationRules = {
       .trim()
       .notEmpty()
       .withMessage('Phone number is required')
-      .matches(/^\d{10}$/)
-      .withMessage('Phone number must be exactly 10 digits'),
+      .custom((value) => {
+        // Remove all non-digit characters for validation
+        const digitsOnly = value.replace(/\D/g, '');
+        // Accept Colombian country code +57 (12 digits total) or direct format
+        if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
+          const localNumber = digitsOnly.substring(2);
+          // Mobile (10 digits starting with 3) or landline (7 digits)
+          return /^3\d{9}$/.test(localNumber) || /^\d{7}$/.test(localNumber);
+        }
+        // Direct format: mobile (10 digits starting with 3) or landline (7 digits)
+        return /^3\d{9}$/.test(digitsOnly) || /^\d{7}$/.test(digitsOnly);
+      })
+      .withMessage('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)'),
     body('email')
       .optional()
       .isEmail()
@@ -150,8 +161,19 @@ const validationRules = {
       .trim()
       .notEmpty()
       .withMessage('Phone number cannot be empty')
-      .matches(/^\d{10}$/)
-      .withMessage('Phone number must be exactly 10 digits'),
+      .custom((value) => {
+        // Remove all non-digit characters for validation
+        const digitsOnly = value.replace(/\D/g, '');
+        // Accept Colombian country code +57 (12 digits total) or direct format
+        if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
+          const localNumber = digitsOnly.substring(2);
+          // Mobile (10 digits starting with 3) or landline (7 digits)
+          return /^3\d{9}$/.test(localNumber) || /^\d{7}$/.test(localNumber);
+        }
+        // Direct format: mobile (10 digits starting with 3) or landline (7 digits)
+        return /^3\d{9}$/.test(digitsOnly) || /^\d{7}$/.test(digitsOnly);
+      })
+      .withMessage('Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits)'),
     body('email')
       .optional()
       .isEmail()

@@ -39,6 +39,7 @@ describe("Sales Transaction Routes", () => {
       firstName: "Test",
       lastName: "Customer",
       email: "customer@test.com",
+      phoneNumber: "3001234567",
     });
 
     // Create test product
