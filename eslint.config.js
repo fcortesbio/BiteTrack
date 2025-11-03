@@ -54,11 +54,13 @@ module.exports = [
         afterEach: 'readonly',
         beforeAll: 'readonly',
         afterAll: 'readonly',
+        testUtils: 'readonly', // Global test utilities from setup.js
       },
     },
     rules: {
       'no-console': 'off', // Allow console in tests
       'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-sync': 'off', // Test files can use sync operations
     },
   },
   
@@ -69,6 +71,20 @@ module.exports = [
       'no-console': 'off',
     },
   },
+  
+  // Configuration for CLI scripts and main entry point
+  {
+    files: [
+      'create-superadmin.js',
+      'index.js',
+      'scripts/**/*.js',
+    ],
+    rules: {
+      'no-console': 'off',
+      'no-process-exit': 'off', // CLI scripts need to exit
+    },
+  },
+  
   
   // Global ignores
   {

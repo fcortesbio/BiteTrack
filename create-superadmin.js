@@ -45,7 +45,7 @@ const validatePassword = (password) => {
   const hasLowercase = /[a-z]/.test(password);
   const hasUppercase = /[A-Z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
-  const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(password);
+  const hasSymbol = /[!@#$%^&*()_+\-=\\[\\]{};':"\\|,.<>/?]+/.test(password);
 
   if (!hasLowercase) {
     console.log('Password must contain at least one lowercase letter.');

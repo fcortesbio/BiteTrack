@@ -1,205 +1,180 @@
 const Seller = require('../models/Seller');
 const PendingSeller = require('../models/PendingSeller');
-const bcrypt = require('bcryptjs');
 
 const listSellers = async(req, res) => {
-  try {
-    const sellers = await Seller.find({});
-    res.json(sellers);
-  } catch (error) {
-    throw error;
-  }
+  const sellers = await Seller.find({});
+  res.json(sellers);
 };
 
 const createPendingSeller = async(req, res) => {
-  try {
-    const { firstName, lastName, email, dateOfBirth } = req.body;
+  const { firstName, lastName, email, dateOfBirth } = req.body;
 
-    // Check if seller already exists
-    const existingSeller = await Seller.findOne({ email });
-    if (existingSeller) {
-      return res.status(400).json({
-        error: 'Duplicate Error',
-        message: 'Seller with this email already exists',
-        statusCode: 400,
-      });
-    }
-
-    // Check if pending seller already exists
-    const existingPending = await PendingSeller.findOne({ email, activatedAt: null });
-    if (existingPending) {
-      return res.status(400).json({
-        error: 'Duplicate Error',
-        message: 'Pending seller with this email already exists',
-        statusCode: 400,
-      });
-    }
-
-    const pendingSeller = new PendingSeller({
-      firstName,
-      lastName,
-      email,
-      dateOfBirth: new Date(dateOfBirth),
-      createdBy: req.user._id,
+  // Check if seller already exists
+  const existingSeller = await Seller.findOne({ email });
+  if (existingSeller) {
+    return res.status(400).json({
+      error: 'Duplicate Error',
+      message: 'Seller with this email already exists',
+      statusCode: 400,
     });
-
-    await pendingSeller.save();
-    res.status(201).json(pendingSeller.toJSON());
-  } catch (error) {
-    throw error;
   }
+
+  // Check if pending seller already exists
+  const existingPending = await PendingSeller.findOne({ email, activatedAt: null });
+  if (existingPending) {
+    return res.status(400).json({
+      error: 'Duplicate Error',
+      message: 'Pending seller with this email already exists',
+      statusCode: 400,
+    });
+  }
+
+  const pendingSeller = new PendingSeller({
+    firstName,
+    lastName,
+    email,
+    dateOfBirth: new Date(dateOfBirth),
+    createdBy: req.user._id,
+  });
+
+  await pendingSeller.save();
+  res.status(201).json(pendingSeller.toJSON());
 };
 
 const updateSeller = async(req, res) => {
-  try {
-    const { id } = req.params;
-    const { firstName, lastName, email, dateOfBirth, oldPassword, newPassword } = req.body;
+  const { id } = req.params;
+  const { firstName, lastName, email, dateOfBirth, oldPassword, newPassword } = req.body;
 
-    // Verify user can only update their own profile
-    if (req.user._id.toString() !== id) {
+  // Verify user can only update their own profile
+  if (req.user._id.toString() !== id) {
+    return res.status(403).json({
+      error: 'Forbidden',
+      message: 'You can only update your own profile',
+      statusCode: 403,
+    });
+  }
+
+  const seller = await Seller.findById(id).select('+password');
+  if (!seller) {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: 'Seller not found',
+      statusCode: 404,
+    });
+  }
+
+  // Check if sensitive fields are being updated
+  const sensitiveUpdate = email !== undefined || dateOfBirth !== undefined || newPassword !== undefined;
+  
+  if (sensitiveUpdate) {
+    if (!oldPassword) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Old password required for sensitive updates',
+        statusCode: 400,
+      });
+    }
+
+    const isValidPassword = await seller.comparePassword(oldPassword);
+    if (!isValidPassword) {
       return res.status(403).json({
         error: 'Forbidden',
-        message: 'You can only update your own profile',
+        message: 'Invalid old password',
         statusCode: 403,
       });
     }
 
-    const seller = await Seller.findById(id).select('+password');
-    if (!seller) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'Seller not found',
-        statusCode: 404,
-      });
-    }
-
-    // Check if sensitive fields are being updated
-    const sensitiveUpdate = email !== undefined || dateOfBirth !== undefined || newPassword !== undefined;
-    
-    if (sensitiveUpdate) {
-      if (!oldPassword) {
-        return res.status(400).json({
-          error: 'Validation Error',
-          message: 'Old password required for sensitive updates',
-          statusCode: 400,
-        });
-      }
-
-      const isValidPassword = await seller.comparePassword(oldPassword);
-      if (!isValidPassword) {
+    // Additional verification for email or dateOfBirth changes
+    if (email !== undefined || dateOfBirth !== undefined) {
+      const currentEmail = email || seller.email;
+      const currentDob = dateOfBirth ? new Date(dateOfBirth) : seller.dateOfBirth;
+      
+      // Verify at least one matches current values
+      const emailMatches = currentEmail === seller.email;
+      const dobMatches = currentDob.getTime() === seller.dateOfBirth.getTime();
+      
+      if (!emailMatches && !dobMatches) {
         return res.status(403).json({
           error: 'Forbidden',
-          message: 'Invalid old password',
+          message: 'Must provide current email or date of birth for verification',
           statusCode: 403,
         });
       }
-
-      // Additional verification for email or dateOfBirth changes
-      if (email !== undefined || dateOfBirth !== undefined) {
-        const currentEmail = email || seller.email;
-        const currentDob = dateOfBirth ? new Date(dateOfBirth) : seller.dateOfBirth;
-        
-        // Verify at least one matches current values
-        const emailMatches = currentEmail === seller.email;
-        const dobMatches = currentDob.getTime() === seller.dateOfBirth.getTime();
-        
-        if (!emailMatches && !dobMatches) {
-          return res.status(403).json({
-            error: 'Forbidden',
-            message: 'Must provide current email or date of birth for verification',
-            statusCode: 403,
-          });
-        }
-      }
     }
-
-    // Update fields
-    if (firstName !== undefined) {seller.firstName = firstName;}
-    if (lastName !== undefined) {seller.lastName = lastName;}
-    if (email !== undefined) {seller.email = email;}
-    if (dateOfBirth !== undefined) {seller.dateOfBirth = new Date(dateOfBirth);}
-    if (newPassword !== undefined) {seller.password = newPassword;}
-
-    await seller.save();
-    res.json(seller.toJSON());
-  } catch (error) {
-    throw error;
   }
+
+  // Update fields
+  if (firstName !== undefined) {seller.firstName = firstName;}
+  if (lastName !== undefined) {seller.lastName = lastName;}
+  if (email !== undefined) {seller.email = email;}
+  if (dateOfBirth !== undefined) {seller.dateOfBirth = new Date(dateOfBirth);}
+  if (newPassword !== undefined) {seller.password = newPassword;}
+
+  await seller.save();
+  res.json(seller.toJSON());
 };
 
 const changeRole = async(req, res) => {
-  try {
-    const { id } = req.params;
-    const { role } = req.body;
+  const { id } = req.params;
+  const { role } = req.body;
 
-    const seller = await Seller.findById(id);
-    if (!seller) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'Seller not found',
-        statusCode: 404,
-      });
-    }
-
-    seller.role = role;
-    await seller.save();
-
-    res.json(seller.toJSON());
-  } catch (error) {
-    throw error;
+  const seller = await Seller.findById(id);
+  if (!seller) {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: 'Seller not found',
+      statusCode: 404,
+    });
   }
+
+  seller.role = role;
+  await seller.save();
+
+  res.json(seller.toJSON());
 };
 
 const listPendingSellers = async(req, res) => {
-  try {
-    const pendingSellers = await PendingSeller.find({ activatedAt: null })
-      .populate('createdBy', 'firstName lastName email role')
-      .sort({ createdAt: -1 })
-      .select('-__v');
+  const pendingSellers = await PendingSeller.find({ activatedAt: null })
+    .populate('createdBy', 'firstName lastName email role')
+    .sort({ createdAt: -1 })
+    .select('-__v');
 
-    const response = {
-      count: pendingSellers.length,
-      pendingSellers: pendingSellers.map(seller => ({
-        _id: seller._id,
-        firstName: seller.firstName,
-        lastName: seller.lastName,
-        email: seller.email,
-        dateOfBirth: seller.dateOfBirth,
-        createdAt: seller.createdAt,
-        createdBy: seller.createdBy ? {
-          _id: seller.createdBy._id,
-          firstName: seller.createdBy.firstName,
-          lastName: seller.createdBy.lastName,
-          email: seller.createdBy.email,
-          role: seller.createdBy.role,
-        } : null,
-      })),
-    };
+  const response = {
+    count: pendingSellers.length,
+    pendingSellers: pendingSellers.map(seller => ({
+      _id: seller._id,
+      firstName: seller.firstName,
+      lastName: seller.lastName,
+      email: seller.email,
+      dateOfBirth: seller.dateOfBirth,
+      createdAt: seller.createdAt,
+      createdBy: seller.createdBy ? {
+        _id: seller.createdBy._id,
+        firstName: seller.createdBy.firstName,
+        lastName: seller.createdBy.lastName,
+        email: seller.createdBy.email,
+        role: seller.createdBy.role,
+      } : null,
+    })),
+  };
 
-    res.json(response);
-  } catch (error) {
-    throw error;
-  }
+  res.json(response);
 };
 
 const deactivateSeller = async(req, res) => {
-  try {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    const seller = await Seller.findById(id);
-    if (!seller) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'Seller not found',
-        statusCode: 404,
-      });
-    }
-
-    await Seller.deleteOne({ _id: id });
-    res.status(204).send();
-  } catch (error) {
-    throw error;
+  const seller = await Seller.findById(id);
+  if (!seller) {
+    return res.status(404).json({
+      error: 'Not Found',
+      message: 'Seller not found',
+      statusCode: 404,
+    });
   }
+
+  await Seller.deleteOne({ _id: id });
+  res.status(204).send();
 };
 
 module.exports = {

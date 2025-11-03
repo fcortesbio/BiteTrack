@@ -1,15 +1,8 @@
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   // Log error with request context
   const timestamp = new Date().toISOString();
-  const requestInfo = {
-    method: req.method,
-    url: req.originalUrl,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    timestamp,
-  };
   
   console.error(`\n🚨 ERROR [${timestamp}]`);
   console.error('📍 Request:', `${req.method} ${req.originalUrl}`);
@@ -22,12 +15,12 @@ const errorHandler = (err, req, res, next) => {
   }
   
   // Sanitize error for response (don't expose sensitive information)
-  const sanitizeError = (error) => {
+  const sanitizeError = (_error) => {
     if (isDevelopment) {
-      return error; // Show full error in development
+      return _error; // Show full error in development
     }
     // In production, sanitize potentially sensitive information
-    const sanitized = { ...error };
+    const sanitized = { ..._error };
     delete sanitized.stack;
     return sanitized;
   };

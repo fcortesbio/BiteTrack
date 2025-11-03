@@ -1,10 +1,5 @@
 const Sale = require('../models/Sale');
-const Product = require('../models/Product');
-const Customer = require('../models/Customer');
-const mongoose = require('mongoose');
 const csv = require('fast-csv');
-const fs = require('fs');
-const path = require('path');
 
 /**
  * Generate comprehensive sales analytics for a given time period
