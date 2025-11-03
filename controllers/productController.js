@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const mongoose = require('mongoose');
 
 const listProducts = async(req, res) => {
   const products = await Product.find({});
@@ -23,6 +24,15 @@ const updateProduct = async(req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
+  // Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Invalid product ID format',
+      statusCode: 400,
+    });
+  }
+
   const product = await Product.findByIdAndUpdate(
     id,
     updates,
@@ -42,6 +52,15 @@ const updateProduct = async(req, res) => {
 
 const deleteProduct = async(req, res) => {
   const { id } = req.params;
+
+  // Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({
+      error: 'Bad Request',
+      message: 'Invalid product ID format',
+      statusCode: 400,
+    });
+  }
 
   const product = await Product.findById(id);
   if (!product) {

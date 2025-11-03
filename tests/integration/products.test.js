@@ -291,8 +291,7 @@ describe("Product Management Routes", () => {
         .set("Authorization", `Bearer ${authToken}`);
 
       // Assert
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("message");
+      expect(response.status).toBe(204);
 
       // Verify deletion
       const deleted = await Product.findById(product._id);
@@ -314,7 +313,8 @@ describe("Product Management Routes", () => {
         .delete("/bitetrack/products/invalid-id")
         .set("Authorization", `Bearer ${authToken}`);
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain("Invalid product ID");
     });
   });
 
