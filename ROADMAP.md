@@ -144,11 +144,74 @@ GET  /bitetrack/health                          # System monitoring and status
 
 ---
 
-## 🎯 **STRATEGIC PIVOT: UI-FIRST DEVELOPMENT APPROACH**
+## 🎯 **STRATEGIC PIVOT: MODERNIZATION BEFORE UX**
 
-> **🚨 UPDATED STRATEGIC FOCUS**: Your backend is **90% UI-ready**. Time to build the user experience that showcases your technical excellence.
+> **🚨 NEW STRATEGIC FOCUS**: Before building the UX, modernize the codebase with ES Modules and add AI-powered conversational interface for competitive advantage.
 
-### 🔥 **Phase 1: Frontend Foundation (Priority 1 - Next 2 weeks)**
+### 🔄 **Phase 0: Critical Modernization (Priority 1 - Weeks 1-4)**
+
+#### **Milestone 0.1: CommonJS → ES Modules Migration** 🔴 **CRITICAL** (Weeks 1-2)
+
+**Status**: 🔴 **REQUIRED BEFORE UX DEVELOPMENT**
+
+**Strategic Impact:**
+- **Future-Proof Codebase** - Modern JavaScript standard for next 5+ years
+- **Better Tooling** - Improved IDE support, static analysis, tree-shaking
+- **Frontend Compatibility** - Native browser ESM support for Next.js integration
+- **TypeScript Path** - Easier migration to TypeScript if needed
+- **Bundle Optimization** - Better dead code elimination
+
+**Implementation Timeline:** 10 days
+1. **Days 1-2**: Package configuration (package.json, Jest, ESLint)
+2. **Days 3-5**: Core modules migration (utils, models, middleware, controllers)
+3. **Days 6-8**: Testing & validation (all 204 tests must pass)
+4. **Days 9-10**: Documentation updates
+
+**Success Criteria:**
+- ✅ All 204 tests passing with ES modules
+- ✅ No `require()` statements remain
+- ✅ Docker builds successfully
+- ✅ Zero breaking changes to API
+
+**See: [MIGRATION-ROADMAP.md](MIGRATION-ROADMAP.md) for detailed implementation**
+
+---
+
+#### **Milestone 0.2: MCP + Gemini AI Integration** 🤖 **GAME-CHANGER** (Weeks 3-4)
+
+**Status**: 🔴 **REQUIRED BEFORE UX DEVELOPMENT**
+
+**Strategic Impact:**
+- **Conversational Business Operations** - Natural language interface for all API endpoints
+- **Competitive Differentiation** - AI-powered POS system (unique in market)
+- **Reduced Learning Curve** - Non-technical users can operate via chat
+- **Enhanced UX Foundation** - Chat interface ready for frontend integration
+- **Future AI Features** - Foundation for predictive analytics, recommendations
+
+**Implementation Timeline:** 14 days
+1. **Days 1-3**: MCP architecture design and server setup
+2. **Days 4-6**: Gemini API integration and chat endpoint
+3. **Days 7-10**: Tool definitions for all 40+ endpoints
+4. **Days 11-14**: Security, testing, and refinement
+
+**Core Features:**
+- **Sales Operations**: "Create a sale for John with 2 coffees" → Executed
+- **Analytics Queries**: "Show me this week's top products" → Instant insights
+- **Inventory Checks**: "Do we have enough milk?" → Real-time stock info
+- **Customer Lookup**: "Find customer by phone 555-1234" → Customer details
+- **Waste Management**: "Record 5 expired sandwiches" → Compliance logged
+
+**Success Criteria:**
+- ✅ Users can chat naturally with API (20+ scenarios tested)
+- ✅ All core business operations accessible via chat
+- ✅ Role-based security enforced (user/admin/superadmin)
+- ✅ Rate limiting and cost controls implemented
+
+**See: [MIGRATION-ROADMAP.md](MIGRATION-ROADMAP.md) for detailed implementation**
+
+---
+
+### 🔥 **Phase 1: Frontend Foundation (Priority 2 - Weeks 5-6)**
 
 #### **1. Frontend Architecture Setup (3-4 days)**
 

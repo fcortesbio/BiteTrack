@@ -1958,11 +1958,11 @@ paths:
         - name: startDate
           in: query
           schema: { type: string, format: date-time }
-          description: Analytics period start date (default: 30 days ago)
+          description: "Analytics period start date (default: 30 days ago)"
         - name: endDate
           in: query
           schema: { type: string, format: date-time }
-          description: Analytics period end date (default: now)
+          description: "Analytics period end date (default: now)"
         - name: productId
           in: query
           schema: { type: string }
