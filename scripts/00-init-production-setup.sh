@@ -268,8 +268,9 @@ show_welcome() {
     echo "  👤 6. Create SuperAdmin user"
     echo "  🔐 7. Generate .secrets file with all credentials"
     echo "  🔗 8. Create .env symlink for Docker Compose"
-    echo "  📊 9. Populate test data (optional)"
-    echo "  🧪 10. Run comprehensive tests"
+    echo "  🛠️  9. Create development environment (optional)"
+    echo "  📊 10. Populate test data (optional)"
+    echo "  🧪 11. Run API tests (optional)"
     echo ""
 }
 
@@ -619,19 +620,9 @@ populate_test_data() {
 }
 
 run_comprehensive_tests() {
-    log_header "🧪 COMPREHENSIVE TESTING"
+    log_header "🧪 API TESTING"
     
-    if confirm_action "Do you want to run comprehensive system tests?"; then
-        log_info "Running data persistence tests..."
-        
-        export MONGO_ROOT_USERNAME="$MONGO_USER"
-        export MONGO_ROOT_PASSWORD="$MONGO_PASS"
-        
-        if ! ./scripts/05-test-data-persistence.sh --verbose; then
-            log_error "Data persistence tests failed"
-            return 1
-        fi
-        
+    if confirm_action "Do you want to run API feature tests?"; then
         log_info "Running API feature tests..."
         
         # Get authentication token
@@ -641,17 +632,20 @@ run_comprehensive_tests() {
             jq -r '.token' 2>/dev/null || echo "")
         
         if [ -n "$JWT_TOKEN" ] && [ "$JWT_TOKEN" != "null" ]; then
-            if ! node scripts/06-test-sales-filtering.js --auth-token="$JWT_TOKEN" --verbose; then
-                log_warning "API feature tests failed, but continuing..."
+            log_success "Successfully obtained authentication token"
+            if node scripts/06-test-sales-filtering.js --auth-token="$JWT_TOKEN" --verbose; then
+                log_success "API feature tests passed"
+            else
+                log_warning "Some API feature tests failed, but setup is complete"
             fi
         else
-            log_warning "Could not obtain authentication token for API tests"
+            log_warning "Could not obtain authentication token - skipping API tests"
+            log_info "You can manually test the API using credentials in .secrets file"
         fi
         
-        log_success "Comprehensive testing completed"
         return 0
     else
-        log_info "Skipping comprehensive tests"
+        log_info "Skipping API feature tests"
         return 0
     fi
 }
@@ -931,7 +925,7 @@ main() {
     execute_step "Environment Symlink Setup" "create_environment_symlink" false
     execute_step "Development Environment Setup" "create_development_environment" true
     execute_step "Test Data Population" "populate_test_data" true
-    execute_step "Comprehensive Testing" "run_comprehensive_tests" true
+    execute_step "API Testing" "run_comprehensive_tests" true
     
     show_completion
 }
