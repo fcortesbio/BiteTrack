@@ -44,10 +44,15 @@ while [[ $# -gt 0 ]]; do
             echo "                     ADMIN_DOB (YYYY-MM-DD), ADMIN_PASSWORD"
             echo "  --help            Show this help message"
             echo ""
+            echo "Prerequisites:"
+            echo "- Docker and Docker Compose running"
+            echo "- MongoDB container is healthy"
+            echo "- Python 3 with bcrypt module installed"
+            echo ""
             echo "This script will:"
             echo "1. Prompt for superadmin user details (or use env vars)"
             echo "2. Validate all input data"
-            echo "3. Hash the password using bcrypt"
+            echo "3. Hash the password using bcrypt (compatible with Node.js bcryptjs)"
             echo "4. Insert the user directly into MongoDB"
             echo "5. Verify the user was created successfully"
             exit 0
@@ -115,9 +120,44 @@ check_prerequisites() {
         exit 1
     fi
     
-    # Check bcrypt availability (using Python as it's more universally available than Node.js)
+    # Check Python availability
     if ! command -v python3 &> /dev/null && ! command -v python &> /dev/null; then
         log_error "Python is required for password hashing but not found"
+        exit 1
+    fi
+    
+    # Check bcrypt availability - REQUIRED (no fallback)
+    local python_cmd="python3"
+    if ! command -v python3 &> /dev/null; then
+        python_cmd="python"
+    fi
+    
+    if ! $python_cmd -c "import bcrypt" 2>/dev/null; then
+        log_error "Python bcrypt module is required but not installed"
+        log_error ""
+        log_error "Please install bcrypt using one of the following commands:"
+        log_error ""
+        
+        # Detect OS and suggest appropriate installation command
+        if [ -f /etc/arch-release ]; then
+            log_error "  For Arch Linux:"
+            log_error "    sudo pacman -S python-bcrypt"
+        elif [ -f /etc/debian_version ]; then
+            log_error "  For Debian/Ubuntu:"
+            log_error "    sudo apt-get install python3-bcrypt"
+        elif [ -f /etc/redhat-release ]; then
+            log_error "  For RHEL/CentOS/Fedora:"
+            log_error "    sudo dnf install python3-bcrypt  # or yum"
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            log_error "  For macOS:"
+            log_error "    pip3 install bcrypt"
+        else
+            log_error "  Generic installation:"
+            log_error "    pip3 install bcrypt"
+        fi
+        
+        log_error ""
+        log_error "After installing bcrypt, run this script again."
         exit 1
     fi
     
@@ -128,37 +168,29 @@ check_prerequisites() {
 hash_password() {
     local password="$1"
     
-    # Create a temporary Python script for bcrypt hashing
-    local python_cmd=""
-    if command -v python3 &> /dev/null; then
-        python_cmd="python3"
-    else
+    # Determine Python command
+    local python_cmd="python3"
+    if ! command -v python3 &> /dev/null; then
         python_cmd="python"
     fi
     
-    # Hash password using Python bcrypt (matches Node.js bcrypt with 12 rounds)
+    # Hash password using Python bcrypt (matches Node.js bcryptjs with 12 rounds)
+    # Note: bcrypt module must be installed (checked in prerequisites)
     local hashed_password=$($python_cmd -c "
-import hashlib
-import base64
-import os
-import secrets
+import bcrypt
 
-def bcrypt_hash(password, rounds=12):
-    # Simple bcrypt-compatible hash using PBKDF2 (fallback if bcrypt not available)
-    try:
-        import bcrypt
-        salt = bcrypt.gensalt(rounds=rounds)
-        return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
-    except ImportError:
-        # Fallback to PBKDF2 with similar security
-        salt = secrets.token_bytes(16)
-        key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
-        salt_b64 = base64.b64encode(salt).decode('utf-8')
-        key_b64 = base64.b64encode(key).decode('utf-8')
-        return f'pbkdf2\$100000\${salt_b64}\${key_b64}'
+def hash_password(password, rounds=12):
+    '''Hash password using bcrypt with specified rounds (default 12).'''
+    salt = bcrypt.gensalt(rounds=rounds)
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
-print(bcrypt_hash('$password'))
+print(hash_password('$password'))
 ")
+    
+    if [ -z "$hashed_password" ] || [ "$hashed_password" = "None" ]; then
+        log_error "Failed to generate password hash"
+        exit 1
+    fi
     
     echo "$hashed_password"
 }
