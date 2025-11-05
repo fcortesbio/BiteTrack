@@ -325,7 +325,7 @@ test_full_stack_restart() {
     
     # Start entire stack
     log_info "Starting full stack..."
-    docker compose --env-file "$COMPOSE_ENV_FILE" up -d
+    docker compose --env-file "$COMPOSE_ENV_FILE" up -d --build
     verbose_log "Full stack started"
     
     # Wait for services
@@ -360,7 +360,7 @@ ensure_stack_running() {
     
     if [ "$running_containers" -lt "$total_services" ]; then
         log_info "Stack not fully running, starting services..."
-        docker compose --env-file "$COMPOSE_ENV_FILE" up -d
+        docker compose --env-file "$COMPOSE_ENV_FILE" up -d --build
         wait_for_mongodb
         sleep 5
     else
