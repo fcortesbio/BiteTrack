@@ -1,14 +1,14 @@
-const express = require('express');
-const { body, param, query } = require('express-validator');
-const { authenticate, authorize } = require('../middleware/auth');
-const {
+import express from 'express';
+import { body, param, query } from 'express-validator';
+import { authenticate, authorize } from '../middleware/auth.js';
+import {
   dropInventory,
   undoInventoryDrop,
   listInventoryDrops,
   getUndoableDrops,
   getDropAnalytics,
   getInventoryDropById,
-} = require('../controllers/inventoryDropController');
+} from '../controllers/inventoryDropController.js';
 
 const router = express.Router();
 
@@ -179,4 +179,4 @@ router.get(
   getInventoryDropById,
 );
 
-module.exports = router;
+export default router;

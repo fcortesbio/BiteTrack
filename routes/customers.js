@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
-const { validationRules, validate } = require('../utils/validation');
-const {
+import { authenticate } from '../middleware/auth.js';
+import { validationRules, validate } from '../utils/validation.js';
+import {
   listCustomers,
   createCustomer,
   updateCustomer,
@@ -10,7 +10,7 @@ const {
   getCustomerTransactions,
   importCustomersFromCSV,
   upload,
-} = require('../controllers/customerController');
+} from '../controllers/customerController.js';
 
 // All routes require authentication
 router.use(authenticate);
@@ -25,4 +25,4 @@ router.delete('/:id', deleteCustomer);
 // CSV import route
 router.post('/import', upload.single('csvFile'), importCustomersFromCSV);
 
-module.exports = router;
+export default router;

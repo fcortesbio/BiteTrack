@@ -1,16 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 // Import middleware
-const { authenticate, authorize } = require('../middleware/auth');
+import { authenticate, authorize } from '../middleware/auth.js';
 
 // Import controller functions
-const {
+import {
   populateTestData,
   cleanTestData,
   getTestDataStatus,
   resetToScenario,
-} = require('../controllers/testDataController');
+} from '../controllers/testDataController.js';
 
 /**
  * Test Data Management Routes
@@ -43,4 +43,4 @@ router.delete('/clean', authenticate, authorize('admin', 'superadmin'), cleanTes
 // @body    { scenario: 'clean|minimal|dev|full', confirmReset: true }
 router.post('/reset', authenticate, authorize('superadmin'), resetToScenario);
 
-module.exports = router;
+export default router;
