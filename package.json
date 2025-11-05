@@ -19,21 +19,21 @@
   },
   "license": "MIT",
   "author": "fcortesbio",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "NODE_ENV=development nodemon -r dotenv/config index.js dotenv_config_path=.env.development",
-    "dev:manual": "NODE_ENV=development node -r dotenv/config index.js dotenv_config_path=.env.development",
-    "dev:watch": "NODE_ENV=development nodemon -r dotenv/config index.js dotenv_config_path=.env.development",
+    "dev": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
+    "dev:manual": "NODE_ENV=development node --loader ./config/dotenv.js index.js",
+    "dev:watch": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
     "start:production": "NODE_ENV=production node index.js",
-    "test": "cross-env NODE_OPTIONS='--no-warnings' NODE_ENV=test jest",
-    "test:watch": "cross-env NODE_OPTIONS='--no-warnings' NODE_ENV=test jest --watch",
-    "test:coverage": "cross-env NODE_OPTIONS='--no-warnings' NODE_ENV=test jest --coverage",
-    "test:verbose": "cross-env NODE_OPTIONS='--no-warnings' NODE_ENV=test jest --verbose",
+    "test": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest",
+    "test:watch": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --coverage",
+    "test:verbose": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --verbose",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:check": "eslint . --max-warnings 0"
@@ -75,6 +75,8 @@
   },
   "jest": {
     "testEnvironment": "node",
+    "extensionsToTreatAsEsm": [".js"],
+    "transform": {},
     "setupFilesAfterEnv": [
       "<rootDir>/tests/setup.js"
     ],
