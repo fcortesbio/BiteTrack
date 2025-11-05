@@ -784,6 +784,89 @@ create_environment_symlink() {
     fi
 }
 
+create_development_environment() {
+    log_header "🛠️ DEVELOPMENT ENVIRONMENT SETUP"
+    
+    if ! confirm_action "Do you want to create a development environment file?"; then
+        log_info "Skipping development environment creation"
+        return 0
+    fi
+    
+    log_info "Creating .env.development for local development..."
+    
+    # Find an available port starting from APP_PORT + 1
+    local dev_port=$((APP_PORT + 1))
+    local max_attempts=10
+    local attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if lsof -Pi :$dev_port -sTCP:LISTEN -t >/dev/null 2>&1; then
+            log_info "Port $dev_port is busy, trying next port..."
+            dev_port=$((dev_port + 2))
+            attempt=$((attempt + 1))
+        else
+            log_success "Found available port: $dev_port"
+            break
+        fi
+    done
+    
+    if [ $attempt -eq $max_attempts ]; then
+        log_warning "Could not find available port after $max_attempts attempts"
+        log_info "Using $dev_port anyway - you may need to change it manually"
+    fi
+    
+    # Create development MongoDB URI with localhost
+    local dev_mongo_uri="'mongodb://$MONGO_USER:$MONGO_PASS_ENCODED@localhost:27017/$MONGO_DB?authSource=admin&directConnection=true'"
+    
+    cat > ".env.development" << EOF
+NODE_ENV=development
+PORT=$dev_port
+
+# MongoDB Configuration - Development (connects to localhost)
+# Use this when running the API locally outside Docker
+MONGO_URI=$dev_mongo_uri
+
+# Separate credentials (same as production)
+MONGO_ROOT_USERNAME=$MONGO_USER
+MONGO_ROOT_PASSWORD=$MONGO_PASS
+
+# JWT Configuration - Development
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRES_IN=$JWT_EXPIRES
+
+# CORS Configuration - Development
+FRONTEND_URLS=$FRONTEND_URLS
+
+# Development Settings
+DEBUG=true
+LOG_LEVEL=debug
+
+# Security Settings
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# Notes:
+# - This file is for LOCAL development (API running outside Docker)
+# - Uses localhost:27017 to connect to MongoDB in Docker
+# - Production uses mongodb:27017 (Docker service name)
+# - Port is set to $dev_port to avoid conflict with production ($APP_PORT)
+EOF
+    
+    chmod 600 ".env.development"
+    log_success "Development environment created: .env.development"
+    log_info "Development API port: $dev_port"
+    log_info "MongoDB connection: localhost:27017 (for local development)"
+    
+    echo ""
+    log_info "${YELLOW}To use the development environment:${NC}"
+    echo "  1. Stop Docker containers if running: docker compose down"
+    echo "  2. Start only MongoDB: docker compose up -d mongodb"
+    echo "  3. Run API locally: npm run dev"
+    echo "  4. API will be available at: http://localhost:$dev_port"
+    
+    return 0
+}
+
 show_completion() {
     log_header "🎉 PRODUCTION SETUP COMPLETED"
     
@@ -846,6 +929,7 @@ main() {
     execute_step "SuperAdmin User Creation" "create_superadmin" false
     execute_step "Secrets File Creation" "create_secrets_file" false
     execute_step "Environment Symlink Setup" "create_environment_symlink" false
+    execute_step "Development Environment Setup" "create_development_environment" true
     execute_step "Test Data Population" "populate_test_data" true
     execute_step "Comprehensive Testing" "run_comprehensive_tests" true
     
