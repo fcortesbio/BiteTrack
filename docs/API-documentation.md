@@ -607,7 +607,94 @@ GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
 }
 ```
 
-### ❌ Remove Customer
+### 📊 Import Customers from CSV
+
+**Endpoint:** `POST /customers/import`
+
+**Description:** Bulk import customers from a CSV file.
+
+**Request Headers:**
+
+```
+Authorization: Bearer <jwt_token>
+Content-Type: multipart/form-data
+```
+
+**Request Body:**
+
+- `csvFile` (required): CSV file with customer data
+
+**CSV Format:**
+
+```csv
+firstName,lastName,phoneNumber,email
+John,Doe,+1-555-0101,john.doe@email.com
+Jane,Smith,+1-555-0102,jane.smith@email.com
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "message": "CSV import successful",
+  "imported": 2,
+  "failed": 0,
+  "customers": [
+    {
+      "id": "507f1f77bcf86cd799439022",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phoneNumber": "+1-555-0101",
+      "email": "john.doe@email.com",
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-16T10:00:00.000Z",
+      "lastTransaction": null
+    },
+    {
+      "id": "507f1f77bcf86cd799439023",
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "phoneNumber": "+1-555-0102",
+      "email": "jane.smith@email.com",
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-16T10:00:00.000Z",
+      "lastTransaction": null
+    }
+  ],
+  "errors": []
+}
+```
+
+**Error Response with Partial Success:**
+
+```json
+{
+  "message": "CSV import completed with errors",
+  "imported": 1,
+  "failed": 1,
+  "customers": [
+    {
+      "id": "507f1f77bcf86cd799439022",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phoneNumber": "+1-555-0101",
+      "email": "john.doe@email.com",
+      "createdAt": "2024-01-16T10:00:00.000Z",
+      "updatedAt": "2024-01-16T10:00:00.000Z",
+      "lastTransaction": null
+    }
+  ],
+  "errors": [
+    {
+      "row": 2,
+      "email": "invalid-email",
+      "error": "Invalid email format"
+    }
+  ]
+}
+```
+
+### ➖ Delete Customer
 
 **Endpoint:** `DELETE /customers/{id}`
 
@@ -1119,6 +1206,116 @@ Authorization: Bearer <jwt_token>
   "settled": true,
   "createdAt": "2024-01-15T15:30:00.000Z",
   "updatedAt": "2024-01-15T22:30:00.000Z"
+}
+```
+
+### 📊 Import Sales from CSV
+
+**Endpoint:** `POST /sales/import`
+
+**Description:** Bulk import sales transactions from a CSV file. Automatically decrements inventory.
+
+**Request Headers:**
+
+```
+Authorization: Bearer <jwt_token>
+Content-Type: multipart/form-data
+```
+
+**Request Body:**
+
+- `csvFile` (required): CSV file with sales data
+
+**CSV Format:**
+
+```csv
+customerId,productId,quantity,amountPaid
+507f1f77bcf86cd799439020,507f1f77bcf86cd799439030,2,25.98
+507f1f77bcf86cd799439020,507f1f77bcf86cd799439031,1,9.99
+```
+
+**Note:** Multiple rows with the same customerId can be grouped into a single sale transaction.
+
+**Response (200 OK):**
+
+```json
+{
+  "message": "CSV import successful",
+  "imported": 2,
+  "failed": 0,
+  "sales": [
+    {
+      "id": "507f1f77bcf86cd799439042",
+      "customerId": "507f1f77bcf86cd799439020",
+      "sellerId": "507f1f77bcf86cd799439011",
+      "products": [
+        {
+          "productId": "507f1f77bcf86cd799439030",
+          "quantity": 2,
+          "priceAtSale": 12.99
+        }
+      ],
+      "totalAmount": 25.98,
+      "amountPaid": 25.98,
+      "settled": true,
+      "createdAt": "2024-01-16T10:30:00.000Z",
+      "updatedAt": "2024-01-16T10:30:00.000Z"
+    },
+    {
+      "id": "507f1f77bcf86cd799439043",
+      "customerId": "507f1f77bcf86cd799439020",
+      "sellerId": "507f1f77bcf86cd799439011",
+      "products": [
+        {
+          "productId": "507f1f77bcf86cd799439031",
+          "quantity": 1,
+          "priceAtSale": 9.99
+        }
+      ],
+      "totalAmount": 9.99,
+      "amountPaid": 9.99,
+      "settled": true,
+      "createdAt": "2024-01-16T10:30:00.000Z",
+      "updatedAt": "2024-01-16T10:30:00.000Z"
+    }
+  ],
+  "errors": []
+}
+```
+
+**Error Response with Partial Success:**
+
+```json
+{
+  "message": "CSV import completed with errors",
+  "imported": 1,
+  "failed": 1,
+  "sales": [
+    {
+      "id": "507f1f77bcf86cd799439042",
+      "customerId": "507f1f77bcf86cd799439020",
+      "sellerId": "507f1f77bcf86cd799439011",
+      "products": [
+        {
+          "productId": "507f1f77bcf86cd799439030",
+          "quantity": 2,
+          "priceAtSale": 12.99
+        }
+      ],
+      "totalAmount": 25.98,
+      "amountPaid": 25.98,
+      "settled": true,
+      "createdAt": "2024-01-16T10:30:00.000Z",
+      "updatedAt": "2024-01-16T10:30:00.000Z"
+    }
+  ],
+  "errors": [
+    {
+      "row": 2,
+      "productId": "507f1f77bcf86cd799439031",
+      "error": "Insufficient stock"
+    }
+  ]
 }
 ```
 

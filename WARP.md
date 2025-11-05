@@ -6,7 +6,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 BiteTrack is a **production-ready Enterprise Business Intelligence Platform** for food businesses built with Node.js, Express, and MongoDB. It has evolved from a simple API into a comprehensive business management platform with advanced analytics, regulatory compliance, and professional development infrastructure.
 
-**🚀 Current Status**: **v2.0+ Enterprise Platform** (36 endpoints across 9 business categories)
+**🚀 Current Status**: **v2.0+ Enterprise Platform** (38 endpoints across 9 business categories)
 
 **🎯 Core Platform Capabilities:**
 - **Business Intelligence & Analytics**: Advanced sales reporting with time-series data
@@ -147,7 +147,7 @@ BiteTrack/
 │   ├── reportingController.js # 🆕 Business intelligence & analytics
 │   ├── inventoryDropController.js # 🆕 Food waste management
 │   └── testDataController.js  # 🆕 Professional testing infrastructure
-├── routes/             # API endpoint definitions (9 categories, 36+ endpoints)
+├── routes/             # API endpoint definitions (9 categories, 38 endpoints)
 ├── middleware/         # Authentication, validation, error handling
 ├── utils/              # JWT generation, validation helpers
 ├── config/             # 🆕 Professional configuration management
@@ -229,7 +229,7 @@ BiteTrack/
 **Professional Swagger UI integration:**
 - **Dynamic OpenAPI loading** from existing YAML specification with error handling
 - **Custom branded interface** with BiteTrack styling and comprehensive getting started guide
-- **Interactive testing environment** for all 36 endpoints with JWT authentication flow
+- **Interactive testing environment** for all 38 endpoints with JWT authentication flow
 - **Professional presentation** with endpoint categorization and search capabilities
 - **Developer experience enhancements** including persistent authorization and request examples
 
@@ -260,7 +260,7 @@ BiteTrack/
 - `Sale.products[].productId` → `Product._id`
 - `PasswordResetToken.sellerId` → `Seller._id`
 
-## 📊 Enterprise API Structure (36+ Endpoints)
+## 📊 Enterprise API Structure (38 Endpoints)
 
 **Base URL:** `http://localhost:3000/bitetrack`
 
@@ -281,6 +281,7 @@ BiteTrack/
 ### 🏪 **Customer Relationship Management** (`/customers/*`)
 - `GET /customers` - Customer database with transaction history
 - `POST /customers` - Customer registration and profile creation
+- `POST /customers/import` - Bulk customer import via CSV upload
 - `GET /customers/{id}/transactions` - Complete purchase history with analytics
 - `PATCH /customers/{id}` - Customer information updates
 - `DELETE /customers/{id}` - Customer record management
@@ -294,6 +295,7 @@ BiteTrack/
 ### 💳 **Sales & Transaction Processing** (`/sales/*`)
 - `GET /sales` - Advanced sales analytics with filtering, pagination, and sorting
 - `POST /sales` - Atomic transaction processing with inventory management
+- `POST /sales/import` - Bulk sales import via CSV upload
 - `GET /sales/{id}` - Detailed transaction information
 - `PATCH /sales/{id}/settle` - Payment settlement and tracking
 
@@ -371,7 +373,7 @@ Sales creation automatically:
 - **Getting Started Guide:** `http://localhost:3000/` - API overview and quick start
 
 ### 📄 **Comprehensive Documentation**
-- **Complete API Reference:** `docs/API-documentation.md` - All 36+ endpoints documented
+- **Complete API Reference:** `docs/API-documentation.md` - All 38 endpoints documented
 - **OpenAPI 3.1 Specification:** `docs/openapi.yaml` - Professional API specification
 - **Postman Collection:** `docs/postman-collection.json` - Ready-to-use API testing
 - **Strategic Roadmap:** `ROADMAP.md` - Development planning and priorities
@@ -393,4 +395,4 @@ Sales creation automatically:
 - **Professional Logging:** Morgan middleware with request/response tracking
 - **Security Monitoring:** Rate limiting, authentication, and authorization audit trails
 
-**🎆 Platform Status**: Production-ready enterprise business intelligence platform with 36+ endpoints across 9 business categories, comprehensive testing infrastructure, and professional documentation portal!
+**🎆 Platform Status**: Production-ready enterprise business intelligence platform with 38 endpoints across 9 business categories, comprehensive testing infrastructure, and professional documentation portal!

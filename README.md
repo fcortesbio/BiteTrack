@@ -9,9 +9,9 @@ BiteTrack is a **production-ready business intelligence platform** that transfor
 
 ## 🏆 **Current Status: Enterprise Backend Complete - UI Development Ready**
 
-> 🚀 **Strategic Position**: The backend platform is **90% UI-ready** with 36 professional endpoints, advanced analytics, compliance features, and multi-role security. **Frontend development is the next strategic phase.**
+> 🚀 **Strategic Position**: The backend platform is **90% UI-ready** with 38 professional endpoints, advanced analytics, compliance features, and multi-role security. **Frontend development is the next strategic phase.**
 
-🗺️ **[View Complete UI Development Roadmap](ROADMAP.md)** | 📊 **[Explore All 36 API Endpoints](docs/API-documentation.md)**
+🗺️ **[View Complete UI Development Roadmap](ROADMAP.md)** | 📊 **[Explore All 38 API Endpoints](docs/API-documentation.md)**
 
 ---
 
@@ -40,7 +40,7 @@ Small food businesses struggle with:
 ### ✨ **The BiteTrack Solution**
 
 - 📊 **Advanced Business Intelligence** - Time-series analytics, customer behavior insights
-- 🚀 **36 Professional API Endpoints** - Complete business operations coverage
+- 🚀 **38 Professional API Endpoints** - Complete business operations coverage
 - 🔐 **Multi-Role Security** - User/Admin/SuperAdmin with JWT authentication
 - 💰 **Financial Management** - Sales tracking, settlement monitoring, payment analytics
 - 🗑️ **Regulatory Compliance** - Food waste tracking with audit trails
@@ -360,6 +360,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **Payment tracking** - Monitor settled vs. pending payments
 - **Sales history** - Complete transaction audit trail
 - **Advanced sales filtering** - Date ranges, pagination, sorting, and search
+- **CSV import capabilities** - Bulk import for sales and customer data
 - **Customer transaction history** - Detailed purchase tracking per customer
 
 ### 📊 **Business Intelligence & Reporting**
@@ -404,9 +405,9 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 | **🔐 Auth** | `/auth/*` | Login, activate accounts, password recovery |
 | **🔎 Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
 | **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
-| **🏪 Customers** | `/customers/*` | Customer database, contact info, transaction history |
+| **🏪 Customers** | `/customers/*` | Customer database, CSV import, contact info, transaction history |
 | **📦 Products** | `/products/*` | Inventory management, pricing, and catalog |
-| **💳 Sales** | `/sales/*` | Process orders, advanced filtering, payment tracking |
+| **💳 Sales** | `/sales/*` | Process orders, CSV import, advanced filtering, payment tracking |
 | **📊 Reporting** | `/reporting/*` | **NEW:** Sales analytics, CSV exports, business intelligence |
 | **🗑️ Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
 | **🧪 Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
@@ -907,14 +908,14 @@ docker compose exec mongodb mongoexport \
 
 ## 🚀 **Strategic Roadmap: UI-First Development**
 
-> 🏆 **ACHIEVEMENT**: Enterprise backend **100% complete** with 36 professional endpoints  
+> 🏆 **ACHIEVEMENT**: Enterprise backend **100% complete** with 38 professional endpoints
 > 🔄 **STRATEGIC PIVOT**: Now focusing on **frontend development** to create complete business solution
 
 🗺️ **[Complete UI Development Roadmap](ROADMAP.md)** - Detailed frontend implementation plan
 
 ### ✅ **Backend Foundation (v2.0+ Complete)**
 
-- ✅ **Enterprise API Platform** - 36 endpoints across 9 business categories
+- ✅ **Enterprise API Platform** - 38 endpoints across 9 business categories
 - ✅ **Advanced Analytics & Reporting** - Time-series data, CSV exports, business intelligence  
 - ✅ **Multi-Role Security** - JWT authentication with User/Admin/SuperAdmin roles
 - ✅ **Compliance & Waste Management** - Food safety tracking with audit trails
@@ -925,7 +926,7 @@ docker compose exec mongodb mongoexport \
 
 - [ ] **Next.js + TypeScript Setup** - Modern React architecture with TailwindCSS
 - [ ] **Core Business UI** - Seller dashboard, sales entry, customer management
-- [ ] **API Integration Layer** - React Query hooks for all 36 endpoints  
+- [ ] **API Integration Layer** - React Query hooks for all 38 endpoints
 - [ ] **Business Intelligence Dashboard** - Charts and analytics leveraging advanced reporting APIs
 - [ ] **Admin & Compliance Interface** - Multi-role UI for enterprise features
 
