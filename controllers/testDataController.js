@@ -1,8 +1,8 @@
-const TestDataPopulator = require('../scripts/04-populate-test-data');
-const Customer = require('../models/Customer');
-const Product = require('../models/Product');
-const Sale = require('../models/Sale');
-const PendingSeller = require('../models/PendingSeller');
+import TestDataPopulator from '../scripts/04-populate-test-data.js';
+import Customer from '../models/Customer.js';
+import Product from '../models/Product.js';
+import Sale from '../models/Sale.js';
+import PendingSeller from '../models/PendingSeller.js';
 
 /**
  * Test Data Management Controller
@@ -386,7 +386,7 @@ const resetToScenario = async(req, res) => {
   }
 };
 
-module.exports = {
+export {
   populateTestData,
   cleanTestData,
   getTestDataStatus,
