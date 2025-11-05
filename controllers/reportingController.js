@@ -1,5 +1,5 @@
-const Sale = require('../models/Sale');
-const csv = require('fast-csv');
+import Sale from '../models/Sale.js';
+import csv from 'fast-csv';
 
 /**
  * Generate comprehensive sales analytics for a given time period
@@ -466,7 +466,7 @@ const getGroupByDateExpression = (groupBy, dateField) => {
   }
 };
 
-module.exports = {
+export {
   getSalesAnalytics,
   exportSalesCSV,
 };
