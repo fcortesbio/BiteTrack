@@ -1,10 +1,10 @@
-const Sale = require('../models/Sale');
-const Product = require('../models/Product');
-const Customer = require('../models/Customer');
-const mongoose = require('mongoose');
-const csv = require('csv-parser');
-const multer = require('multer');
-const { Readable } = require('stream');
+import Sale from '../models/Sale.js';
+import Product from '../models/Product.js';
+import Customer from '../models/Customer.js';
+import mongoose from 'mongoose';
+import csv from 'csv-parser';
+import multer from 'multer';
+import { Readable } from 'stream';
 
 const listSales = async(req, res, next) => {
   try {
@@ -664,7 +664,7 @@ const uploadCSV = multer({
   },
 });
 
-module.exports = {
+export {
   listSales,
   createSale,
   getSale,
