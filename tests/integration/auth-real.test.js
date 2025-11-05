@@ -2,12 +2,12 @@
  * BiteTrack Authentication Routes Integration Tests
  * Tests for actual available authentication endpoints
  */
-const request = require("supertest");
-const app = require("../../testApp");
-const Seller = require("../../models/Seller");
-const PendingSeller = require("../../models/PendingSeller");
-const PasswordResetToken = require("../../models/PasswordResetToken");
-const bcrypt = require("bcryptjs");
+import request from 'supertest';
+import app from '../../testApp.js';
+import Seller from '../../models/Seller.js';
+import PendingSeller from '../../models/PendingSeller.js';
+import PasswordResetToken from '../../models/PasswordResetToken.js';
+import bcrypt from 'bcryptjs';
 
 describe("BiteTrack Authentication Routes", () => {
   describe("POST /bitetrack/auth/login", () => {

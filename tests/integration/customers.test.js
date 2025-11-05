@@ -2,12 +2,12 @@
  * Customer Management Routes Integration Tests
  * Tests all customer management endpoints
  */
-const request = require("supertest");
-const app = require("../../testApp");
-const Customer = require("../../models/Customer");
-const Seller = require("../../models/Seller");
-const Sale = require("../../models/Sale");
-const Product = require("../../models/Product");
+import request from 'supertest';
+import app from '../../testApp.js';
+import Customer from '../../models/Customer.js';
+import Seller from '../../models/Seller.js';
+import Sale from '../../models/Sale.js';
+import Product from '../../models/Product.js';
 
 describe("Customer Management Routes", () => {
   let authToken;

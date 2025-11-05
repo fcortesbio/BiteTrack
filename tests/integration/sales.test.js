@@ -2,12 +2,12 @@
  * Sales Transaction Routes Integration Tests
  * Tests all sales management endpoints
  */
-const request = require("supertest");
-const app = require("../../testApp");
-const Sale = require("../../models/Sale");
-const Product = require("../../models/Product");
-const Customer = require("../../models/Customer");
-const Seller = require("../../models/Seller");
+import request from 'supertest';
+import app from '../../testApp.js';
+import Sale from '../../models/Sale.js';
+import Product from '../../models/Product.js';
+import Customer from '../../models/Customer.js';
+import Seller from '../../models/Seller.js';
 
 describe("Sales Transaction Routes", () => {
   let authToken;

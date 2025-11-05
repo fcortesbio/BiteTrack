@@ -2,11 +2,11 @@
  * Inventory Drop System Integration Tests
  * Tests all food waste management endpoints
  */
-const request = require("supertest");
-const app = require("../../testApp");
-const InventoryDrop = require("../../models/InventoryDrop");
-const Product = require("../../models/Product");
-const Seller = require("../../models/Seller");
+import request from 'supertest';
+import app from '../../testApp.js';
+import InventoryDrop from '../../models/InventoryDrop.js';
+import Product from '../../models/Product.js';
+import Seller from '../../models/Seller.js';
 
 describe("Inventory Drop System Routes", () => {
   let adminToken;

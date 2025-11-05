@@ -2,10 +2,10 @@
  * Products Routes Integration Tests
  * Tests all product management endpoints
  */
-const request = require("supertest");
-const app = require("../../testApp");
-const Product = require("../../models/Product");
-const Seller = require("../../models/Seller");
+import request from 'supertest';
+import app from '../../testApp.js';
+import Product from '../../models/Product.js';
+import Seller from '../../models/Seller.js';
 
 describe("Product Management Routes", () => {
   let authToken;
