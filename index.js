@@ -1,26 +1,26 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const morgan = require('morgan');
+import './config/dotenv.js';
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const sellerRoutes = require('./routes/sellers');
-const customerRoutes = require('./routes/customers');
-const productRoutes = require('./routes/products');
-const salesRoutes = require('./routes/sales');
-const inventoryDropRoutes = require('./routes/inventoryDrops');
-const testDataRoutes = require('./routes/testDataRoutes');
-const reportingRoutes = require('./routes/reporting');
+import authRoutes from './routes/auth.js';
+import sellerRoutes from './routes/sellers.js';
+import customerRoutes from './routes/customers.js';
+import productRoutes from './routes/products.js';
+import salesRoutes from './routes/sales.js';
+import inventoryDropRoutes from './routes/inventoryDrops.js';
+import testDataRoutes from './routes/testDataRoutes.js';
+import reportingRoutes from './routes/reporting.js';
 
 // Import middleware
-const errorHandler = require('./middleware/errorHandler');
+import errorHandler from './middleware/errorHandler.js';
 
 // Import Swagger documentation configuration
-const { setupSwaggerUI } = require('./config/swagger');
+import { setupSwaggerUI } from './config/swagger.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -285,4 +285,4 @@ const server = app.listen(PORT, () => {
   console.log('\n✨ Server ready - Happy coding! ✨\n');
 });
 
-module.exports = app;
+export default app;
