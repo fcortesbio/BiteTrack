@@ -19,6 +19,7 @@
 
 import mongoose from 'mongoose';
 import fs from 'fs/promises';
+import { accessSync } from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -62,7 +63,7 @@ class TestDataPopulator {
       try {
         // Check if env file exists synchronously (required for script initialization)
         // eslint-disable-next-line no-sync
-        await import('fs').then(m => m.accessSync(envPath));
+        accessSync(envPath);
         
         // Load the environment file
         dotenv.config({ path: envPath });
@@ -77,7 +78,7 @@ class TestDataPopulator {
       
       try {
         // eslint-disable-next-line no-sync
-        await import('fs').then(m => m.accessSync(defaultEnvPath));
+        accessSync(defaultEnvPath);
         dotenv.config({ path: defaultEnvPath });
         this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);
       } catch {
