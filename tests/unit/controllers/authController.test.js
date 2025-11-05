@@ -6,12 +6,21 @@
 import { jest } from '@jest/globals';
 
 // Mock modules before importing
-jest.unstable_mockModule('../../../models/Seller.js', () => ({
-  default: {
-    findOne: jest.fn(),
-    findById: jest.fn(),
-  },
-}));
+jest.unstable_mockModule('../../../models/Seller.js', () => {
+  // Create a mock constructor function
+  const SellerMock = jest.fn(function() {
+    // Instance methods
+    this.save = jest.fn().mockResolvedValue(this);
+    this.toJSON = jest.fn().mockReturnValue({});
+    return this;
+  });
+  
+  // Static methods
+  SellerMock.findOne = jest.fn();
+  SellerMock.findById = jest.fn();
+  
+  return { default: SellerMock };
+});
 
 jest.unstable_mockModule('../../../models/PendingSeller.js', () => ({
   default: {
@@ -19,9 +28,20 @@ jest.unstable_mockModule('../../../models/PendingSeller.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../models/PasswordResetToken.js', () => ({
-  default: jest.fn(),
-}));
+jest.unstable_mockModule('../../../models/PasswordResetToken.js', () => {
+  // Create a mock constructor function
+  const PasswordResetTokenMock = jest.fn(function() {
+    // Instance methods
+    this.save = jest.fn().mockResolvedValue(this);
+    return this;
+  });
+  
+  // Static methods
+  PasswordResetTokenMock.findOne = jest.fn();
+  PasswordResetTokenMock.deleteOne = jest.fn();
+  
+  return { default: PasswordResetTokenMock };
+});
 
 jest.unstable_mockModule('../../../utils/jwt.js', () => ({
   generateToken: jest.fn(),
