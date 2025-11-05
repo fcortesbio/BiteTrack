@@ -2,7 +2,7 @@
  * Data Helper Utilities for Testing
  * Provides test data generation and validation utilities
  */
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 /**
  * Generate realistic test data for various scenarios
@@ -298,7 +298,7 @@ const paginationTestUtils = {
   },
 };
 
-module.exports = {
+export {
   dataGenerators,
   invalidDataGenerators,
   dbTestUtils,

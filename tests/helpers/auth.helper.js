@@ -2,9 +2,9 @@
  * Authentication Helper Utilities for Testing
  * Provides common authentication patterns and JWT token management
  */
-const request = require('supertest');
-const jwt = require('jsonwebtoken');
-const Seller = require('../../models/Seller');
+import request from 'supertest';
+import jwt from 'jsonwebtoken';
+import Seller from '../../models/Seller.js';
 
 /**
  * Login a user and return response with token
@@ -177,7 +177,7 @@ const createMalformedToken = () => {
   return 'invalid.jwt.token.structure';
 };
 
-module.exports = {
+export {
   loginUser,
   getAuthToken,
   getAuthTokenForRole,
