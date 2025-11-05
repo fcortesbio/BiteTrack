@@ -512,7 +512,8 @@ start_containers() {
     log_info "  MONGO_ROOT_USERNAME: $(grep '^MONGO_ROOT_USERNAME=' $ENV_FILE | cut -d'=' -f2)"
     log_info "  MONGO_ROOT_PASSWORD: [REDACTED - $(echo $MONGO_PASS | cut -c1-3)]***"
     
-    if ! docker compose --env-file "$ENV_FILE" up -d; then
+    log_info "Building containers with new environment configuration..."
+    if ! docker compose --env-file "$ENV_FILE" up -d --build; then
         log_error "Failed to start Docker containers"
         return 1
     fi

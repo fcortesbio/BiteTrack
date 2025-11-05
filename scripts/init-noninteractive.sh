@@ -363,22 +363,21 @@ EOF
 setup_keyfile() {
     log_info "Setting up MongoDB keyfile..."
     
-    if [ ! -d "keyfile" ]; then
-        mkdir -p keyfile
+    # Use the existing keyfile setup script for consistency
+    if bash scripts/01-setup-keyfile.sh > /dev/null 2>&1; then
+        log_success "MongoDB keyfile setup completed"
+        return 0
+    else
+        log_error "MongoDB keyfile setup failed"
+        return 1
     fi
-    
-    if [ ! -f "keyfile/keyfile.example" ]; then
-        openssl rand -base64 756 > keyfile/keyfile.example
-        chmod 400 keyfile/keyfile.example
-    fi
-    
-    log_success "MongoDB keyfile setup completed"
 }
 
 start_containers() {
     log_info "Starting Docker containers..."
+    log_info "Building containers with new environment configuration..."
     
-    docker compose --env-file "$ENV_FILE" up -d
+    docker compose --env-file "$ENV_FILE" up -d --build
     
     # Wait for containers to be healthy
     local max_attempts=30
@@ -436,20 +435,23 @@ verify_system() {
 create_superadmin() {
     log_info "Creating SuperAdmin user..."
     
-    # Create admin user via API
-    local response
-    response=$(curl -s -X POST "http://localhost:$APP_PORT/bitetrack/sellers/pending" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"email\": \"$ADMIN_EMAIL\",
-            \"password\": \"$ADMIN_PASSWORD\",
-            \"firstName\": \"$ADMIN_FIRST_NAME\",
-            \"lastName\": \"$ADMIN_LAST_NAME\",
-            \"dateOfBirth\": \"$ADMIN_DOB\",
-            \"role\": \"superadmin\"
-        }" 2>/dev/null) || true
+    # Export variables for the superadmin creation script
+    export ADMIN_FIRST_NAME
+    export ADMIN_LAST_NAME
+    export ADMIN_EMAIL
+    export ADMIN_DOB
+    export ADMIN_PASSWORD
+    export MONGO_ROOT_USERNAME="$MONGO_USER"
+    export MONGO_ROOT_PASSWORD="$MONGO_PASS"
     
-    log_success "SuperAdmin user creation initiated"
+    # Use the existing superadmin creation script
+    if bash scripts/03-create-superadmin.sh --non-interactive > /dev/null 2>&1; then
+        log_success "SuperAdmin user created successfully"
+        return 0
+    else
+        log_error "SuperAdmin user creation failed"
+        return 1
+    fi
 }
 
 create_secrets_file() {
