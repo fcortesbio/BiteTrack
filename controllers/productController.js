@@ -1,5 +1,5 @@
-const Product = require('../models/Product');
-const mongoose = require('mongoose');
+import Product from '../models/Product.js';
+import mongoose from 'mongoose';
 
 const listProducts = async(req, res) => {
   const products = await Product.find({});
@@ -75,7 +75,7 @@ const deleteProduct = async(req, res) => {
   res.status(204).send();
 };
 
-module.exports = {
+export {
   listProducts,
   createProduct,
   updateProduct,
