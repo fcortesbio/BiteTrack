@@ -1,5 +1,5 @@
-const Seller = require('../models/Seller');
-const PendingSeller = require('../models/PendingSeller');
+import Seller from '../models/Seller.js';
+import PendingSeller from '../models/PendingSeller.js';
 
 const listSellers = async(req, res) => {
   const sellers = await Seller.find({});
@@ -177,7 +177,7 @@ const deactivateSeller = async(req, res) => {
   res.status(204).send();
 };
 
-module.exports = {
+export {
   listSellers,
   listPendingSellers,
   createPendingSeller,
