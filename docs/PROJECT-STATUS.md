@@ -132,7 +132,7 @@ npm run test:verbose      # Detailed output
 - **OpenAPI Specification:** `docs/openapi.yaml` (3.1.0 standard)
 - **JSON API Spec:** `http://localhost:3000/bitetrack/api-docs.json`
 - **Complete API Reference:** `docs/API-documentation.md`
-- **Testing Guide:** `TESTING-STATUS.md`
+- **Testing Guide:** `docs/TESTING-STATUS.md`
 - **Development Guide:** `WARP.md`
 - **Strategic Roadmap:** `ROADMAP.md`
 - **README:** `README.md` (comprehensive setup guide)

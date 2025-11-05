@@ -284,17 +284,17 @@ AI: "Sale #243 marked as paid. ✓"
 ## 📚 **Documentation Index**
 
 **Strategic Planning:**
-- `NEW-STRATEGY-SUMMARY.md` (this file) - Executive overview
-- `MIGRATION-ROADMAP.md` - Detailed implementation guide
+- `docs/NEW-STRATEGY-SUMMARY.md` (this file) - Executive overview
+- `docs/MIGRATION-ROADMAP.md` - Detailed implementation guide
 - `ROADMAP.md` - Updated with Phase 0
 
 **Technical Reference:**
-- `PROJECT-STATUS.md` - Current system status
-- `TESTING-STATUS.md` - Test coverage (204/204 passing)
+- `docs/PROJECT-STATUS.md` - Current system status
+- `docs/TESTING-STATUS.md` - Test coverage (204/204 passing)
 - `docs/API-documentation.md` - Complete API reference
 
 **Next Steps:**
-- Read `MIGRATION-ROADMAP.md` for detailed implementation
+- Read `docs/MIGRATION-ROADMAP.md` for detailed implementation
 - Review ES Modules resources
 - Explore MCP documentation
 - Get Gemini API credentials
@@ -322,4 +322,4 @@ This 4-week investment will create a **10x better product** and establish BiteTr
 
 ---
 
-**Ready to start?** See [MIGRATION-ROADMAP.md](MIGRATION-ROADMAP.md) for Day 1 tasks! 🚀
+**Ready to start?** See [MIGRATION-ROADMAP.md](docs/MIGRATION-ROADMAP.md) for Day 1 tasks! 🚀

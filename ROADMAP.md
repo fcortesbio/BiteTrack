@@ -173,7 +173,7 @@ GET  /bitetrack/health                          # System monitoring and status
 - ✅ Docker builds successfully
 - ✅ Zero breaking changes to API
 
-**See: [MIGRATION-ROADMAP.md](MIGRATION-ROADMAP.md) for detailed implementation**
+**See: [MIGRATION-ROADMAP.md](docs/MIGRATION-ROADMAP.md) for detailed implementation**
 
 ---
 
@@ -207,7 +207,7 @@ GET  /bitetrack/health                          # System monitoring and status
 - ✅ Role-based security enforced (user/admin/superadmin)
 - ✅ Rate limiting and cost controls implemented
 
-**See: [MIGRATION-ROADMAP.md](MIGRATION-ROADMAP.md) for detailed implementation**
+**See: [MIGRATION-ROADMAP.md](docs/MIGRATION-ROADMAP.md) for detailed implementation**
 
 ---
 

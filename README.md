@@ -328,7 +328,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 
 ### 📚 **Testing Documentation**
 
-- **📋 Complete Status & Roadmap**: [`TESTING-STATUS.md`](TESTING-STATUS.md)
+- **📋 Complete Status & Roadmap**: [`docs/TESTING-STATUS.md`](docs/TESTING-STATUS.md)
 - **🔧 Test Infrastructure Guide**: [`tests/README.md`](tests/README.md)
 - **💻 Test Implementation Examples**: [`tests/integration/auth-real.test.js`](tests/integration/auth-real.test.js)
 
