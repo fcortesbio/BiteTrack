@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const passwordResetTokenSchema = new mongoose.Schema({
   token: {
@@ -33,4 +33,4 @@ passwordResetTokenSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('PasswordResetToken', passwordResetTokenSchema);
+export default mongoose.model('PasswordResetToken', passwordResetTokenSchema);

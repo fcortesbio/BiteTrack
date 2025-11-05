@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const saleSchema = new mongoose.Schema({
   customerId: {
@@ -87,4 +87,4 @@ saleSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('Sale', saleSchema);
+export default mongoose.model('Sale', saleSchema);

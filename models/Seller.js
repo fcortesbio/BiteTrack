@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const sellerSchema = new mongoose.Schema(
   {
@@ -92,4 +92,4 @@ sellerSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('Seller', sellerSchema);
+export default mongoose.model('Seller', sellerSchema);
