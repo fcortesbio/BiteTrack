@@ -3,17 +3,37 @@
  * Tests authentication, activation, and password recovery functions
  */
 
-const authController = require("../../../controllers/authController");
-const Seller = require("../../../models/Seller");
-const PendingSeller = require("../../../models/PendingSeller");
-const PasswordResetToken = require("../../../models/PasswordResetToken");
-const { generateToken, generateResetToken } = require("../../../utils/jwt");
+import { jest } from '@jest/globals';
 
-// Mock dependencies
-jest.mock("../../../models/Seller");
-jest.mock("../../../models/PendingSeller");
-jest.mock("../../../models/PasswordResetToken");
-jest.mock("../../../utils/jwt");
+// Mock modules before importing
+jest.unstable_mockModule('../../../models/Seller.js', () => ({
+  default: {
+    findOne: jest.fn(),
+    findById: jest.fn(),
+  },
+}));
+
+jest.unstable_mockModule('../../../models/PendingSeller.js', () => ({
+  default: {
+    findOne: jest.fn(),
+  },
+}));
+
+jest.unstable_mockModule('../../../models/PasswordResetToken.js', () => ({
+  default: jest.fn(),
+}));
+
+jest.unstable_mockModule('../../../utils/jwt.js', () => ({
+  generateToken: jest.fn(),
+  generateResetToken: jest.fn(),
+}));
+
+// Now import after mocks are set up
+const authController = await import('../../../controllers/authController.js');
+const Seller = (await import('../../../models/Seller.js')).default;
+const PendingSeller = (await import('../../../models/PendingSeller.js')).default;
+const PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
+const { generateToken, generateResetToken } = await import('../../../utils/jwt.js');
 
 describe("Auth Controller", () => {
   let mockReq, mockRes;
