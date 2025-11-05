@@ -3,11 +3,19 @@
  * Tests token generation, verification, and reset token creation
  */
 
-const jwt = require('jsonwebtoken');
-const { generateToken, verifyToken, generateResetToken } = require('../../../utils/jwt');
+import { jest } from '@jest/globals';
 
-// Mock jwt module
-jest.mock('jsonwebtoken');
+// Mock jwt module for ESM
+const mockJwt = {
+  sign: jest.fn(),
+  verify: jest.fn(),
+};
+
+jest.unstable_mockModule('jsonwebtoken', () => ({
+  default: mockJwt,
+}));
+
+const { generateToken, verifyToken, generateResetToken } = await import('../../../utils/jwt.js');
 
 describe('JWT Utils', () => {
   const originalEnv = process.env;
@@ -29,11 +37,11 @@ describe('JWT Utils', () => {
       const mockToken = 'mock.jwt.token';
       const payload = { id: 'user123', role: 'user' };
 
-      jwt.sign.mockReturnValue(mockToken);
+      mockJwt.sign.mockReturnValue(mockToken);
 
       const result = generateToken(payload);
 
-      expect(jwt.sign).toHaveBeenCalledWith(
+      expect(mockJwt.sign).toHaveBeenCalledWith(
         payload,
         'test-secret-key',
         { expiresIn: '24h' },
@@ -46,7 +54,7 @@ describe('JWT Utils', () => {
       
       generateToken(payload);
 
-      expect(jwt.sign).toHaveBeenCalledWith(
+      expect(mockJwt.sign).toHaveBeenCalledWith(
         payload,
         'test-secret-key',
         expect.any(Object),
@@ -59,11 +67,11 @@ describe('JWT Utils', () => {
       const token = 'valid.jwt.token';
       const mockDecoded = { id: 'user123', role: 'user' };
 
-      jwt.verify.mockReturnValue(mockDecoded);
+      mockJwt.verify.mockReturnValue(mockDecoded);
 
       const result = verifyToken(token);
 
-      expect(jwt.verify).toHaveBeenCalledWith(token, 'test-secret-key');
+      expect(mockJwt.verify).toHaveBeenCalledWith(token, 'test-secret-key');
       expect(result).toEqual(mockDecoded);
     });
 
@@ -71,7 +79,7 @@ describe('JWT Utils', () => {
       const token = 'invalid.token';
       const error = new Error('Invalid token');
 
-      jwt.verify.mockImplementation(() => {
+      mockJwt.verify.mockImplementation(() => {
         throw error;
       });
 

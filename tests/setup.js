@@ -4,6 +4,7 @@
  */
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
+import { jest } from '@jest/globals';
 
 let mongoServer;
 

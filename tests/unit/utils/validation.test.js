@@ -3,11 +3,13 @@
  * Tests validation rules and middleware
  */
 
-const { validationRules, validate } = require('../../../utils/validation');
+import { jest } from '@jest/globals';
 
-// Mock express-validator
-jest.mock('express-validator', () => ({
-  validationResult: jest.fn(),
+// Mock express-validator for ESM
+const mockValidationResult = jest.fn();
+
+jest.unstable_mockModule('express-validator', () => ({
+  validationResult: mockValidationResult,
   body: jest.fn(() => ({
     isEmail: jest.fn().mockReturnThis(),
     normalizeEmail: jest.fn().mockReturnThis(),
@@ -32,7 +34,7 @@ jest.mock('express-validator', () => ({
   })),
 }));
 
-const { validationResult } = require('express-validator');
+const { validationRules, validate } = await import('../../../utils/validation.js');
 
 describe('Validation Utils', () => {
   let mockReq, mockRes, mockNext;
@@ -83,7 +85,7 @@ describe('Validation Utils', () => {
       const mockErrors = {
         isEmpty: jest.fn().mockReturnValue(true),
       };
-      validationResult.mockReturnValue(mockErrors);
+      mockValidationResult.mockReturnValue(mockErrors);
 
       validate(mockReq, mockRes, mockNext);
 
@@ -101,7 +103,7 @@ describe('Validation Utils', () => {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
       };
-      validationResult.mockReturnValue(mockErrors);
+      mockValidationResult.mockReturnValue(mockErrors);
 
       validate(mockReq, mockRes, mockNext);
 
@@ -127,7 +129,7 @@ describe('Validation Utils', () => {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
       };
-      validationResult.mockReturnValue(mockErrors);
+      mockValidationResult.mockReturnValue(mockErrors);
 
       validate(mockReq, mockRes, mockNext);
 
@@ -151,7 +153,7 @@ describe('Validation Utils', () => {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
       };
-      validationResult.mockReturnValue(mockErrors);
+      mockValidationResult.mockReturnValue(mockErrors);
 
       validate(mockReq, mockRes, mockNext);
 
