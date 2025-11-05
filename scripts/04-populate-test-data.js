@@ -17,17 +17,22 @@
  *   dev      - Development-friendly smaller dataset
  */
 
-const mongoose = require('mongoose');
-const fs = require('fs').promises;
-const path = require('path');
-const dotenv = require('dotenv');
+import mongoose from 'mongoose';
+import fs from 'fs/promises';
+import path from 'path';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Import models
-const Customer = require('../models/Customer');
-const Product = require('../models/Product');
-const Sale = require('../models/Sale');
-const PendingSeller = require('../models/PendingSeller');
-const Seller = require('../models/Seller');
+import Customer from '../models/Customer.js';
+import Product from '../models/Product.js';
+import Sale from '../models/Sale.js';
+import PendingSeller from '../models/PendingSeller.js';
+import Seller from '../models/Seller.js';
 
 // Load test data files
 const DATA_DIR = path.join(__dirname, '..', 'test-data');
@@ -57,7 +62,7 @@ class TestDataPopulator {
       try {
         // Check if env file exists synchronously (required for script initialization)
         // eslint-disable-next-line no-sync
-        require('fs').accessSync(envPath);
+        await import('fs').then(m => m.accessSync(envPath));
         
         // Load the environment file
         dotenv.config({ path: envPath });
@@ -72,7 +77,7 @@ class TestDataPopulator {
       
       try {
         // eslint-disable-next-line no-sync
-        require('fs').accessSync(defaultEnvPath);
+        await import('fs').then(m => m.accessSync(defaultEnvPath));
         dotenv.config({ path: defaultEnvPath });
         this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);
       } catch {
@@ -521,12 +526,12 @@ Examples:
   await populator.populate();
 }
 
-// Run if called directly
-if (require.main === module) {
+// Run if called directly (ESM equivalent)
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     console.error('❌ Script failed:', error);
     process.exit(1);
   });
 }
 
-module.exports = TestDataPopulator;
+export default TestDataPopulator;
