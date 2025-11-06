@@ -3,24 +3,25 @@
  * Separate app configuration for testing that skips MongoDB connection
  * since the test setup handles MongoDB Memory Server
  */
-require('dotenv').config({ path: '.env.test' });
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.test' });
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const sellerRoutes = require('./routes/sellers');
-const customerRoutes = require('./routes/customers');
-const productRoutes = require('./routes/products');
-const salesRoutes = require('./routes/sales');
-const inventoryDropRoutes = require('./routes/inventoryDrops');
-const testDataRoutes = require('./routes/testDataRoutes');
-const reportingRoutes = require('./routes/reporting');
+import authRoutes from './routes/auth.js';
+import sellerRoutes from './routes/sellers.js';
+import customerRoutes from './routes/customers.js';
+import productRoutes from './routes/products.js';
+import salesRoutes from './routes/sales.js';
+import inventoryDropRoutes from './routes/inventoryDrops.js';
+import testDataRoutes from './routes/testDataRoutes.js';
+import reportingRoutes from './routes/reporting.js';
 
 // Import middleware
-const errorHandler = require('./middleware/errorHandler');
+import errorHandler from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -85,4 +86,4 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // Export app without starting server (tests will handle this)
-module.exports = app;
+export default app;

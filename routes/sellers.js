@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { authenticate, authorize } = require('../middleware/auth');
-const { validationRules, validate } = require('../utils/validation');
-const {
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validationRules, validate } from '../utils/validation.js';
+import {
   listSellers,
   listPendingSellers,
   createPendingSeller,
   updateSeller,
   changeRole,
   deactivateSeller,
-} = require('../controllers/sellerController');
+} from '../controllers/sellerController.js';
 
 // All routes require authentication
 router.use(authenticate);
@@ -49,4 +49,4 @@ router.delete('/:id',
   deactivateSeller,
 );
 
-module.exports = router;
+export default router;

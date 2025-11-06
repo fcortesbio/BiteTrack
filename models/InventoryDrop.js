@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const inventoryDropSchema = new mongoose.Schema(
   {
@@ -351,4 +351,4 @@ inventoryDropSchema.statics.getUndoableDrops = async function(userId = null) {
 
 const InventoryDrop = mongoose.model('InventoryDrop', inventoryDropSchema);
 
-module.exports = InventoryDrop;
+export default InventoryDrop;

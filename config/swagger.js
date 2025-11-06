@@ -1,8 +1,13 @@
 // const swaggerJSDoc = require('swagger-jsdoc'); <-- this is never used ; 
-const swaggerUi = require('swagger-ui-express');
-const fs = require('fs');
-const yaml = require('js-yaml');
-const path = require('path');
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
+import yaml from 'js-yaml';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
  * Swagger Configuration for BiteTrack API
@@ -168,13 +173,14 @@ const swaggerOptions = {
   },
 };
 
-module.exports = {
+export {
   swaggerUi,
   swaggerOptions,
   loadOpenAPISpec, // Export the function so we can call it with dynamic parameters
-  
-  // Helper function to serve Swagger UI with dynamic configuration
-  setupSwaggerUI: (app, port, host = 'localhost') => {
+};
+
+// Helper function to serve Swagger UI with dynamic configuration
+export const setupSwaggerUI = (app, port, host = 'localhost') => {
     // Load specification with dynamic port and host
     const swaggerSpec = loadOpenAPISpec(port, host);
     
@@ -194,7 +200,6 @@ module.exports = {
     console.log(`🌐 Interactive docs available at: http://${host}:${port}/bitetrack/api-docs`);
     console.log(`📄 JSON specification at: http://${host}:${port}/bitetrack/api-docs.json`);
     
-    // Return the spec for potential use elsewhere
-    return swaggerSpec;
-  },
+  // Return the spec for potential use elsewhere
+  return swaggerSpec;
 };

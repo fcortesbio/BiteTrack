@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 // Helper function to normalize phone numbers
 const normalizePhoneNumber = (phone) => {
@@ -90,5 +90,5 @@ customerSchema.set('toJSON', {
 
 const Customer = mongoose.model('Customer', customerSchema);
 
-module.exports = Customer;
-module.exports.normalizePhoneNumber = normalizePhoneNumber;
+export default Customer;
+export { normalizePhoneNumber };

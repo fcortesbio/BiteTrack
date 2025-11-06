@@ -1,7 +1,7 @@
-const InventoryDrop = require('../models/InventoryDrop');
-const Product = require('../models/Product');
-const mongoose = require('mongoose');
-const { validationResult } = require('express-validator');
+import InventoryDrop from '../models/InventoryDrop.js';
+import Product from '../models/Product.js';
+import mongoose from 'mongoose';
+import { validationResult } from 'express-validator';
 
 /**
  * Drop inventory for a product (admin/superadmin only)
@@ -411,7 +411,7 @@ const getInventoryDropById = async(req, res) => {
   }
 };
 
-module.exports = {
+export {
   dropInventory,
   undoInventoryDrop,
   listInventoryDrops,

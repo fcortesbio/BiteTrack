@@ -1,15 +1,15 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { authenticate } = require('../middleware/auth');
-const { validationRules, validate } = require('../utils/validation');
-const {
+import { authenticate } from '../middleware/auth.js';
+import { validationRules, validate } from '../utils/validation.js';
+import {
   listSales,
   createSale,
   getSale,
   settleSale,
   importSalesFromCSV,
   uploadCSV,
-} = require('../controllers/saleController');
+} from '../controllers/saleController.js';
 
 // All routes require authentication
 router.use(authenticate);
@@ -23,4 +23,4 @@ router.patch('/:id/settle', validationRules.settleSale, validate, settleSale);
 // CSV import route
 router.post('/import', uploadCSV.single('csvFile'), importSalesFromCSV);
 
-module.exports = router;
+export default router;

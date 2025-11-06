@@ -3,7 +3,8 @@
  * Tests schema validation, phone normalization, and pre-save middleware
  */
 
-const Customer = require('../../../models/Customer');
+import Customer from '../../../models/Customer.js';
+import { jest } from '@jest/globals';
 
 describe('Customer Model', () => {
   describe('Schema Validation', () => {

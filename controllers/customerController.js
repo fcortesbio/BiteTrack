@@ -1,9 +1,8 @@
-const Customer = require('../models/Customer');
-const { normalizePhoneNumber } = require('../models/Customer');
-const Sale = require('../models/Sale');
-const csv = require('csv-parser');
-const multer = require('multer');
-const { Readable } = require('stream');
+import Customer, { normalizePhoneNumber } from '../models/Customer.js';
+import Sale from '../models/Sale.js';
+import csv from 'csv-parser';
+import multer from 'multer';
+import { Readable } from 'stream';
 
 const listCustomers = async(req, res) => {
   const customers = await Customer.find({});
@@ -513,7 +512,7 @@ const upload = multer({
   },
 });
 
-module.exports = {
+export {
   listCustomers,
   createCustomer,
   updateCustomer,

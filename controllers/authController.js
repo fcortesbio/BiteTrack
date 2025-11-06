@@ -1,7 +1,7 @@
-const Seller = require("../models/Seller");
-const PendingSeller = require("../models/PendingSeller");
-const PasswordResetToken = require("../models/PasswordResetToken");
-const { generateToken, generateResetToken } = require("../utils/jwt");
+import Seller from '../models/Seller.js';
+import PendingSeller from '../models/PendingSeller.js';
+import PasswordResetToken from '../models/PasswordResetToken.js';
+import { generateToken, generateResetToken } from '../utils/jwt.js';
 
 const getSellerByEmail = async (req, res) => {
   try {
@@ -224,7 +224,7 @@ const reset = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   login,
   activate,
   recover,

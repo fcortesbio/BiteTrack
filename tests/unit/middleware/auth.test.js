@@ -3,13 +3,25 @@
  * Tests authenticate and authorize functions
  */
 
-const { verifyToken } = require('../../../utils/jwt');
-const Seller = require('../../../models/Seller');
-const { authenticate, authorize } = require('../../../middleware/auth');
+import { jest } from '@jest/globals';
 
-// Mock dependencies
-jest.mock('../../../utils/jwt');
-jest.mock('../../../models/Seller');
+// Mock dependencies for ESM
+const mockVerifyToken = jest.fn();
+const mockSeller = {
+  findById: jest.fn(),
+};
+
+jest.unstable_mockModule('../../../utils/jwt.js', () => ({
+  verifyToken: mockVerifyToken,
+}));
+
+jest.unstable_mockModule('../../../models/Seller.js', () => ({
+  default: mockSeller,
+}));
+
+const { authenticate, authorize } = await import('../../../middleware/auth.js');
+const verifyToken = mockVerifyToken;
+const Seller = mockSeller;
 
 describe('Auth Middleware', () => {
   let mockReq, mockRes, mockNext;

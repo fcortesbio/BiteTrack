@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const pendingSellerSchema = new mongoose.Schema({
   firstName: {
@@ -59,4 +59,4 @@ pendingSellerSchema.set('toJSON', {
   },
 });
 
-module.exports = mongoose.model('PendingSeller', pendingSellerSchema);
+export default mongoose.model('PendingSeller', pendingSellerSchema);

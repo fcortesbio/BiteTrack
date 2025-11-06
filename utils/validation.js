@@ -1,4 +1,4 @@
-const { body, query, validationResult } = require('express-validator');
+import { body, query, validationResult } from 'express-validator';
 
 // Password validation regex
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -262,7 +262,7 @@ const validationRules = {
 };
 
 // Validation middleware
-const validate = (req, res, next) => {
+export const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -278,7 +278,4 @@ const validate = (req, res, next) => {
   next();
 };
 
-module.exports = {
-  validationRules,
-  validate,
-};
+export { validationRules };

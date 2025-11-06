@@ -2,7 +2,7 @@
  * Request Helper Utilities for Testing
  * Provides common HTTP request patterns and utilities
  */
-const request = require('supertest');
+import request from 'supertest';
 
 /**
  * Common request builder patterns
@@ -356,7 +356,7 @@ const performanceTestHelpers = {
   },
 };
 
-module.exports = {
+export {
   requestBuilders,
   requestValidators,
   commonTestScenarios,

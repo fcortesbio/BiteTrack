@@ -3,7 +3,7 @@
  * Tests schema validation, virtuals, and transforms
  */
 
-const Product = require('../../../models/Product');
+import Product from '../../../models/Product.js';
 
 describe('Product Model', () => {
   describe('Schema Validation', () => {
