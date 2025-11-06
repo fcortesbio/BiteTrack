@@ -232,10 +232,16 @@ class TestDataPopulator {
   async populatePendingSellers() {
     const { pendingSellers } = this.testData.pendingsellers;
     
+    // Get the superadmin to use as creator
+    const superadmin = await Seller.findOne({ role: 'superadmin' });
+    if (!superadmin) {
+      throw new Error('No superadmin found. Please ensure superadmin is created before populating test data.');
+    }
+    
     let pendingData = pendingSellers.map(seller => ({
       ...seller,
       dateOfBirth: new Date(seller.dateOfBirth),
-      createdBy: 'Self', // Indicates created by script, not a real seller
+      createdBy: superadmin._id, // Use actual superadmin ObjectId for traceability
     }));
     
     switch (this.preset) {
@@ -262,7 +268,7 @@ class TestDataPopulator {
         createdOrUpdatedPendingSellers.push(result);
       }
       this.createdData.pendingSellers = createdOrUpdatedPendingSellers;
-      this.log(`✅ Created ${this.createdData.pendingSellers.length} pending sellers`);
+      this.log(`✅ Created ${this.createdData.pendingSellers.length} pending sellers (created by superadmin)`);
     } catch (error) {
       throw new Error(`Pending seller creation failed: ${error.message}`);
     }
