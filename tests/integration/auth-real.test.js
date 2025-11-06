@@ -8,6 +8,7 @@ import Seller from '../../models/Seller.js';
 import PendingSeller from '../../models/PendingSeller.js';
 import PasswordResetToken from '../../models/PasswordResetToken.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 describe("BiteTrack Authentication Routes", () => {
   describe("POST /bitetrack/auth/login", () => {
@@ -68,7 +69,6 @@ describe("BiteTrack Authentication Routes", () => {
         expect(token).toBeTruthy();
 
         // Decode token without verification to check structure
-        const jwt = require("jsonwebtoken");
         const decoded = jwt.decode(token);
         expect(decoded).toHaveProperty("id");
         expect(decoded).toHaveProperty("role");
