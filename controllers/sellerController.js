@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Seller from '../models/Seller.js';
 import PendingSeller from '../models/PendingSeller.js';
 
@@ -134,28 +135,55 @@ const changeRole = async(req, res) => {
 };
 
 const listPendingSellers = async(req, res) => {
+  // Don't use populate - manually fetch createdBy sellers to handle Mixed type
   const pendingSellers = await PendingSeller.find({ activatedAt: null })
-    .populate('createdBy', 'firstName lastName email role')
     .sort({ createdAt: -1 })
-    .select('-__v');
+    .select('-__v')
+    .lean();
+
+  // Get all unique seller IDs (excluding "Self")
+  const sellerIds = pendingSellers
+    .map(ps => ps.createdBy)
+    .filter(id => id !== 'Self' && mongoose.Types.ObjectId.isValid(id));
+
+  // Fetch all referenced sellers in one query
+  const sellers = await Seller.find({ _id: { $in: sellerIds } })
+    .select('firstName lastName email role')
+    .lean();
+
+  // Create a map for quick lookup
+  const sellerMap = new Map(sellers.map(s => [s._id.toString(), s]));
 
   const response = {
     count: pendingSellers.length,
-    pendingSellers: pendingSellers.map(seller => ({
-      _id: seller._id,
-      firstName: seller.firstName,
-      lastName: seller.lastName,
-      email: seller.email,
-      dateOfBirth: seller.dateOfBirth,
-      createdAt: seller.createdAt,
-      createdBy: seller.createdBy ? {
-        _id: seller.createdBy._id,
-        firstName: seller.createdBy.firstName,
-        lastName: seller.createdBy.lastName,
-        email: seller.createdBy.email,
-        role: seller.createdBy.role,
-      } : null,
-    })),
+    pendingSellers: pendingSellers.map(seller => {
+      // Handle createdBy which can be "Self" (string) or ObjectId reference
+      let createdByInfo = null;
+      if (seller.createdBy === 'Self') {
+        createdByInfo = 'Self';
+      } else if (mongoose.Types.ObjectId.isValid(seller.createdBy)) {
+        const createdBySeller = sellerMap.get(seller.createdBy.toString());
+        if (createdBySeller) {
+          createdByInfo = {
+            _id: createdBySeller._id,
+            firstName: createdBySeller.firstName,
+            lastName: createdBySeller.lastName,
+            email: createdBySeller.email,
+            role: createdBySeller.role,
+          };
+        }
+      }
+
+      return {
+        _id: seller._id,
+        firstName: seller.firstName,
+        lastName: seller.lastName,
+        email: seller.email,
+        dateOfBirth: seller.dateOfBirth,
+        createdAt: seller.createdAt,
+        createdBy: createdByInfo,
+      };
+    }),
   };
 
   res.json(response);

@@ -25,6 +25,7 @@ const pendingSellerSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.Mixed, // Allow both ObjectId and String
     required: true,
+    // No ref - we handle population manually in controller to support Mixed type
     validate: {
       validator: function(value) {
         // Allow the special "Self" string for bootstrap superadmin
@@ -35,10 +36,6 @@ const pendingSellerSchema = new mongoose.Schema({
         return mongoose.Types.ObjectId.isValid(value);
       },
       message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts',
-    },
-    // Set reference only when it's an ObjectId
-    refPath: function() {
-      return this.createdBy === 'Self' ? null : 'Seller';
     },
   },
   activatedAt: {
