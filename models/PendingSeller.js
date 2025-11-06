@@ -31,6 +31,11 @@ const pendingSellerSchema = new mongoose.Schema({
     type: Date,
     default: null,
   },
+  testingUser: {
+    type: Boolean,
+    default: false,
+    index: true, // Index for efficient filtering
+  },
 }, {
   timestamps: true,
 });

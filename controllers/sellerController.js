@@ -148,6 +148,7 @@ const listPendingSellers = async(req, res) => {
       email: seller.email,
       dateOfBirth: seller.dateOfBirth,
       createdAt: seller.createdAt,
+      testingUser: seller.testingUser || false,
       createdBy: seller.createdBy ? {
         _id: seller.createdBy._id,
         firstName: seller.createdBy.firstName,

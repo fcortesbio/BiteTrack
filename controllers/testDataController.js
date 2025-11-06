@@ -3,6 +3,7 @@ import Customer from '../models/Customer.js';
 import Product from '../models/Product.js';
 import Sale from '../models/Sale.js';
 import PendingSeller from '../models/PendingSeller.js';
+import Seller from '../models/Seller.js';
 
 /**
  * Test Data Management Controller
@@ -143,6 +144,7 @@ const cleanTestData = async(req, res) => {
         customers: 0,
         products: 0,
         pendingSellers: 0,
+        testingSellers: 0,
       },
       preserved: preserveData,
     };
@@ -165,13 +167,15 @@ const cleanTestData = async(req, res) => {
       deletionSummary.deletedCounts.products = productsResult.deletedCount;
     }
 
-    // Delete pending sellers
+    // Delete pending sellers (only those marked as testing users)
     if (!preserveData.includes('pendingSellers')) {
-      const pendingSellersResult = await PendingSeller.deleteMany({});
+      const pendingSellersResult = await PendingSeller.deleteMany({ testingUser: true });
       deletionSummary.deletedCounts.pendingSellers = pendingSellersResult.deletedCount;
     }
 
-    // Note: We never delete Seller records to preserve admin accounts
+    // Delete testing sellers (but never real admin accounts)
+    const testingSellersResult = await Seller.deleteMany({ testingUser: true });
+    deletionSummary.deletedCounts.testingSellers = testingSellersResult.deletedCount;
 
     const totalDeleted = Object.values(deletionSummary.deletedCounts).reduce((sum, count) => sum + count, 0);
 
@@ -213,12 +217,18 @@ const getTestDataStatus = async(req, res) => {
       productCount,
       saleCount,
       pendingSellerCount,
+      testingPendingSellerCount,
+      testingSellerCount,
+      totalSellerCount,
       recentSales,
     ] = await Promise.all([
       Customer.countDocuments(),
       Product.countDocuments(),
       Sale.countDocuments(),
       PendingSeller.countDocuments(),
+      PendingSeller.countDocuments({ testingUser: true }),
+      Seller.countDocuments({ testingUser: true }),
+      Seller.countDocuments(),
       Sale.find({}).sort({ createdAt: -1 }).limit(5).populate('customerId sellerId', 'firstName lastName'),
     ]);
 
@@ -254,6 +264,11 @@ const getTestDataStatus = async(req, res) => {
         products: productCount,
         sales: saleCount,
         pendingSellers: pendingSellerCount,
+        sellers: totalSellerCount,
+      },
+      testingUserCounts: {
+        pendingSellers: testingPendingSellerCount,
+        sellers: testingSellerCount,
       },
       salesStatistics: {
         totalSalesValue: stats.totalSalesValue,

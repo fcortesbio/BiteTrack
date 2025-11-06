@@ -57,6 +57,11 @@ const sellerSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    testingUser: {
+      type: Boolean,
+      default: false,
+      index: true, // Index for efficient filtering
+    },
   },
   {
     timestamps: true,

@@ -242,6 +242,7 @@ class TestDataPopulator {
       ...seller,
       dateOfBirth: new Date(seller.dateOfBirth),
       createdBy: superadmin._id, // Use actual superadmin ObjectId for traceability
+      testingUser: true, // Mark as test data for easy identification and cleanup
     }));
     
     switch (this.preset) {
