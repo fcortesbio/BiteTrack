@@ -2,6 +2,7 @@ import Seller from '../models/Seller.js';
 import PendingSeller from '../models/PendingSeller.js';
 import PasswordResetToken from '../models/PasswordResetToken.js';
 import { generateToken, generateResetToken } from '../utils/jwt.js';
+import { sendPasswordResetEmail } from '../utils/emailService.js';
 
 const getSellerByEmail = async (req, res) => {
   try {
@@ -37,8 +38,7 @@ const getSellerByEmail = async (req, res) => {
       statusCode: 404,
     });
   } catch (error) {
-     
-    console.error("Error in getSellerByEmail:", error);
+    console.error('Error in getSellerByEmail:', error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred while retrieving seller information",
@@ -72,8 +72,7 @@ const login = async (req, res) => {
       seller: sellerResponse,
     });
   } catch (error) {
-     
-    console.error("Error in login:", error);
+    console.error('Error in login:', error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during login",
@@ -121,8 +120,7 @@ const activate = async (req, res) => {
 
     res.status(201).json(seller.toJSON());
   } catch (error) {
-     
-    console.error("Error in activate:", error);
+    console.error('Error in activate:', error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during account activation",
@@ -153,18 +151,96 @@ const recover = async (req, res) => {
     });
 
     await resetToken.save();
+    
+    // Send password reset email
+    const emailResult = await sendPasswordResetEmail(seller.email, token);
+    
+    if (!emailResult.success) {
+      return res.status(500).json({
+        error: "Email Service Error",
+        message: "Failed to send password reset email",
+        statusCode: 500,
+      });
+    }
 
-    res.json({
-      token,
+    // Only return token in development for testing
+    const responseData = {
+      message: "Password reset email sent successfully",
       sellerId,
       expiresAt: resetToken.expiresAt,
-    });
+    };
+    
+    // In development, include the token and preview URL for testing
+    if (process.env.NODE_ENV !== 'production') {
+      responseData.token = token;
+      responseData.emailPreview = emailResult.previewUrl;
+    }
+
+    res.json(responseData);
   } catch (error) {
-     
-    console.error("Error in recover:", error);
+    console.error('Error in recover:', error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during password recovery",
+      statusCode: 500,
+    });
+  }
+};
+
+const requestRecovery = async (req, res) => {
+  try {
+    const { email, dateOfBirth } = req.body;
+
+    // Verify seller exists with matching details
+    const seller = await Seller.findOne({
+      email,
+      dateOfBirth: new Date(dateOfBirth),
+    });
+
+    if (!seller) {
+      // Don't reveal whether email exists (security best practice)
+      return res.json({
+        message: "If an account exists with this email and date of birth, a password reset link has been sent",
+      });
+    }
+
+    // Generate reset token
+    const token = generateResetToken();
+    const resetToken = new PasswordResetToken({
+      token,
+      sellerId: seller._id,
+    });
+
+    await resetToken.save();
+    
+    // Send password reset email
+    const emailResult = await sendPasswordResetEmail(seller.email, token);
+    
+    if (!emailResult.success) {
+      // Still return success message to not reveal email service issues
+      console.error('Failed to send password reset email:', emailResult);
+      return res.json({
+        message: "If an account exists with this email and date of birth, a password reset link has been sent",
+      });
+    }
+
+    // Return same message whether or not account exists (security)
+    const responseData = {
+      message: "If an account exists with this email and date of birth, a password reset link has been sent",
+    };
+    
+    // In development, include the token and preview URL for testing
+    if (process.env.NODE_ENV !== 'production') {
+      responseData.token = token;
+      responseData.emailPreview = emailResult.previewUrl;
+    }
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error in requestRecovery:', error);
+    return res.status(500).json({
+      error: "Internal Server Error",
+      message: "An error occurred during password recovery request",
       statusCode: 500,
     });
   }
@@ -214,8 +290,7 @@ const reset = async (req, res) => {
       message: "Password reset successful",
     });
   } catch (error) {
-     
-    console.error("Error in reset:", error);
+    console.error('Error in reset:', error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during password reset",
@@ -228,6 +303,7 @@ export {
   login,
   activate,
   recover,
+  requestRecovery,
   reset,
   getSellerByEmail,
 };

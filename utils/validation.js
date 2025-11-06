@@ -51,6 +51,17 @@ const validationRules = {
       .withMessage('Password must be at least 8 characters with mixed case, numbers, and symbols'),
   ],
 
+  requestRecovery: [
+    body('email')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Valid email is required'),
+    body('dateOfBirth')
+      .isISO8601()
+      .toDate()
+      .withMessage('Valid date of birth is required'),
+  ],
+
   getSellerByEmail: [
     query('email')
       .isEmail()

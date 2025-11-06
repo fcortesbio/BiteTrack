@@ -359,6 +359,191 @@ describe("BiteTrack Authentication Routes", () => {
     });
   });
 
+  describe("POST /bitetrack/auth/request-recovery", () => {
+    describe("Success scenarios", () => {
+      it("should request password recovery with valid email and DOB", async () => {
+        // Arrange - Create a seller
+        const sellerData = {
+          firstName: "Recovery",
+          lastName: "Test",
+          email: "recovery.test@example.com",
+          password: "Password123!",
+          dateOfBirth: new Date("1990-01-01"),
+          role: "user",
+          createdBy: testUtils.generateObjectId(),
+        };
+
+        const seller = new Seller(sellerData);
+        await seller.save();
+
+        // Act
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: sellerData.email,
+            dateOfBirth: "1990-01-01",
+          });
+
+        // Assert
+        expect(response.status).toBe(200);
+        expect(response.body.message).toContain(
+          "If an account exists with this email and date of birth",
+        );
+
+        // Verify reset token was created
+        const resetToken = await PasswordResetToken.findOne({
+          sellerId: seller._id,
+        });
+        expect(resetToken).toBeTruthy();
+        expect(resetToken.expiresAt).toBeTruthy();
+      });
+
+      it("should return same message for non-existent email (security)", async () => {
+        // Act - Try with email that doesn't exist
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: "nonexistent.recovery@example.com",
+            dateOfBirth: "1990-01-01",
+          });
+
+        // Assert - Should return same generic message
+        expect(response.status).toBe(200);
+        expect(response.body.message).toContain(
+          "If an account exists with this email and date of birth",
+        );
+      });
+
+      it("should return same message for incorrect DOB (security)", async () => {
+        // Arrange - Create a seller
+        const sellerData = {
+          firstName: "Wrong",
+          lastName: "DOB",
+          email: "wrong.dob@example.com",
+          password: "Password123!",
+          dateOfBirth: new Date("1990-01-01"),
+          role: "user",
+          createdBy: testUtils.generateObjectId(),
+        };
+
+        const seller = new Seller(sellerData);
+        await seller.save();
+
+        // Act - Try with wrong DOB
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: sellerData.email,
+            dateOfBirth: "1995-01-01", // Wrong DOB
+          });
+
+        // Assert - Should still return generic message (security)
+        expect(response.status).toBe(200);
+        expect(response.body.message).toContain(
+          "If an account exists with this email and date of birth",
+        );
+
+        // Verify no token was created
+        const resetToken = await PasswordResetToken.findOne({
+          sellerId: seller._id,
+        });
+        expect(resetToken).toBeNull();
+      });
+
+      it("should create reset token when valid account found", async () => {
+        // Arrange - Create a seller
+        const sellerData = {
+          firstName: "Token",
+          lastName: "Creation",
+          email: "token.creation@example.com",
+          password: "Password123!",
+          dateOfBirth: new Date("1990-01-01"),
+          role: "user",
+          createdBy: testUtils.generateObjectId(),
+        };
+
+        const seller = new Seller(sellerData);
+        await seller.save();
+
+        // Act - Request recovery (will fail email but should create token)
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: sellerData.email,
+            dateOfBirth: "1990-01-01",
+          });
+
+        // Assert - Should always return generic message
+        expect(response.status).toBe(200);
+        expect(response.body.message).toContain(
+          "If an account exists with this email and date of birth",
+        );
+
+        // Verify reset token was created in database (regardless of email failure)
+        const resetToken = await PasswordResetToken.findOne({
+          sellerId: seller._id,
+        });
+        expect(resetToken).toBeTruthy();
+      });
+    });
+
+    describe("Validation errors", () => {
+      it("should reject missing email", async () => {
+        // Act
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({ dateOfBirth: "1990-01-01" });
+
+        // Assert
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("message");
+        expect(response.body).toHaveProperty("error");
+      });
+
+      it("should reject invalid email format", async () => {
+        // Act
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: "not-an-email",
+            dateOfBirth: "1990-01-01",
+          });
+
+        // Assert
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("message");
+        expect(response.body).toHaveProperty("error");
+      });
+
+      it("should reject missing dateOfBirth", async () => {
+        // Act
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({ email: "test@example.com" });
+
+        // Assert
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("message");
+        expect(response.body).toHaveProperty("error");
+      });
+
+      it("should reject invalid date format", async () => {
+        // Act
+        const response = await request(app)
+          .post("/bitetrack/auth/request-recovery")
+          .send({
+            email: "test@example.com",
+            dateOfBirth: "not-a-date",
+          });
+
+        // Assert
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty("message");
+        expect(response.body).toHaveProperty("error");
+      });
+    });
+  });
+
   describe("POST /bitetrack/auth/reset", () => {
     describe("Success scenarios", () => {
       it("should reset password with valid token and seller details", async () => {
