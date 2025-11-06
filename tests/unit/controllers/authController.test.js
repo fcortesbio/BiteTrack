@@ -49,11 +49,15 @@ jest.unstable_mockModule('../../../utils/jwt.js', () => ({
 }));
 
 // Now import after mocks are set up
-const authController = await import('../../../controllers/authController.js');
-const Seller = (await import('../../../models/Seller.js')).default;
-const PendingSeller = (await import('../../../models/PendingSeller.js')).default;
-const PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
-const { generateToken, generateResetToken } = await import('../../../utils/jwt.js');
+let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken;
+
+beforeAll(async () => {
+  authController = await import('../../../controllers/authController.js');
+  Seller = (await import('../../../models/Seller.js')).default;
+  PendingSeller = (await import('../../../models/PendingSeller.js')).default;
+  PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
+  ({ generateToken, generateResetToken } = await import('../../../utils/jwt.js'));
+});
 
 describe("Auth Controller", () => {
   let mockReq, mockRes;

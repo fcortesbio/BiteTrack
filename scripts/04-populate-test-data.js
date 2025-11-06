@@ -20,10 +20,9 @@
 import mongoose from 'mongoose';
 import fs from 'fs/promises';
 import { accessSync } from 'fs';
-import path from 'path';
+import path, { dirname } from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -62,7 +61,7 @@ class TestDataPopulator {
       
       try {
         // Check if env file exists synchronously (required for script initialization)
-        // eslint-disable-next-line no-sync
+         
         accessSync(envPath);
         
         // Load the environment file
@@ -77,7 +76,7 @@ class TestDataPopulator {
       const defaultEnvPath = path.join(process.cwd(), '.env');
       
       try {
-        // eslint-disable-next-line no-sync
+         
         accessSync(defaultEnvPath);
         dotenv.config({ path: defaultEnvPath });
         this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);

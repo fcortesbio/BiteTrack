@@ -34,7 +34,10 @@ jest.unstable_mockModule('express-validator', () => ({
   })),
 }));
 
-const { validationRules, validate } = await import('../../../utils/validation.js');
+let validationRules, validate;
+beforeAll(async () => {
+  ({ validationRules, validate } = await import('../../../utils/validation.js'));
+});
 
 describe('Validation Utils', () => {
   let mockReq, mockRes, mockNext;

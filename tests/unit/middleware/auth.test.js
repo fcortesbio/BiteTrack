@@ -19,7 +19,10 @@ jest.unstable_mockModule('../../../models/Seller.js', () => ({
   default: mockSeller,
 }));
 
-const { authenticate, authorize } = await import('../../../middleware/auth.js');
+let authenticate, authorize;
+beforeAll(async () => {
+  ({ authenticate, authorize } = await import('../../../middleware/auth.js'));
+});
 const verifyToken = mockVerifyToken;
 const Seller = mockSeller;
 

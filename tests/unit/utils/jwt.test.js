@@ -15,7 +15,10 @@ jest.unstable_mockModule('jsonwebtoken', () => ({
   default: mockJwt,
 }));
 
-const { generateToken, verifyToken, generateResetToken } = await import('../../../utils/jwt.js');
+let generateToken, verifyToken, generateResetToken;
+beforeAll(async () => {
+  ({ generateToken, verifyToken, generateResetToken } = await import('../../../utils/jwt.js'));
+});
 
 describe('JWT Utils', () => {
   const originalEnv = process.env;
