@@ -48,8 +48,12 @@ jest.unstable_mockModule('../../../utils/jwt.js', () => ({
   generateResetToken: jest.fn(),
 }));
 
+jest.unstable_mockModule('../../../utils/emailService.js', () => ({
+  sendPasswordResetEmail: jest.fn(),
+}));
+
 // Now import after mocks are set up
-let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken;
+let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken, sendPasswordResetEmail;
 
 beforeAll(async () => {
   authController = await import('../../../controllers/authController.js');
@@ -57,6 +61,7 @@ beforeAll(async () => {
   PendingSeller = (await import('../../../models/PendingSeller.js')).default;
   PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
   ({ generateToken, generateResetToken } = await import('../../../utils/jwt.js'));
+  ({ sendPasswordResetEmail } = await import('../../../utils/emailService.js'));
 });
 
 describe("Auth Controller", () => {
@@ -399,18 +404,32 @@ describe("Auth Controller", () => {
       Seller.findById.mockResolvedValue(mockSeller);
       generateResetToken.mockReturnValue("reset_abcdef123456");
       PasswordResetToken.mockImplementation(() => mockResetToken);
+      sendPasswordResetEmail.mockResolvedValue({
+        success: true,
+        previewUrl: "https://ethereal.email/message/123"
+      });
+
+      // Mock NODE_ENV as development to get token in response
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'development';
 
       await authController.recover(mockReq, mockRes);
 
       expect(Seller.findById).toHaveBeenCalledWith("seller123");
       expect(generateResetToken).toHaveBeenCalled();
       expect(mockResetToken.save).toHaveBeenCalled();
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith("user@example.com", "reset_abcdef123456");
 
       expect(mockRes.json).toHaveBeenCalledWith({
-        token: "reset_abcdef123456",
+        message: "Password reset email sent successfully",
         sellerId: "seller123",
         expiresAt: mockResetToken.expiresAt,
+        token: "reset_abcdef123456",
+        emailPreview: "https://ethereal.email/message/123"
       });
+
+      // Restore environment
+      process.env.NODE_ENV = originalEnv;
     });
 
     it("should return 404 when seller not found for recovery", async () => {

@@ -6,6 +6,7 @@ import {
   login,
   activate,
   recover,
+  requestRecovery,
   reset,
   getSellerByEmail,
 } from '../controllers/authController.js';
@@ -13,6 +14,7 @@ import {
 // Public routes
 router.post('/login', validationRules.login, validate, login);
 router.post('/activate', validationRules.activate, validate, activate);
+router.post('/request-recovery', validationRules.requestRecovery, validate, requestRecovery);
 router.post('/reset', validationRules.resetPassword, validate, reset);
 router.get('/seller-status', validationRules.getSellerByEmail, validate, getSellerByEmail);
 

@@ -23,27 +23,18 @@ const pendingSellerSchema = new mongoose.Schema({
     required: true,
   },
   createdBy: {
-    type: mongoose.Schema.Types.Mixed, // Allow both ObjectId and String
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Seller',
     required: true,
-    validate: {
-      validator: function(value) {
-        // Allow the special "Self" string for bootstrap superadmin
-        if (value === 'Self') {
-          return true;
-        }
-        // Otherwise, validate as ObjectId
-        return mongoose.Types.ObjectId.isValid(value);
-      },
-      message: 'createdBy must be a valid ObjectId or "Self" for bootstrap accounts',
-    },
-    // Set reference only when it's an ObjectId
-    refPath: function() {
-      return this.createdBy === 'Self' ? null : 'Seller';
-    },
   },
   activatedAt: {
     type: Date,
     default: null,
+  },
+  testingUser: {
+    type: Boolean,
+    default: false,
+    index: true, // Index for efficient filtering
   },
 }, {
   timestamps: true,
