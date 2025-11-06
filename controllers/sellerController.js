@@ -20,7 +20,7 @@ const createPendingSeller = async(req, res) => {
   }
 
   // Check if pending seller already exists
-  const existingPending = await PendingSeller.findOne({ email, activatedAt: null });
+  const existingPending = await PendingSeller.findOne({ email });
   if (existingPending) {
     return res.status(400).json({
       error: 'Duplicate Error',
@@ -134,7 +134,7 @@ const changeRole = async(req, res) => {
 };
 
 const listPendingSellers = async(req, res) => {
-  const pendingSellers = await PendingSeller.find({ activatedAt: null })
+  const pendingSellers = await PendingSeller.find({})
     .populate('createdBy', 'firstName lastName email role')
     .sort({ createdAt: -1 })
     .select('-__v');

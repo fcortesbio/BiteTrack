@@ -185,9 +185,9 @@ describe("BiteTrack Authentication Routes", () => {
         expect(seller).toBeTruthy();
         expect(seller.firstName).toBe(pendingSellerData.firstName);
 
-        // Verify pending seller was marked as activated
+        // Verify pending seller was deleted
         const updatedPending = await PendingSeller.findById(pendingSeller._id);
-        expect(updatedPending.activatedAt).toBeTruthy();
+        expect(updatedPending).toBeNull();
       });
 
       it("should hash password before storing", async () => {
@@ -248,21 +248,28 @@ describe("BiteTrack Authentication Routes", () => {
         expect(response.body.message).toContain("Pending seller not found");
       });
 
-      it("should reject activation of already activated seller", async () => {
-        // Arrange - Create and activate a pending seller
+      it("should reject activation when active seller already exists", async () => {
+        // Arrange - Create a pending seller and an active seller with same email
         const pendingSellerData = {
           firstName: "Already",
           lastName: "Activated",
           email: "already.activated@test.com",
           dateOfBirth: new Date("1990-01-01"),
           createdBy: testUtils.generateObjectId(),
-          activatedAt: new Date(), // Already activated
         };
 
         const pendingSeller = new PendingSeller(pendingSellerData);
         await pendingSeller.save();
 
-        // Act - Try to activate again
+        // Create active seller with same email
+        const activeSeller = new Seller({
+          ...pendingSellerData,
+          password: "ExistingPassword123!",
+          role: "user",
+        });
+        await activeSeller.save();
+
+        // Act - Try to activate the pending seller
         const response = await request(app)
           .post("/bitetrack/auth/activate")
           .send({
@@ -273,9 +280,9 @@ describe("BiteTrack Authentication Routes", () => {
           });
 
         // Assert
-        expect(response.status).toBe(404);
+        expect(response.status).toBe(409);
         expect(response.body).toHaveProperty("message");
-        expect(response.body.message).toContain("already activated");
+        expect(response.body.message).toContain("already exists");
       });
     });
   });

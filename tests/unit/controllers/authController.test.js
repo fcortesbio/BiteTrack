@@ -25,6 +25,7 @@ jest.unstable_mockModule('../../../models/Seller.js', () => {
 jest.unstable_mockModule('../../../models/PendingSeller.js', () => ({
   default: {
     findOne: jest.fn(),
+    deleteOne: jest.fn(),
   },
 }));
 
@@ -52,8 +53,14 @@ jest.unstable_mockModule('../../../utils/emailService.js', () => ({
   sendPasswordResetEmail: jest.fn(),
 }));
 
+jest.unstable_mockModule('mongoose', () => ({
+  default: {
+    startSession: jest.fn(),
+  },
+}));
+
 // Now import after mocks are set up
-let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken, sendPasswordResetEmail;
+let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken, sendPasswordResetEmail, mongoose;
 
 beforeAll(async () => {
   authController = await import('../../../controllers/authController.js');
@@ -62,6 +69,7 @@ beforeAll(async () => {
   PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
   ({ generateToken, generateResetToken } = await import('../../../utils/jwt.js'));
   ({ sendPasswordResetEmail } = await import('../../../utils/emailService.js'));
+  mongoose = (await import('mongoose')).default;
 });
 
 describe("Auth Controller", () => {
@@ -122,7 +130,6 @@ describe("Auth Controller", () => {
       });
       expect(PendingSeller.findOne).toHaveBeenCalledWith({
         email: "pending@example.com",
-        activatedAt: null,
       });
       expect(mockRes.json).toHaveBeenCalledWith({
         email: "pending@example.com",
@@ -286,12 +293,12 @@ describe("Auth Controller", () => {
   describe("activate", () => {
     it("should activate pending seller successfully", async () => {
       const mockPendingSeller = {
+        _id: "pending123",
         firstName: "John",
         lastName: "Doe",
         email: "john@example.com",
         dateOfBirth: new Date("1990-01-01"),
         createdBy: "admin123",
-        save: jest.fn().mockResolvedValue(),
       };
 
       const mockNewSeller = {
@@ -304,6 +311,13 @@ describe("Auth Controller", () => {
         save: jest.fn().mockResolvedValue(),
       };
 
+      const mockSession = {
+        withTransaction: jest.fn((cb) => cb()),
+        endSession: jest.fn(),
+      };
+
+      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+
       mockReq.body = {
         email: "john@example.com",
         dateOfBirth: "1990-01-01",
@@ -311,21 +325,22 @@ describe("Auth Controller", () => {
         password: "NewPassword123!",
       };
 
-      PendingSeller.findOne.mockResolvedValue(mockPendingSeller);
+      Seller.findOne.mockReturnValue({
+        session: jest.fn().mockResolvedValue(null), // No existing active seller
+      });
+      PendingSeller.findOne.mockReturnValue({
+        session: jest.fn().mockResolvedValue(mockPendingSeller),
+      });
+      PendingSeller.deleteOne.mockReturnValue({
+        session: jest.fn().mockResolvedValue({ deletedCount: 1 }),
+      });
       Seller.mockImplementation(() => mockNewSeller);
+      mockRes.locals = {};
 
       await authController.activate(mockReq, mockRes);
 
-      expect(PendingSeller.findOne).toHaveBeenCalledWith({
-        email: "john@example.com",
-        dateOfBirth: new Date("1990-01-01"),
-        lastName: "Doe",
-        activatedAt: null,
-      });
-
       expect(mockNewSeller.save).toHaveBeenCalled();
-      expect(mockPendingSeller.save).toHaveBeenCalled();
-      expect(mockPendingSeller.activatedAt).toBeInstanceOf(Date);
+      expect(PendingSeller.deleteOne).toHaveBeenCalled();
 
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith({
@@ -334,9 +349,18 @@ describe("Auth Controller", () => {
         lastName: "Doe",
         email: "john@example.com",
       });
+
+      mongoose.startSession.mockRestore();
     });
 
     it("should return 404 when pending seller not found", async () => {
+      const mockSession = {
+        withTransaction: jest.fn((cb) => cb()),
+        endSession: jest.fn(),
+      };
+
+      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+
       mockReq.body = {
         email: "notfound@example.com",
         dateOfBirth: "1990-01-01",
@@ -344,27 +368,39 @@ describe("Auth Controller", () => {
         password: "Password123!",
       };
 
-      PendingSeller.findOne.mockResolvedValue(null);
+      Seller.findOne.mockReturnValue({
+        session: jest.fn().mockResolvedValue(null),
+      });
+      PendingSeller.findOne.mockReturnValue({
+        session: jest.fn().mockResolvedValue(null),
+      });
 
       await authController.activate(mockReq, mockRes);
 
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
         error: "Not Found",
-        message: "Pending seller not found or already activated",
+        message: "Pending seller not found or verification details do not match",
         statusCode: 404,
       });
+
+      mongoose.startSession.mockRestore();
     });
 
     it("should handle database errors during activation", async () => {
+      const mockSession = {
+        withTransaction: jest.fn().mockRejectedValue(new Error("Database error")),
+        endSession: jest.fn(),
+      };
+
+      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+
       mockReq.body = {
         email: "error@example.com",
         dateOfBirth: "1990-01-01",
         lastName: "Error",
         password: "Password123!",
       };
-
-      PendingSeller.findOne.mockRejectedValue(new Error("Database error"));
 
       const consoleSpy = jest
         .spyOn(console, "error")
@@ -380,6 +416,7 @@ describe("Auth Controller", () => {
       });
 
       consoleSpy.mockRestore();
+      mongoose.startSession.mockRestore();
     });
   });
 

@@ -27,10 +27,6 @@ const pendingSellerSchema = new mongoose.Schema({
     ref: 'Seller',
     required: true,
   },
-  activatedAt: {
-    type: Date,
-    default: null,
-  },
   testingUser: {
     type: Boolean,
     default: false,

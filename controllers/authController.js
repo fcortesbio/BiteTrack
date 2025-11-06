@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Seller from '../models/Seller.js';
 import PendingSeller from '../models/PendingSeller.js';
 import PasswordResetToken from '../models/PasswordResetToken.js';
@@ -19,10 +20,7 @@ const getSellerByEmail = async (req, res) => {
     }
 
     // If no active account, check for pending account
-    const pendingSeller = await PendingSeller.findOne({
-      email,
-      activatedAt: null,
-    });
+    const pendingSeller = await PendingSeller.findOne({ email });
 
     if (pendingSeller) {
       return res.json({
@@ -82,50 +80,87 @@ const login = async (req, res) => {
 };
 
 const activate = async (req, res) => {
+  const session = await mongoose.startSession();
+  
   try {
-    const { email, dateOfBirth, lastName, password } = req.body;
+    await session.withTransaction(async () => {
+      const { email, dateOfBirth, lastName, password } = req.body;
 
-    // Find pending seller
-    const pendingSeller = await PendingSeller.findOne({
-      email,
-      dateOfBirth: new Date(dateOfBirth),
-      lastName,
-      activatedAt: null,
-    });
+      // Check if seller already exists (race condition protection)
+      const existingSeller = await Seller.findOne({ email }).session(session);
+      if (existingSeller) {
+        throw {
+          statusCode: 409,
+          error: "Conflict",
+          message: "An active account with this email already exists",
+        };
+      }
 
-    if (!pendingSeller) {
-      return res.status(404).json({
-        error: "Not Found",
-        message: "Pending seller not found or already activated",
-        statusCode: 404,
+      // Find pending seller
+      const pendingSeller = await PendingSeller.findOne({
+        email,
+        dateOfBirth: new Date(dateOfBirth),
+        lastName,
+      }).session(session);
+
+      if (!pendingSeller) {
+        throw {
+          statusCode: 404,
+          error: "Not Found",
+          message: "Pending seller not found or verification details do not match",
+        };
+      }
+
+      // Create activated seller
+      const seller = new Seller({
+        firstName: pendingSeller.firstName,
+        lastName: pendingSeller.lastName,
+        email: pendingSeller.email,
+        dateOfBirth: pendingSeller.dateOfBirth,
+        password,
+        role: "user",
+        createdBy: pendingSeller.createdBy,
       });
-    }
 
-    // Create activated seller
-    const seller = new Seller({
-      firstName: pendingSeller.firstName,
-      lastName: pendingSeller.lastName,
-      email: pendingSeller.email,
-      dateOfBirth: pendingSeller.dateOfBirth,
-      password,
-      role: "user",
-      createdBy: pendingSeller.createdBy,
+      await seller.save({ session });
+
+      // Delete pending seller
+      await PendingSeller.deleteOne({ _id: pendingSeller._id }).session(session);
+
+      // Store seller for response (outside transaction to avoid issues)
+      res.locals.activatedSeller = seller;
     });
 
-    await seller.save();
-
-    // Mark pending seller as activated
-    pendingSeller.activatedAt = new Date();
-    await pendingSeller.save();
-
-    res.status(201).json(seller.toJSON());
+    // Transaction succeeded
+    res.status(201).json(res.locals.activatedSeller.toJSON());
   } catch (error) {
     console.error('Error in activate:', error);
+    
+    // Handle custom errors from transaction
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        error: error.error,
+        message: error.message,
+        statusCode: error.statusCode,
+      });
+    }
+    
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      return res.status(409).json({
+        error: "Conflict",
+        message: "An account with this email already exists",
+        statusCode: 409,
+      });
+    }
+    
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during account activation",
       statusCode: 500,
     });
+  } finally {
+    session.endSession();
   }
 };
 
