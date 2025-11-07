@@ -1,0 +1,24 @@
+{
+  "name": "@bitetrack/mcp-server",
+  "version": "1.0.0",
+  "description": "BiteTrack MCP (Model Context Protocol) server for AI-powered operations",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": ["mcp", "ai", "gemini", "bitetrack"],
+  "author": "fcortesbio",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.2.0",
+    "dotenv": "^16.6.1",
+    "axios": "^1.12.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

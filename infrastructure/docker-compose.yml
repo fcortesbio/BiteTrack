@@ -1,7 +1,47 @@
-# Load environment variables from .env.development for local Docker development
-# For production, create a .env.production file based on .env.production.template
+# BiteTrack Unified Infrastructure
+# All services orchestrated with Traefik reverse proxy
+#
+# Usage:
+#   docker compose up -d          # Start all services
+#   docker compose logs -f        # View logs
+#   docker compose down           # Stop all services
+#
+# Access:
+#   Frontend:  http://localhost
+#   API:       http://localhost/api
+#   MCP:       http://localhost/mcp
+#   Traefik:   http://localhost:8080
+
 services:
-  # MongoDB Service (with replica set)
+  # Traefik Reverse Proxy
+  traefik:
+    image: traefik:v3.5
+    container_name: bitetrack-traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=INFO"
+    ports:
+      - "80:80"      # HTTP
+      - "8080:8080"  # Traefik Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_logs:/var/log/traefik
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  # MongoDB Service (replica set for transactions)
   mongodb:
     image: mongo:8.0-noble
     container_name: bitetrack-mongodb
@@ -9,13 +49,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    ports:
-      - "27017:27017"
     volumes:
       - mongodb_data:/data/db
       - ../keyfile.example:/etc/mongodb-keyfile:ro
     networks:
-      - bitetrack-network
+      - backend  # Private network only
     entrypoint: >
       bash -c "
         cp /etc/mongodb-keyfile /tmp/keyfile &&
@@ -55,25 +93,30 @@ services:
   # BiteTrack API Service
   bitetrack-api:
     build:
-      context: ..
-      dockerfile: services/api/Dockerfile
+      context: ../services/api
+      dockerfile: Dockerfile
     container_name: bitetrack-api
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     environment:
       MONGO_URI: ${MONGO_URI}
       JWT_SECRET: ${JWT_SECRET}
-      PORT: ${PORT:-3000}
+      PORT: 3000
       NODE_ENV: ${NODE_ENV:-production}
       FRONTEND_URLS: ${FRONTEND_URLS}
     networks:
-      - bitetrack-network
+      - web
+      - backend
     depends_on:
       mongodb:
         condition: service_healthy
       mongodb-init:
         condition: service_completed_successfully
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=PathPrefix(`/api`) || PathPrefix(`/bitetrack`)"
+      - "traefik.http.routers.api.entrypoints=web"
+      - "traefik.http.services.api.loadbalancer.server.port=3000"
+      - "traefik.docker.network=web"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/bitetrack/health"]
       interval: 30s
@@ -81,9 +124,72 @@ services:
       retries: 3
       start_period: 30s
 
+  # BiteTrack Frontend Service
+  bitetrack-frontend:
+    build:
+      context: ../services/frontend
+      dockerfile: Dockerfile
+    container_name: bitetrack-frontend
+    restart: unless-stopped
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.routers.frontend.priority=1"  # Lowest priority (catch-all)
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.docker.network=web"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # BiteTrack MCP AI Service
+  bitetrack-mcp:
+    build:
+      context: ../services/mcp
+      dockerfile: Dockerfile
+    container_name: bitetrack-mcp
+    restart: unless-stopped
+    environment:
+      MCP_PORT: 3001
+      NODE_ENV: ${NODE_ENV:-production}
+      API_URL: http://bitetrack-api:3000
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - web
+      - backend
+    depends_on:
+      bitetrack-api:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mcp.rule=PathPrefix(`/mcp`)"
+      - "traefik.http.routers.mcp.entrypoints=web"
+      - "traefik.http.middlewares.mcp-stripprefix.stripprefix.prefixes=/mcp"
+      - "traefik.http.routers.mcp.middlewares=mcp-stripprefix"
+      - "traefik.http.services.mcp.loadbalancer.server.port=3001"
+      - "traefik.docker.network=web"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 networks:
-  bitetrack-network:
+  web:
     driver: bridge
+    name: bitetrack_web
+  backend:
+    driver: bridge
+    name: bitetrack_backend
+    internal: true  # No external access
 
 volumes:
   mongodb_data:
+  traefik_logs:

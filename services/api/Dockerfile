@@ -2,28 +2,23 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy root workspace package.json first for dependency resolution
-COPY package.json ./
+# Copy package files
+COPY package*.json ./
 
-# Copy API service package files
-COPY services/api/package*.json ./services/api/
-
-# Copy shared packages
-COPY packages ./packages/
-
-# Install all dependencies (workspace aware)
-RUN npm install --workspace=services/api
+# Install dependencies
+RUN npm install --production
 
 # Install wget for healthcheck
 RUN apk add --no-cache wget
 
-# Copy API source code
-COPY services/api ./services/api/
+# Copy source code
+COPY . .
 
-# Set working directory to API service
-WORKDIR /app/services/api
-
-# Don't hardcode env values, app will read from .env
+# Expose API port
 EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/bitetrack/health || exit 1
 
 CMD ["npm", "start"]
