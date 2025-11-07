@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-11-05T20:32:36.792Z",
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "successRate": "100.0%"
+  },
+  "details": [
+    {
+      "name": "Basic Sales List Structure",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Pagination Functionality",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Sorting Functionality",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Settlement Status Filtering",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Date Range Filtering",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Populated References",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Combined Filtering",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    },
+    {
+      "name": "Error Handling",
+      "status": "PASS",
+      "message": "Test passed successfully"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "preset": "minimal",
+  "timestamp": "2025-11-03T20:40:20.593Z",
+  "counts": {
+    "customers": 5,
+    "products": 7,
+    "sales": 3,
+    "pendingSellers": 2
+  },
+  "sampleIds": {
+    "firstCustomer": "690913340b23c832b80a14fb",
+    "firstProduct": "69091334a2e98ccafc214749",
+    "firstSale": "69091334a2e98ccafc214754"
+  },
+  "statistics": {
+    "totalSalesValue": 122.35,
+    "averageOrderValue": "40.78",
+    "settledSales": 2,
+    "unsettledSales": 1
+  }
+}

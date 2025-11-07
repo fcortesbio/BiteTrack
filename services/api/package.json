@@ -1,0 +1,102 @@
+{
+  "name": "bitetrack",
+  "version": "1.0.0",
+  "description": "RESTful API for small food businesses to manage sellers, products, customers, and sales",
+  "keywords": [
+    "api",
+    "food",
+    "business",
+    "express",
+    "mongodb"
+  ],
+  "homepage": "https://github.com/fcortesbio/BiteTrack#readme",
+  "bugs": {
+    "url": "https://github.com/fcortesbio/BiteTrack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fcortesbio/BiteTrack.git"
+  },
+  "license": "MIT",
+  "author": "fcortesbio",
+  "type": "module",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
+    "dev:manual": "NODE_ENV=development node --loader ./config/dotenv.js index.js",
+    "dev:watch": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
+    "start:production": "NODE_ENV=production node index.js",
+    "test": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest",
+    "test:watch": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --coverage",
+    "test:verbose": "cross-env NODE_OPTIONS='--experimental-vm-modules --no-warnings' NODE_ENV=test jest --verbose",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:check": "eslint . --max-warnings 0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
+    "express-validator": "^7.2.1",
+    "fast-csv": "^5.0.5",
+    "helmet": "^7.2.0",
+    "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.3",
+    "@faker-js/faker": "^10.0.0",
+    "cross-env": "^10.0.0",
+    "eslint": "^9.37.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^16.4.0",
+    "jest": "^30.1.3",
+    "mongodb-memory-server": "^10.2.1",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "controllers/**/*.js",
+      "models/**/*.js",
+      "middleware/**/*.js",
+      "routes/**/*.js",
+      "utils/**/*.js",
+      "!**/node_modules/**",
+      "!**/coverage/**"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "testTimeout": 30000
+  }
+}

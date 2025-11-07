@@ -13,7 +13,7 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./keyfile.example:/etc/mongodb-keyfile:ro
+      - ../keyfile.example:/etc/mongodb-keyfile:ro
     networks:
       - bitetrack-network
     entrypoint: >
@@ -54,7 +54,9 @@ services:
 
   # BiteTrack API Service
   bitetrack-api:
-    build: .
+    build:
+      context: ..
+      dockerfile: services/api/Dockerfile
     container_name: bitetrack-api
     restart: unless-stopped
     ports:

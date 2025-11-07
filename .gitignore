@@ -1,4 +1,12 @@
+# Dependencies (all workspaces)
 node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
 
 # Environment files (ignore all except templates and examples)
 .env*

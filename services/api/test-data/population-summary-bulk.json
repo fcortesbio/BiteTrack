@@ -1,0 +1,21 @@
+{
+  "preset": "bulk",
+  "timestamp": "2025-11-06T19:30:49.969Z",
+  "counts": {
+    "customers": 25,
+    "products": 42,
+    "sales": 11,
+    "pendingSellers": 8
+  },
+  "sampleIds": {
+    "firstCustomer": "690cf76935452c828f357dfa",
+    "firstProduct": "690cf7697da0e3079ff1007d",
+    "firstSale": "690cf7697da0e3079ff100b2"
+  },
+  "statistics": {
+    "totalSalesValue": 463.79,
+    "averageOrderValue": "42.16",
+    "settledSales": 6,
+    "unsettledSales": 5
+  }
+}

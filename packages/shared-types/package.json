@@ -1,0 +1,13 @@
+{
+  "name": "@bitetrack/shared-types",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types and interfaces for BiteTrack services",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "keywords": ["types", "shared", "bitetrack"],
+  "author": "fcortesbio",
+  "license": "MIT"
+}
