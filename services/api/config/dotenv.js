@@ -18,8 +18,8 @@ dotenv.config({ path: envPath });
 
 // Optional: Development logging
 if (environment === "development") {
-  console.log("🔧 Environment loaded:", envFile);
-  console.log("📁 From:", envPath);
+//   console.log("🔧 Environment loaded:", envFile);
+//   console.log("📁 From:", envPath);
 }
 
 export default dotenv;
