@@ -4,11 +4,37 @@ import csv from "csv-parser";
 import multer from "multer";
 import { Readable } from "stream";
 
+/**
+ * List all customers
+ *
+ * @async
+ * @function listCustomers
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON array of all customers
+ */
 const listCustomers = async (req, res) => {
   const customers = await Customer.find({});
   res.json(customers);
 };
 
+/**
+ * Create a new customer
+ * Validates uniqueness of phone number and email before creation
+ *
+ * @async
+ * @function createCustomer
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.firstName - Customer's first name
+ * @param {string} req.body.lastName - Customer's last name
+ * @param {string} req.body.phoneNumber - Customer's 10-digit phone number
+ * @param {string} [req.body.email] - Customer's email (optional)
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with created customer (201)
+ * @throws {409} If phone number or email already exists
+ * @throws {400} If validation fails
+ */
 const createCustomer = async (req, res) => {
   try {
     const { firstName, lastName, phoneNumber, email } = req.body;
@@ -114,6 +140,26 @@ const createCustomer = async (req, res) => {
   }
 };
 
+/**
+ * Update an existing customer
+ * Validates uniqueness constraints for phone number and email
+ *
+ * @async
+ * @function updateCustomer
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - Customer ID to update
+ * @param {Object} req.body - Fields to update
+ * @param {string} [req.body.firstName] - Updated first name
+ * @param {string} [req.body.lastName] - Updated last name
+ * @param {string} [req.body.phoneNumber] - Updated phone number
+ * @param {string} [req.body.email] - Updated email
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with updated customer
+ * @throws {404} If customer not found
+ * @throws {409} If phone number or email conflict with existing customer
+ * @throws {400} If validation fails
+ */
 const updateCustomer = async (req, res) => {
   try {
     const { id } = req.params;
@@ -256,6 +302,18 @@ const updateCustomer = async (req, res) => {
   }
 };
 
+/**
+ * Delete a customer
+ *
+ * @async
+ * @function deleteCustomer
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - Customer ID to delete
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Empty response with 204 status
+ * @throws {404} If customer not found
+ */
 const deleteCustomer = async (req, res) => {
   const { id } = req.params;
 
@@ -272,6 +330,24 @@ const deleteCustomer = async (req, res) => {
   res.status(204).send();
 };
 
+/**
+ * Get customer transaction history with pagination
+ * Returns customer details and their sales with optional filtering
+ *
+ * @async
+ * @function getCustomerTransactions
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - Customer ID
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.limit=10] - Number of transactions per page (1-100)
+ * @param {number} [req.query.page=1] - Page number
+ * @param {string} [req.query.settled] - Filter by settled status ("true" or "false")
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with customer, transactions, and pagination info
+ * @throws {404} If customer not found
+ * @throws {400} If pagination parameters are invalid
+ */
 const getCustomerTransactions = async (req, res) => {
   // Parameter extraction & Setup
   const { id } = req.params;
@@ -340,7 +416,17 @@ const getCustomerTransactions = async (req, res) => {
   });
 };
 
-// Helper function to validate customer data
+/**
+ * Validate customer data from CSV import
+ * Checks required fields and phone number format
+ *
+ * @function validateCustomerData
+ * @param {Object} data - Customer data to validate
+ * @param {string} data.firstName - First name
+ * @param {string} data.lastName - Last name
+ * @param {string} data.phoneNumber - Phone number
+ * @returns {Array<Object>} Array of validation error objects
+ */
 const validateCustomerData = (data) => {
   const errors = [];
 
@@ -369,7 +455,17 @@ const validateCustomerData = (data) => {
   return errors;
 };
 
-// Helper function to check for existing customers
+/**
+ * Check for existing customers with same phone or email
+ * Used during CSV import to prevent duplicates
+ *
+ * @async
+ * @function checkForConflicts
+ * @param {Object} customerData - Customer data to check
+ * @param {string} customerData.phoneNumber - Phone number to check
+ * @param {string} [customerData.email] - Email to check (optional)
+ * @returns {Promise<Array<Object>>} Array of conflict objects with details
+ */
 const checkForConflicts = async (customerData) => {
   const conflicts = [];
   const phoneNumber = normalizePhoneNumber(customerData.phoneNumber.toString());
@@ -410,6 +506,29 @@ const checkForConflicts = async (customerData) => {
   return conflicts;
 };
 
+/**
+ * Import customers from CSV file
+ * Processes CSV file, validates data, and creates customer records
+ *
+ * @async
+ * @function importCustomersFromCSV
+ * @param {Object} req - Express request object
+ * @param {Object} req.file - Uploaded file from multer
+ * @param {Buffer} req.file.buffer - CSV file buffer
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with import summary and results
+ * @throws {400} If no file provided
+ * @throws {500} If CSV processing fails
+ *
+ * @description
+ * Expected CSV columns: firstName, lastName, phoneNumber, email (optional)
+ * Returns detailed report of successful imports and failures with reasons
+ *
+ * @example
+ * POST /customers/import
+ * Content-Type: multipart/form-data
+ * file: customers.csv
+ */
 const importCustomersFromCSV = async (req, res) => {
   try {
     if (!req.file) {
@@ -534,7 +653,15 @@ const importCustomersFromCSV = async (req, res) => {
   }
 };
 
-// Configure multer for file upload
+/**
+ * Multer configuration for CSV file upload
+ * Configures memory storage, file size limit, and file type validation
+ *
+ * @constant {Object} upload
+ * @property {Object} storage - Memory storage configuration
+ * @property {Object} limits - Upload limits (5MB max)
+ * @property {Function} fileFilter - CSV file validation
+ */
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {

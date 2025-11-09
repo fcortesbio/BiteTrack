@@ -1,5 +1,47 @@
 const isDevelopment = process.env.NODE_ENV === "development";
 
+/**
+ * Global error handling middleware for Express application
+ * Handles various types of errors (Mongoose validation, JWT, Multer, etc.)
+ * and returns consistent error responses
+ *
+ * @function errorHandler
+ * @param {Error} err - Error object thrown by application or middleware
+ * @param {string} err.name - Error type name (e.g., 'ValidationError', 'CastError', 'JsonWebTokenError')
+ * @param {string} err.message - Error message
+ * @param {number} [err.statusCode] - HTTP status code for custom errors
+ * @param {string} [err.code] - Error code for specific error types (e.g., 11000 for MongoDB duplicate key)
+ * @param {Object} req - Express request object
+ * @param {string} req.method - HTTP method
+ * @param {string} req.originalUrl - Original URL requested
+ * @param {string} req.ip - Client IP address
+ * @param {Object} res - Express response object
+ * @param {Function} _next - Express next middleware function (unused but required by signature)
+ * @returns {void} Sends JSON error response with appropriate status code
+ *
+ * @description
+ * Handles the following error types:
+ * - Mongoose ValidationError: 400 with field-specific error details
+ * - MongoDB duplicate key (code 11000): 400 with duplicate field info
+ * - Mongoose CastError (invalid ObjectId): 400 with invalid ID message
+ * - JWT errors (JsonWebTokenError, TokenExpiredError): 401 unauthorized
+ * - Multer file upload errors (LIMIT_FILE_SIZE): 400 with file size message
+ * - Custom operational errors: Uses error.statusCode
+ * - Unknown errors: 500 internal server error
+ *
+ * Logs all errors with contextual information (request details, timestamp, stack trace in dev)
+ * Sanitizes error responses in production to prevent information leakage
+ *
+ * @example
+ * // Usage in Express app
+ * app.use(errorHandler);
+ *
+ * @example
+ * // Throwing custom error in controller
+ * const error = new Error('Resource not found');
+ * error.statusCode = 404;
+ * throw error;
+ */
 const errorHandler = (err, req, res, _next) => {
   // Log error with request context
   const timestamp = new Date().toISOString();

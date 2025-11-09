@@ -6,6 +6,28 @@ import csv from "csv-parser";
 import multer from "multer";
 import { Readable } from "stream";
 
+/**
+ * List all sales with advanced filtering, pagination, and sorting
+ * Supports filtering by customer, seller, settlement status, and date ranges
+ *
+ * @async
+ * @function listSales
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} [req.query.customerId] - Filter by customer ID
+ * @param {string} [req.query.sellerId] - Filter by seller ID
+ * @param {string} [req.query.settled] - Filter by settled status ("true" or "false")
+ * @param {string} [req.query.startDate] - Start date filter (YYYY-MM-DD)
+ * @param {string} [req.query.endDate] - End date filter (YYYY-MM-DD)
+ * @param {string} [req.query.dateField="createdAt"] - Date field to filter on
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=50] - Results per page (1-100)
+ * @param {string} [req.query.sort="-createdAt"] - Sort field (prefix with - for descending)
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with sales array, pagination, and filters
+ * @throws {400} If date format is invalid or pagination parameters are out of range
+ */
 const listSales = async (req, res, next) => {
   try {
     const {
@@ -160,6 +182,34 @@ const listSales = async (req, res, next) => {
   }
 };
 
+/**
+ * Create a new sale with atomic inventory management
+ * Uses MongoDB transactions to ensure data consistency across sale and inventory updates
+ *
+ * @async
+ * @function createSale
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.customerId - Customer ID
+ * @param {Array<Object>} req.body.products - Array of product items
+ * @param {string} req.body.products[].productId - Product ID
+ * @param {number} req.body.products[].quantity - Quantity to purchase
+ * @param {number} [req.body.amountPaid=0] - Amount paid (defaults to 0)
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user._id - Seller ID from authentication
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with created sale (201)
+ * @throws {404} If customer or product not found
+ * @throws {400} If insufficient inventory
+ *
+ * @description
+ * - Verifies customer exists
+ * - Validates product availability and inventory levels
+ * - Atomically decrements inventory and creates sale record
+ * - Updates customer's lastTransaction timestamp
+ * - All operations wrapped in MongoDB transaction
+ */
 const createSale = async (req, res, next) => {
   const session = await mongoose.startSession();
 
@@ -252,6 +302,19 @@ const createSale = async (req, res, next) => {
   }
 };
 
+/**
+ * Get a single sale by ID
+ *
+ * @async
+ * @function getSale
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - Sale ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with sale details
+ * @throws {404} If sale not found
+ */
 const getSale = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -271,6 +334,23 @@ const getSale = async (req, res, next) => {
   }
 };
 
+/**
+ * Settle a pending sale by recording payment
+ * Updates sale settlement status and records payment amount
+ *
+ * @async
+ * @function settleSale
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - Sale ID to settle
+ * @param {Object} req.body - Request body
+ * @param {number} [req.body.amountPaid] - Amount paid (defaults to full amount)
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with updated sale
+ * @throws {404} If sale not found
+ * @throws {400} If sale is already settled
+ */
 const settleSale = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -313,7 +393,14 @@ const settleSale = async (req, res, next) => {
   }
 };
 
-// Helper function to parse timestamp from CSV
+/**
+ * Parse timestamp string from CSV
+ *
+ * @function parseCSVTimestamp
+ * @param {string} timestampStr - Timestamp string (MM/DD/YYYY HH:mm:ss)
+ * @returns {Date} Parsed date object
+ * @throws {Error} If timestamp format is invalid
+ */
 const parseCSVTimestamp = (timestampStr) => {
   // Expected format: MM/DD/YYYY HH:mm:ss
   const parsed = new Date(timestampStr);
@@ -323,7 +410,17 @@ const parseCSVTimestamp = (timestampStr) => {
   return parsed;
 };
 
-// Helper function to determine if contact is email or phone
+/**
+ * Parse contact string to determine if it's email or phone number
+ * Normalizes phone numbers to 10-digit format
+ *
+ * @function parseContact
+ * @param {string} contact - Contact string (email or phone)
+ * @returns {Object} Object with type and normalized value
+ * @returns {string} return.type - "email" or "phone"
+ * @returns {string} return.value - Normalized contact value
+ * @throws {Error} If contact format is invalid
+ */
 const parseContact = (contact) => {
   const trimmedContact = contact.toString().trim();
 
@@ -348,7 +445,14 @@ const parseContact = (contact) => {
   throw new Error(`Invalid contact format: ${contact}`);
 };
 
-// Helper function to find customer by contact
+/**
+ * Find customer by email or phone number
+ *
+ * @async
+ * @function findCustomerByContact
+ * @param {string} contact - Customer email or phone number
+ * @returns {Promise<Object|null>} Customer object or null if not found
+ */
 const findCustomerByContact = async (contact) => {
   const parsedContact = parseContact(contact);
 
@@ -359,14 +463,27 @@ const findCustomerByContact = async (contact) => {
   }
 };
 
-// Helper function to find product by name (case-insensitive)
+/**
+ * Find product by name (case-insensitive)
+ *
+ * @async
+ * @function findProductByName
+ * @param {string} productName - Product name to search for
+ * @returns {Promise<Object|null>} Product object or null if not found
+ */
 const findProductByName = async (productName) => {
   return await Product.findOne({
     productName: { $regex: new RegExp(`^${productName.trim()}$`, "i") },
   });
 };
 
-// Helper function to normalize CSV row data
+/**
+ * Normalize CSV row data by mapping columns to expected field names
+ *
+ * @function normalizeCSVRow
+ * @param {Object} row - Raw CSV row data
+ * @returns {Object} Normalized data object
+ */
 const normalizeCSVRow = (row) => {
   const normalized = {};
 
@@ -400,7 +517,15 @@ const normalizeCSVRow = (row) => {
   return normalized;
 };
 
-// Helper function to validate CSV row data
+/**
+ * Validate CSV row data for required fields and formats
+ *
+ * @function validateCSVRow
+ * @param {Object} row - CSV row data
+ * @returns {Object} Validation result
+ * @returns {Array<Object>} return.errors - Array of validation errors
+ * @returns {Object} return.normalized - Normalized row data
+ */
 const validateCSVRow = (row) => {
   const errors = [];
   const normalized = normalizeCSVRow(row);
@@ -444,6 +569,33 @@ const validateCSVRow = (row) => {
   return { errors, normalized };
 };
 
+/**
+ * Import sales from CSV file
+ * Processes CSV file and creates sales with inventory updates and deduplication
+ *
+ * @async
+ * @function importSalesFromCSV
+ * @param {Object} req - Express request object
+ * @param {Object} req.file - Uploaded file from multer
+ * @param {Buffer} req.file.buffer - CSV file buffer
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user._id - Seller ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {Promise<void>} JSON response with import summary
+ * @throws {400} If no file provided
+ *
+ * @description
+ * Expected CSV columns: Date, Contact Name, Contact Phone/Email, Product, Quantity,
+ * Unit Price, Total Amount, Amount Paid, Payment Method (optional), Receipt URL (optional)
+ *
+ * Features:
+ * - Duplicate detection by customer and timestamp
+ * - Customer lookup by email or phone
+ * - Product lookup by name (case-insensitive)
+ * - Batch processing for memory efficiency
+ * - Detailed error reporting per row
+ */
 const importSalesFromCSV = async (req, res, next) => {
   try {
     if (!req.file) {
@@ -709,7 +861,15 @@ const importSalesFromCSV = async (req, res, next) => {
   }
 };
 
-// Configure multer for CSV file upload
+/**
+ * Multer configuration for sales CSV file upload
+ * Configures memory storage, 10MB file size limit, and CSV file validation
+ *
+ * @constant {Object} uploadCSV
+ * @property {Object} storage - Memory storage configuration
+ * @property {Object} limits - Upload limits (10MB max)
+ * @property {Function} fileFilter - CSV file validation
+ */
 const uploadCSV = multer({
   storage: multer.memoryStorage(),
   limits: {

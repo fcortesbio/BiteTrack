@@ -3,7 +3,27 @@ import csv from "fast-csv";
 
 /**
  * Generate comprehensive sales analytics for a given time period
- * Includes totals, averages, top products, customer analytics, etc.
+ * Includes totals, averages, top products, customer analytics, settlement stats
+ *
+ * @async
+ * @function getSalesAnalytics
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} [req.query.startDate] - Start date filter (YYYY-MM-DD)
+ * @param {string} [req.query.endDate] - End date filter (YYYY-MM-DD)
+ * @param {string} [req.query.dateField="createdAt"] - Date field to filter on
+ * @param {string} [req.query.groupBy="day"] - Time grouping (hour/day/week/month/year)
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with comprehensive analytics
+ * @throws {400} If date format is invalid
+ *
+ * @description
+ * Returns analytics including:
+ * - Basic statistics (total sales, revenue, averages)
+ * - Time series data with trend analysis
+ * - Top 10 products by revenue
+ * - Customer analytics (unique customers, spend patterns)
+ * - Payment/settlement statistics
  */
 const getSalesAnalytics = async (req, res) => {
   const {
@@ -210,8 +230,29 @@ const getSalesAnalytics = async (req, res) => {
 };
 
 /**
- * Export sales data as CSV
- * Supports various export formats and filtering options
+ * Export sales data as CSV file
+ * Supports three formats: detailed, summary, and products
+ *
+ * @async
+ * @function exportSalesCSV
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} [req.query.startDate] - Start date filter (YYYY-MM-DD)
+ * @param {string} [req.query.endDate] - End date filter (YYYY-MM-DD)
+ * @param {string} [req.query.dateField="createdAt"] - Date field to filter on
+ * @param {string} [req.query.format="detailed"] - Export format (detailed/summary/products)
+ * @param {string} [req.query.customerId] - Filter by customer ID
+ * @param {string} [req.query.sellerId] - Filter by seller ID
+ * @param {string} [req.query.settled] - Filter by settled status
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} CSV file download
+ * @throws {400} If invalid format or date
+ *
+ * @description
+ * Export formats:
+ * - detailed: One row per product in each sale with full transaction details
+ * - summary: One row per sale with aggregate information
+ * - products: Product performance metrics and sales statistics
  */
 const exportSalesCSV = async (req, res) => {
   try {
@@ -307,7 +348,14 @@ const exportSalesCSV = async (req, res) => {
 };
 
 /**
- * Helper function to export detailed sales data as CSV
+ * Export detailed sales data as CSV (internal helper)
+ * Creates one row per product line item with full details
+ *
+ * @async
+ * @function exportDetailedSalesCSV
+ * @param {Object} filter - MongoDB filter for sales query
+ * @param {Object} res - Express response object (for streaming)
+ * @returns {Promise<void>} Streams CSV data to response
  */
 const exportDetailedSalesCSV = async (filter, res) => {
   const csvStream = csv.format({ headers: true });
@@ -356,7 +404,14 @@ const exportDetailedSalesCSV = async (filter, res) => {
 };
 
 /**
- * Helper function to export summary sales data as CSV
+ * Export summary sales data as CSV (internal helper)
+ * Creates one row per sale with aggregate totals
+ *
+ * @async
+ * @function exportSummaryCSV
+ * @param {Object} filter - MongoDB filter for sales query
+ * @param {Object} res - Express response object (for streaming)
+ * @returns {Promise<void>} Streams CSV data to response
  */
 const exportSummaryCSV = async (filter, res) => {
   const csvStream = csv.format({ headers: true });
@@ -396,7 +451,14 @@ const exportSummaryCSV = async (filter, res) => {
 };
 
 /**
- * Helper function to export product performance data as CSV
+ * Export product performance data as CSV (internal helper)
+ * Aggregates sales data by product with performance metrics
+ *
+ * @async
+ * @function exportProductsCSV
+ * @param {Object} filter - MongoDB filter for sales query
+ * @param {Object} res - Express response object (for streaming)
+ * @returns {Promise<void>} Streams CSV data to response
  */
 const exportProductsCSV = async (filter, res) => {
   const csvStream = csv.format({ headers: true });
@@ -457,7 +519,13 @@ const exportProductsCSV = async (filter, res) => {
 };
 
 /**
- * Helper function to create MongoDB date grouping expressions
+ * Create MongoDB aggregation expression for date grouping
+ * Generates appropriate grouping structure based on time period
+ *
+ * @function getGroupByDateExpression
+ * @param {string} groupBy - Grouping period (hour/day/week/month/year)
+ * @param {string} dateField - MongoDB date field to group by
+ * @returns {Object} MongoDB date grouping expression
  */
 const getGroupByDateExpression = (groupBy, dateField) => {
   switch (groupBy) {

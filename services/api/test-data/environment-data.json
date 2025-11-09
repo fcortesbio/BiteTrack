@@ -93,23 +93,9 @@
 
   "testDates": {
     "dateOfBirth": {
-      "valid": [
-        "1990-01-15",
-        "1985-12-31",
-        "1992-06-15",
-        "1988-03-22"
-      ],
-      "edge_cases": [
-        "2000-02-29",
-        "1980-01-01",
-        "2005-12-31"
-      ],
-      "invalid": [
-        "2030-01-01",
-        "1900-01-01",
-        "invalid-date",
-        "12/31/1990"
-      ]
+      "valid": ["1990-01-15", "1985-12-31", "1992-06-15", "1988-03-22"],
+      "edge_cases": ["2000-02-29", "1980-01-01", "2005-12-31"],
+      "invalid": ["2030-01-01", "1900-01-01", "invalid-date", "12/31/1990"]
     }
   },
 
@@ -119,12 +105,12 @@
       "max": 4.99
     },
     "medium": {
-      "min": 5.00,
+      "min": 5.0,
       "max": 14.99
     },
     "high": {
-      "min": 15.00,
-      "max": 50.00
+      "min": 15.0,
+      "max": 50.0
     },
     "premium": {
       "min": 50.01,
@@ -142,12 +128,12 @@
 
   "paymentScenarios": {
     "exact_payment": 12.99,
-    "overpayment": 15.00,
-    "underpayment": 10.00,
+    "overpayment": 15.0,
+    "underpayment": 10.0,
     "large_order": 159.99,
     "small_order": 1.99,
-    "zero_payment": 0.00,
-    "negative_payment": -5.00
+    "zero_payment": 0.0,
+    "negative_payment": -5.0
   },
 
   "commonSearchTerms": [
@@ -171,12 +157,7 @@
     "sales": {
       "settled": true,
       "unsettled": false,
-      "date_ranges": [
-        "today",
-        "this_week",
-        "this_month",
-        "last_30_days"
-      ]
+      "date_ranges": ["today", "this_week", "this_month", "last_30_days"]
     },
     "products": {
       "in_stock": true,

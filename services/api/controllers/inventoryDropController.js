@@ -6,6 +6,28 @@ import { validationResult } from "express-validator";
 /**
  * Drop inventory for a product (admin/superadmin only)
  * Creates a persistent record for analytics and updates product inventory
+ *
+ * @async
+ * @function dropInventory
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.productId - Product ID to drop inventory from
+ * @param {number} req.body.quantityToDrop - Quantity to drop (must be > 0)
+ * @param {string} req.body.reason - Reason for drop (e.g., "expired", "damaged")
+ * @param {string} [req.body.notes] - Additional notes
+ * @param {string} [req.body.productionDate] - Production date
+ * @param {string} [req.body.expirationDate] - Expiration date
+ * @param {string} [req.body.batchId] - Batch identifier
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user.id - User ID performing the drop
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with drop details and undo information (201)
+ * @throws {404} If product not found
+ * @throws {400} If quantity is invalid or insufficient inventory
+ *
+ * @description
+ * Uses MongoDB transaction to ensure atomic operation
+ * Creates audit trail and allows undo within 8-hour window
  */
 const dropInventory = async (req, res) => {
   const errors = validationResult(req);
@@ -135,6 +157,25 @@ const dropInventory = async (req, res) => {
 /**
  * Undo an inventory drop (admin/superadmin only)
  * Restores the inventory and marks the drop as undone
+ *
+ * @async
+ * @function undoInventoryDrop
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.dropId - Drop ID to undo
+ * @param {Object} req.body - Request body
+ * @param {string} [req.body.undoReason] - Reason for undoing the drop
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user.id - User ID performing the undo
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with restored inventory details
+ * @throws {404} If drop or product not found
+ * @throws {400} If drop cannot be undone (already undone or expired)
+ *
+ * @description
+ * - Can only undo drops within 8-hour window
+ * - Restores inventory atomically using MongoDB transaction
+ * - Creates audit trail of undo operation
  */
 const undoInventoryDrop = async (req, res) => {
   const session = await mongoose.startSession();
@@ -227,6 +268,21 @@ const undoInventoryDrop = async (req, res) => {
 
 /**
  * List inventory drops with filtering and pagination
+ *
+ * @async
+ * @function listInventoryDrops
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {number} [req.query.page=1] - Page number
+ * @param {number} [req.query.limit=10] - Results per page
+ * @param {string} [req.query.productId] - Filter by product ID
+ * @param {string} [req.query.reason] - Filter by drop reason
+ * @param {string} [req.query.droppedBy] - Filter by user who dropped
+ * @param {string} [req.query.startDate] - Start date filter
+ * @param {string} [req.query.endDate] - End date filter
+ * @param {string} [req.query.includeUndone="false"] - Include undone drops
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with drops array and pagination info
  */
 const listInventoryDrops = async (req, res) => {
   try {
@@ -307,7 +363,15 @@ const listInventoryDrops = async (req, res) => {
 };
 
 /**
- * Get drops that can still be undone
+ * Get drops that can still be undone (within 8-hour window)
+ *
+ * @async
+ * @function getUndoableDrops
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} [req.query.userId] - Filter by specific user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with undoable drops array
  */
 const getUndoableDrops = async (req, res) => {
   try {
@@ -331,7 +395,27 @@ const getUndoableDrops = async (req, res) => {
 };
 
 /**
- * Get inventory drop analytics
+ * Get inventory drop analytics with cost analysis
+ * Returns waste statistics, patterns, and financial impact
+ *
+ * @async
+ * @function getDropAnalytics
+ * @param {Object} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} [req.query.startDate] - Start date (defaults to 30 days ago)
+ * @param {string} [req.query.endDate] - End date (defaults to now)
+ * @param {string} [req.query.productId] - Filter by product
+ * @param {string} [req.query.reason] - Filter by drop reason
+ * @param {string} [req.query.droppedBy] - Filter by user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with comprehensive analytics
+ *
+ * @description
+ * Returns:
+ * - Total quantity dropped and value lost
+ * - Analytics grouped by reason
+ * - Daily summary
+ * - Average values and trends
  */
 const getDropAnalytics = async (req, res) => {
   try {
@@ -397,6 +481,15 @@ const getDropAnalytics = async (req, res) => {
 
 /**
  * Get inventory drop details by ID
+ *
+ * @async
+ * @function getInventoryDropById
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.dropId - Drop ID to retrieve
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with drop details and undo status
+ * @throws {404} If drop not found
  */
 const getInventoryDropById = async (req, res) => {
   try {

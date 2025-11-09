@@ -15,10 +15,31 @@ import Seller from "../models/Seller.js";
  */
 
 /**
- * @desc    Populate database with test data
+ * Populate database with realistic test data
+ * Supports multiple presets for different testing scenarios
+ *
+ * @async
+ * @function populateTestData
  * @route   POST /api/test-data/populate
  * @access  Admin/SuperAdmin only
- * @body    { preset?, cleanBefore?, verbose? }
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} [req.body.preset="minimal"] - Data preset (minimal/dev/full/bulk)
+ * @param {boolean} [req.body.cleanBefore=false] - Clean existing data before populating
+ * @param {boolean} [req.body.verbose=false] - Enable verbose logging
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user.id - User ID requesting population
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with population summary (201)
+ * @throws {403} If in production environment
+ * @throws {400} If invalid preset provided
+ *
+ * @description
+ * Presets:
+ * - minimal: Small dataset for basic testing
+ * - dev: Moderate dataset for development
+ * - full: Comprehensive dataset with varied scenarios
+ * - bulk: Large dataset for performance testing
  */
 const populateTestData = async (req, res) => {
   try {
@@ -121,10 +142,27 @@ const populateTestData = async (req, res) => {
 };
 
 /**
- * @desc    Clean/remove test data from database
+ * Clean/remove test data from database
+ * Selectively deletes test data with preservation options
+ *
+ * @async
+ * @function cleanTestData
  * @route   DELETE /api/test-data/clean
  * @access  Admin/SuperAdmin only
- * @body    { confirmClean?, preserveData? }
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {boolean} [req.body.confirmClean=false] - Confirmation flag (required)
+ * @param {Array<string>} [req.body.preserveData=[]] - Data types to preserve
+ * @param {Object} req.user - Authenticated user
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with deletion summary
+ * @throws {403} If in production environment
+ * @throws {400} If confirmClean not provided
+ *
+ * @description
+ * Safely deletes test data with confirmation requirement
+ * Can preserve specific data types: sales, customers, products, pendingSellers
+ * Only deletes sellers marked with testingUser flag
  */
 const cleanTestData = async (req, res) => {
   try {
@@ -216,9 +254,24 @@ const cleanTestData = async (req, res) => {
 };
 
 /**
- * @desc    Get current test data statistics
+ * Get current test data statistics and database state
+ * Returns comprehensive counts and recent activity
+ *
+ * @async
+ * @function getTestDataStatus
  * @route   GET /api/test-data/status
  * @access  Admin/SuperAdmin only
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with database statistics
+ * @throws {403} If in production environment
+ *
+ * @description
+ * Returns:
+ * - Document counts for all collections
+ * - Testing user counts
+ * - Sales statistics (total value, averages, settlement status)
+ * - Recent sales with customer and seller info
  */
 const getTestDataStatus = async (req, res) => {
   try {
@@ -324,10 +377,29 @@ const getTestDataStatus = async (req, res) => {
 };
 
 /**
- * @desc    Reset database to specific test scenario
+ * Reset database to specific test scenario (SuperAdmin only)
+ * Complete database wipe and repopulation to known state
+ *
+ * @async
+ * @function resetToScenario
  * @route   POST /api/test-data/reset
  * @access  SuperAdmin only
- * @body    { scenario, confirmReset }
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} [req.body.scenario="clean"] - Reset scenario (clean/minimal/dev/full)
+ * @param {boolean} [req.body.confirmReset=false] - Confirmation flag (required)
+ * @param {Object} req.user - Authenticated user
+ * @param {string} req.user.role - User role (must be "superadmin")
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} JSON response with reset summary
+ * @throws {403} If in production environment or user not superadmin
+ * @throws {400} If confirmReset not provided
+ *
+ * @description
+ * Most destructive operation - requires superadmin privileges
+ * Scenarios:
+ * - clean: Removes all data except seller accounts
+ * - minimal/dev/full: Removes all data then repopulates with preset
  */
 const resetToScenario = async (req, res) => {
   try {
