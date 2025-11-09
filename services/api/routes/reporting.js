@@ -6,31 +6,78 @@ import {
   exportSalesCSV,
 } from "../controllers/reportingController.js";
 
-// All reporting routes require authentication
 router.use(authenticate);
 
 /**
- * GET /reporting/sales/analytics
- * Generate comprehensive sales analytics with time-based aggregations
- * Query parameters:
- * - startDate: Start date for filtering (ISO 8601)
- * - endDate: End date for filtering (ISO 8601)
- * - dateField: Field to filter by (createdAt, updatedAt)
- * - groupBy: Time grouping (hour, day, week, month, year)
+ * @swagger
+ * tags:
+ *   name: Reporting
+ *   description: Business intelligence and analytics
+ */
+
+/**
+ * @swagger
+ * /reporting/sales/analytics:
+ *   get:
+ *     tags: [Reporting]
+ *     summary: Get comprehensive sales analytics
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: groupBy
+ *         schema:
+ *           type: string
+ *           enum: [hour, day, week, month, year]
+ *           default: day
+ *     responses:
+ *       200:
+ *         description: Sales analytics with time-series data
  */
 router.get("/sales/analytics", getSalesAnalytics);
 
 /**
- * GET /reporting/sales/export
- * Export sales data as CSV file
- * Query parameters:
- * - startDate: Start date for filtering (ISO 8601)
- * - endDate: End date for filtering (ISO 8601)
- * - dateField: Field to filter by (createdAt, updatedAt)
- * - format: Export format (detailed, summary, products)
- * - customerId: Filter by customer ID
- * - sellerId: Filter by seller ID
- * - settled: Filter by settlement status (true/false)
+ * @swagger
+ * /reporting/sales/export:
+ *   get:
+ *     tags: [Reporting]
+ *     summary: Export sales data as CSV
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: format
+ *         schema:
+ *           type: string
+ *           enum: [detailed, summary, products]
+ *           default: detailed
+ *     responses:
+ *       200:
+ *         description: CSV file download
+ *         content:
+ *           text/csv:
+ *             schema:
+ *               type: string
  */
 router.get("/sales/export", exportSalesCSV);
 
