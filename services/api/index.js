@@ -98,9 +98,9 @@ if (isDevelopment) {
 
   // Log environment variables confirmation (once)
   console.log(
-    "🔍 Development logging enabled - Full request details will be shown",
+    "Development logging enabled - Full request details will be shown",
   );
-  console.log("📋 CORS origins:", corsOptions.origin);
+  console.log("CORS origins:", corsOptions.origin);
 } else {
   // Standard production logging
   app.use(
@@ -126,13 +126,13 @@ mongoose
     }
   })
   .catch((error) => {
-    console.error("🔴 MongoDB connection error:", error);
+    console.error("MongoDB connection error:", error);
     if (isDevelopment) {
       console.error(
-        "🧪 Check your .env.development file and MongoDB service status",
+        "Check your .env.development file and MongoDB service status",
       );
       console.error(
-        "📌 MongoDB URI format should be: mongodb://username:password@host:port/database",
+        "MongoDB URI format should be: mongodb://username:password@host:port/database",
       );
     }
     process.exit(1);
@@ -148,7 +148,7 @@ app.get("/bitetrack", (req, res) => {
 
   res.json({
     message:
-      "🍔 Welcome to BiteTrack API - Enterprise Business Intelligence Platform",
+      "Welcome to BiteTrack API - Enterprise Business Intelligence Platform",
     version: "2.0.0+",
     server: {
       host: host,
@@ -215,7 +215,7 @@ app.use(errorHandler);
 
 // Global error handlers to prevent server crashes
 process.on("uncaughtException", (error) => {
-  console.error("💥 UNCAUGHT EXCEPTION! Shutting down gracefully...");
+  console.error("UNCAUGHT EXCEPTION! Shutting down gracefully...");
   console.error("Error name:", error.name);
   console.error("Error message:", error.message);
   if (isDevelopment) {
@@ -227,7 +227,7 @@ process.on("uncaughtException", (error) => {
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("💥 UNHANDLED REJECTION! Shutting down gracefully...");
+  console.error("UNHANDLED REJECTION! Shutting down gracefully...");
   console.error("Reason:", reason);
   console.error("Promise:", promise);
 
@@ -242,16 +242,16 @@ let isShuttingDown = false;
 async function gracefulShutdown(signal) {
   // Prevent multiple shutdown attempts
   if (isShuttingDown) {
-    console.log(`⚠️  Shutdown already in progress, ignoring ${signal}`);
+    console.log(`WARNING: Shutdown already in progress, ignoring ${signal}`);
     return;
   }
 
   isShuttingDown = true;
-  console.log(`\n🔄 Received ${signal}. Starting graceful shutdown...`);
+  console.log(`\nReceived ${signal}. Starting graceful shutdown...`);
 
   // Force shutdown if graceful shutdown takes too long
   const forceShutdownTimer = setTimeout(() => {
-    console.error("⚠️  Forced shutdown - graceful shutdown timeout");
+    console.error("WARNING: Forced shutdown - graceful shutdown timeout");
     process.exit(1);
   }, 10000); // 10 seconds timeout
 
@@ -262,7 +262,7 @@ async function gracefulShutdown(signal) {
         if (err) {
           reject(err);
         } else {
-          console.log("🔌 HTTP server closed");
+          console.log("HTTP server closed");
           resolve();
         }
       });
@@ -271,18 +271,18 @@ async function gracefulShutdown(signal) {
     // Close MongoDB connection using Promise-based API (Mongoose v8+)
     if (mongoose.connection.readyState !== 0) {
       await mongoose.connection.close();
-      console.log("🍃 MongoDB connection closed");
+      console.log("MongoDB connection closed");
     }
 
     if (isDevelopment) {
-      console.log("🧪 Development server shutdown complete");
+      console.log("Development server shutdown complete");
     }
 
     clearTimeout(forceShutdownTimer);
-    console.log("✅ Graceful shutdown completed successfully");
+    console.log("Graceful shutdown completed successfully");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error during graceful shutdown:", error.message);
+    console.error("Error during graceful shutdown:", error.message);
     clearTimeout(forceShutdownTimer);
     process.exit(1);
   }

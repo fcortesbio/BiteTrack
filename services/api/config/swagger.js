@@ -21,11 +21,11 @@ const swaggerDefinition = {
     version: "2.0.0",
     description: `
       <div style="margin-bottom: 20px;">
-        <h3>🍔 BiteTrack Enterprise Business Intelligence Platform</h3>
+        <h3>BiteTrack Enterprise Business Intelligence Platform</h3>
         <p><strong>Transform your food business from spreadsheet chaos to structured success</strong></p>
         
         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <h4>🎯 Platform Capabilities</h4>
+          <h4>Platform Capabilities</h4>
           <ul>
             <li><strong>38 Professional API Endpoints</strong> across 9 business categories</li>
             <li><strong>Advanced Business Intelligence</strong> with sales analytics and reporting</li>
@@ -37,7 +37,7 @@ const swaggerDefinition = {
         </div>
         
         <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <h4>🚀 Getting Started</h4>
+          <h4>Getting Started</h4>
           <ol>
             <li><strong>Authentication Required:</strong> Most endpoints require JWT authentication</li>
             <li><strong>Get Token:</strong> Use <code>POST /auth/login</code> to obtain your JWT token</li>
@@ -47,17 +47,17 @@ const swaggerDefinition = {
         </div>
         
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0;">
-          <h4>📊 Business Categories</h4>
+          <h4>Business Categories</h4>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div><strong>🔐 Authentication</strong><br/>Login, activation, recovery</div>
-            <div><strong>👤 User Management</strong><br/>Staff, roles, permissions</div>
-            <div><strong>🏪 Customer Relations</strong><br/>CRM, transaction history</div>
-            <div><strong>📦 Inventory</strong><br/>Products, pricing, stock</div>
-            <div><strong>💳 Sales Processing</strong><br/>Transactions, settlements</div>
-            <div><strong>📊 Business Intelligence</strong><br/>Analytics, reporting, CSV</div>
-            <div><strong>🗑️ Waste Management</strong><br/>Compliance, cost tracking</div>
-            <div><strong>🧪 Development Tools</strong><br/>Testing, data management</div>
-            <div><strong>❤️ System Health</strong><br/>Monitoring, status</div>
+            <div><strong>Authentication</strong><br/>Login, activation, recovery</div>
+            <div><strong>User Management</strong><br/>Staff, roles, permissions</div>
+            <div><strong>Customer Relations</strong><br/>CRM, transaction history</div>
+            <div><strong>Inventory</strong><br/>Products, pricing, stock</div>
+            <div><strong>Sales Processing</strong><br/>Transactions, settlements</div>
+            <div><strong>Business Intelligence</strong><br/>Analytics, reporting, CSV</div>
+            <div><strong>Waste Management</strong><br/>Compliance, cost tracking</div>
+            <div><strong>Development Tools</strong><br/>Testing, data management</div>
+            <div><strong>System Health</strong><br/>Monitoring, status</div>
           </div>
         </div>
       </div>

@@ -46,14 +46,14 @@ const errorHandler = (err, req, res, _next) => {
   // Log error with request context
   const timestamp = new Date().toISOString();
 
-  console.error(`\n🚨 ERROR [${timestamp}]`);
-  console.error("📍 Request:", `${req.method} ${req.originalUrl}`);
-  console.error("🌐 IP:", req.ip);
-  console.error("🏷️  Error Type:", err.name || "Unknown");
-  console.error("📝 Error Message:", err.message);
+  console.error(`\nERROR [${timestamp}]`);
+  console.error("Request:", `${req.method} ${req.originalUrl}`);
+  console.error("IP:", req.ip);
+  console.error("Error Type:", err.name || "Unknown");
+  console.error("Error Message:", err.message);
 
   if (isDevelopment && err.stack) {
-    console.error("📚 Stack Trace:", err.stack);
+    console.error("Stack Trace:", err.stack);
   }
 
   // Sanitize error for response (don't expose sensitive information)
@@ -74,7 +74,7 @@ const errorHandler = (err, req, res, _next) => {
       message: e.message,
     }));
 
-    console.error("🔍 Validation Details:", errors);
+    console.error("Validation Details:", errors);
 
     return res.status(400).json({
       error: "Validation Error",
@@ -88,7 +88,7 @@ const errorHandler = (err, req, res, _next) => {
   // Mongoose duplicate key error
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue)[0];
-    console.error("🔄 Duplicate Key Error:", field, err.keyValue[field]);
+    console.error("Duplicate Key Error:", field, err.keyValue[field]);
 
     return res.status(400).json({
       error: "Duplicate Error",
@@ -100,7 +100,7 @@ const errorHandler = (err, req, res, _next) => {
 
   // Mongoose cast error (invalid ObjectId)
   if (err.name === "CastError") {
-    console.error("🎯 Cast Error:", err.path, err.value);
+    console.error("Cast Error:", err.path, err.value);
 
     return res.status(400).json({
       error: "Invalid ID",
@@ -112,7 +112,7 @@ const errorHandler = (err, req, res, _next) => {
 
   // JWT errors
   if (err.name === "JsonWebTokenError") {
-    console.error("🔐 JWT Error:", err.message);
+    console.error("JWT Error:", err.message);
 
     return res.status(401).json({
       error: "Unauthorized",
@@ -123,7 +123,7 @@ const errorHandler = (err, req, res, _next) => {
   }
 
   if (err.name === "TokenExpiredError") {
-    console.error("⏰ Token Expired:", err.message);
+    console.error("Token Expired:", err.message);
 
     return res.status(401).json({
       error: "Unauthorized",
@@ -135,7 +135,7 @@ const errorHandler = (err, req, res, _next) => {
 
   // Multer file upload errors
   if (err.code === "LIMIT_FILE_SIZE") {
-    console.error("📁 File Upload Error: File too large");
+    console.error("File Upload Error: File too large");
 
     return res.status(400).json({
       error: "File Upload Error",
@@ -147,7 +147,7 @@ const errorHandler = (err, req, res, _next) => {
 
   // Custom application errors
   if (err.isOperational) {
-    console.error("🏷️  Application Error:", err.message);
+    console.error("Application Error:", err.message);
 
     return res.status(err.statusCode || 400).json({
       error: err.name || "Application Error",
@@ -158,8 +158,8 @@ const errorHandler = (err, req, res, _next) => {
   }
 
   // Log unknown errors with more context
-  console.error("💥 UNKNOWN ERROR - This should be investigated:");
-  console.error("🤷 Error Object:", sanitizeError(err));
+  console.error("UNKNOWN ERROR - This should be investigated:");
+  console.error("Error Object:", sanitizeError(err));
 
   // Default server error - don't expose internal details in production
   const statusCode = err.statusCode || 500;
