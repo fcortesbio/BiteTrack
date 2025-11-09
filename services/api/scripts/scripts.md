@@ -5,6 +5,7 @@ This directory contains a comprehensive suite of utility and testing scripts for
 ## 🎯 Quick Start Guide
 
 ### For New Environments
+
 ```bash
 # Complete production setup (interactive)
 ./scripts/00-init-production-setup.sh
@@ -19,6 +20,7 @@ export ADMIN_DOB="1990-01-01"
 ```
 
 ### For CI/CD Pipelines
+
 ```bash
 # Basic health check
 ./scripts/02-quick-persistence-test.sh
@@ -40,8 +42,10 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 ## 🎆 Master Setup Script
 
 ### `00-init-production-setup.sh`
+
 **Purpose:** Complete production deployment orchestration with automation support  
-**Usage:** 
+**Usage:**
+
 - Interactive: `./scripts/00-init-production-setup.sh`
 - Automated: `./scripts/00-init-production-setup.sh --non-interactive`
 
@@ -49,6 +53,7 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 **What it does:** Orchestrates all numbered scripts in sequence for complete setup
 
 **Complete Setup Process:**
+
 - 🧹 Docker cleanup (optional) - Fresh environment
 - ⚙️ Environment configuration - Interactive prompts or env vars
 - 🔐 MongoDB keyfile generation - Secure replica set auth
@@ -59,6 +64,7 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 - 🧪 Comprehensive testing - Full system validation
 
 **Automation Features:**
+
 - **Non-interactive mode** - Full automation with environment variables
 - **Exit codes** - Proper CI/CD integration (0=success, 1=failure)
 - **Logging** - Structured output for build systems
@@ -66,6 +72,7 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 - **Environment detection** - Automatically configures for production vs development
 
 **Non-Interactive Environment Variables:**
+
 ```bash
 ADMIN_EMAIL="admin@company.com"       # Required: Admin email
 ADMIN_PASSWORD="SecurePass123!"       # Required: Admin password
@@ -77,9 +84,10 @@ SKIP_CLEANUP="true"                  # Optional: Skip Docker cleanup
 ```
 
 **Use cases:**
+
 - **Production deployments** - Complete production environment setup
 - **CI/CD pipelines** - Automated deployment and testing
-- **Fresh installations** - New server or clean environment setup  
+- **Fresh installations** - New server or clean environment setup
 - **Team onboarding** - Guided setup for new team members
 - **Demo environments** - Quick professional environment creation
 
@@ -92,8 +100,10 @@ The scripts are numbered to follow a logical development and deployment workflow
 ### **Phase 1: Environment Setup** 🔧
 
 ### `01-setup-keyfile.sh`
+
 **Purpose:** MongoDB keyfile setup for replica set authentication  
-**Usage:** 
+**Usage:**
+
 - Standard: `./scripts/01-setup-keyfile.sh`
 - CI/CD: `./scripts/01-setup-keyfile.sh --force`
 
@@ -101,24 +111,29 @@ The scripts are numbered to follow a logical development and deployment workflow
 **What it does:** Creates or copies MongoDB keyfile with proper permissions
 
 **Non-Interactive Options:**
+
 - `--force` - Overwrite existing keyfile without confirmation
 - `KEYFILE_PATH="/path/to/keyfile"` - Environment variable for custom keyfile location
 
 **Features:**
+
 - Copies from keyfile.example if available
 - Generates new keyfile if no example exists
 - Sets proper file permissions (600)
 - Development-only usage (production should have unique keyfiles)
 
 **Use cases:**
+
 - Initial project setup
 - New developer onboarding
 - Fresh development environment setup
 - CI/CD pipeline initialization
 
 ### `02-quick-persistence-test.sh`
+
 **Purpose:** Quick system health and data persistence verification  
-**Usage:** 
+**Usage:**
+
 - Standard: `./scripts/02-quick-persistence-test.sh`
 - Verbose: `./scripts/02-quick-persistence-test.sh --verbose`
 
@@ -126,17 +141,20 @@ The scripts are numbered to follow a logical development and deployment workflow
 **What it tests:** Basic MongoDB connectivity and data operations
 
 **Non-Interactive Options:**
+
 - `--verbose` - Display detailed test information
 - `--json` - Output results in JSON format for CI/CD
 - Environment variables for credentials (see Environment Variables section)
 
 **Features:**
+
 - **Production-ready environment detection** - Auto-detects .env.production vs .env.development
 - **Flexible credential handling** - Supports multiple credential formats
 - Quick database write/read/delete test cycle
 - Perfect for CI/CD pipeline validation
 
 **Use cases:**
+
 - Verify stack is running correctly
 - CI/CD pipeline health checks
 - Pre-deployment validation
@@ -145,8 +163,10 @@ The scripts are numbered to follow a logical development and deployment workflow
 ### **Phase 2: System Initialization** 🚀
 
 ### `03-create-superadmin.sh`
+
 **Purpose:** Create initial SuperAdmin user account  
-**Usage:** 
+**Usage:**
+
 - Interactive: `./scripts/03-create-superadmin.sh`
 - Automated: `./scripts/03-create-superadmin.sh --non-interactive`
 - Help: `./scripts/03-create-superadmin.sh --help`
@@ -155,6 +175,7 @@ The scripts are numbered to follow a logical development and deployment workflow
 **What it does:** Creates and validates superadmin user in one step
 
 **Non-Interactive Environment Variables:**
+
 ```bash
 ADMIN_FIRST_NAME="John"              # First name (required)
 ADMIN_LAST_NAME="Doe"                # Last name (required)
@@ -164,6 +185,7 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 ```
 
 **Features:**
+
 - **Production-ready environment support** - Works with any environment configuration
 - Interactive prompts with comprehensive input validation
 - Non-interactive mode for automation (CI/CD)
@@ -173,30 +195,35 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - No manual copy/paste steps required
 
 **Use cases:**
+
 - Initial system setup (CRITICAL - required for API access)
 - Automated deployments
 - CI/CD pipeline user creation
 - Production environment initialization
 
 ### `04-populate-test-data.js`
+
 **Purpose:** Populate database with realistic test data  
 **Usage:** `node scripts/04-populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`  
 **Duration:** ~10-30 seconds (depending on preset)  
 **What it does:** Creates customers, products, sales with proper relationships
 
 **Non-Interactive Options:**
+
 - `--preset=<preset>` - Data size preset (minimal, dev, full, bulk)
 - `--clean` - Remove existing data before populating
 - `--verbose` - Display detailed operation info
 - `--json` - Output results in JSON format for CI/CD
 
 **Presets:**
+
 - `minimal` - Essential data (5 customers, 7 products, 3 sales)
-- `dev` - Development dataset (10 customers, 14 products, 7 sales) 
+- `dev` - Development dataset (10 customers, 14 products, 7 sales)
 - `full` - Complete realistic dataset (~20 customers, ~35 products)
 - `bulk` - Large dataset for performance testing
 
 **Features:**
+
 - Resolves placeholder IDs to real MongoDB ObjectIds
 - Schema validation against current models
 - Detailed summary report with statistics
@@ -204,6 +231,7 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Multiple data presets for different use cases
 
 **Use cases:**
+
 - Development environment setup
 - API testing with realistic data
 - Performance testing scenarios
@@ -212,8 +240,10 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 ### **Phase 3: Testing & Validation** 🧪
 
 ### `05-test-data-persistence.sh`
+
 **Purpose:** Comprehensive data persistence testing across failure scenarios  
 **Usage:**
+
 - Standard: `./scripts/05-test-data-persistence.sh`
 - Verbose: `./scripts/05-test-data-persistence.sh --verbose`
 - Clean mode: `./scripts/05-test-data-persistence.sh --clean`
@@ -222,18 +252,21 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 **What it tests:** Enterprise-grade persistence validation
 
 **Non-Interactive Options:**
+
 - `--verbose` - Display detailed test information
 - `--clean` - Clean up test data after testing
 - `--quick` - Run abbreviated test suite for faster results
 - `--json` - Output results in JSON format for CI/CD
 
 **Comprehensive Test Suite:**
+
 - MongoDB container restarts → Data survives ✅
 - API container restarts → Data survives ✅
 - Full stack restarts → Data survives ✅
 - Volume integrity verification → Data preserved ✅
 
 **Features:**
+
 - **Production environment support** - Works with production credentials
 - Automated test data creation and cleanup
 - Detailed logging with verbose mode
@@ -241,28 +274,33 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Docker volume integrity validation
 
 **Use cases:**
+
 - Production deployment verification
 - Infrastructure change validation
 - Disaster recovery testing
 - Development environment validation
 
 ### `06-test-sales-filtering.js`
+
 **Purpose:** Advanced API feature testing (sales filtering, pagination, sorting)  
 **Usage:**
+
 - Standard: `node scripts/06-test-sales-filtering.js`
-- With token: `node scripts/06-test-sales-filtering.js --auth-token=<token>` 
+- With token: `node scripts/06-test-sales-filtering.js --auth-token=<token>`
 - Verbose: `node scripts/06-test-sales-filtering.js --verbose`
 
 **Duration:** ~15-30 seconds  
 **What it tests:** Complex API functionality and performance
 
 **Non-Interactive Options:**
+
 - `--auth-token=<token>` - JWT authentication token
 - `--verbose` - Display detailed test information
 - `--json` - Output results in JSON format for CI/CD
 - Environment variables for authentication (see Environment Variables section)
 
 **Comprehensive API Tests:**
+
 - Pagination functionality and metadata accuracy
 - Multi-field sorting (ascending/descending)
 - Date range filtering with edge cases
@@ -273,14 +311,17 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Response structure validation
 
 **Use cases:**
+
 - Feature validation after API changes
 - Regression testing for sales endpoints
 - Performance validation for complex queries
 - CI/CD integration testing
 
 ### `07-test-reporting-features.js`
+
 **Purpose:** Tests reporting and CSV export capabilities  
 **Usage:**
+
 - Standard: `node scripts/07-test-reporting-features.js`
 - With token: `node scripts/07-test-reporting-features.js --auth-token=<token>`
 - Base URL: `node scripts/07-test-reporting-features.js --base-url=<url>`
@@ -291,15 +332,18 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 **What it tests:** Analytics endpoints and CSV export functionality
 
 **Non-Interactive Options:**
+
 - `--auth-token=<token>` - JWT authentication token
 - `--base-url=<url>` - API base URL [default: http://localhost:3000/bitetrack]
 - `--verbose` - Display detailed test information
 
 **Environment Variables:**
+
 - `TEST_EMAIL` - Email for authentication [default: admin@bitetrack.com]
 - `TEST_PASSWORD` - Password for authentication [default: SuperAdmin123!]
 
 **Comprehensive Test Suite:**
+
 - Basic analytics structure validation
 - Date range analytics testing
 - Time grouping options (day/week/month/year)
@@ -308,6 +352,7 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Performance with large datasets
 
 **Use cases:**
+
 - Reporting feature validation
 - CSV export functionality testing
 - Analytics endpoint verification
@@ -333,11 +378,13 @@ When adding new scripts to this directory:
 **Security Enhancement:** Scripts now read MongoDB credentials from environment variables instead of hardcoding them.
 
 ### Credential Loading Priority:
+
 1. **Environment variables** (if already set):
    - `MONGO_ROOT_USERNAME`
    - `MONGO_ROOT_PASSWORD`
 
 2. **From .env.development file** (automatically loaded):
+
    ```bash
    MONGO_ROOT_USERNAME=admin
    MONGO_ROOT_PASSWORD=supersecret
@@ -348,6 +395,7 @@ When adding new scripts to this directory:
    - Password: `supersecret`
 
 ### Manual Override:
+
 ```bash
 # Override credentials for a single run
 MONGO_ROOT_USERNAME=myuser MONGO_ROOT_PASSWORD=mypass ./scripts/02-quick-persistence-test.sh
@@ -359,7 +407,9 @@ export MONGO_ROOT_PASSWORD=mypass
 ```
 
 ### Non-Interactive Mode Variables:
+
 For `03-create-superadmin.sh --non-interactive`, set these environment variables:
+
 ```bash
 ADMIN_FIRST_NAME="John"              # First name (required)
 ADMIN_LAST_NAME="Doe"               # Last name (required)
@@ -371,11 +421,13 @@ ADMIN_PASSWORD="SecurePass123!"     # Password meeting complexity requirements (
 ## CI/CD Integration
 
 All scripts are designed for CI/CD integration with proper exit codes:
+
 - `0` - Script executed successfully
 - `1` - Script encountered an error
 - `2` - Missing prerequisites or invalid parameters
 
 ### Example CI/CD Script:
+
 ```bash
 #!/bin/bash
 set -e  # Exit on any error
@@ -415,6 +467,7 @@ echo "All tests completed successfully!"
 ## Script Dependencies
 
 All scripts assume:
+
 - Docker and Docker Compose are installed
 - BiteTrack stack is available (docker-compose.yml exists)
 - Environment file (.env.development) is configured with MongoDB credentials

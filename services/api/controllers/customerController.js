@@ -1,57 +1,65 @@
-import Customer, { normalizePhoneNumber } from '../models/Customer.js';
-import Sale from '../models/Sale.js';
-import csv from 'csv-parser';
-import multer from 'multer';
-import { Readable } from 'stream';
+import Customer, { normalizePhoneNumber } from "../models/Customer.js";
+import Sale from "../models/Sale.js";
+import csv from "csv-parser";
+import multer from "multer";
+import { Readable } from "stream";
 
-const listCustomers = async(req, res) => {
+const listCustomers = async (req, res) => {
   const customers = await Customer.find({});
   res.json(customers);
 };
 
-const createCustomer = async(req, res) => {
+const createCustomer = async (req, res) => {
   try {
     const { firstName, lastName, phoneNumber, email } = req.body;
 
     // Normalize phone number before checking for duplicates
     const normalizedPhoneNumber = normalizePhoneNumber(phoneNumber);
-    
+
     // Check for duplicate phone number
-    const existingCustomerByPhone = await Customer.findOne({ phoneNumber: normalizedPhoneNumber });
+    const existingCustomerByPhone = await Customer.findOne({
+      phoneNumber: normalizedPhoneNumber,
+    });
     if (existingCustomerByPhone) {
       return res.status(409).json({
-        error: 'Conflict',
-        message: 'A customer with this phone number already exists',
+        error: "Conflict",
+        message: "A customer with this phone number already exists",
         statusCode: 409,
-        details: [{
-          field: 'phoneNumber',
-          message: 'Phone number must be unique',
-          existingCustomer: {
-            id: existingCustomerByPhone._id,
-            name: `${existingCustomerByPhone.firstName} ${existingCustomerByPhone.lastName}`,
-            phoneNumber: existingCustomerByPhone.phoneNumber,
+        details: [
+          {
+            field: "phoneNumber",
+            message: "Phone number must be unique",
+            existingCustomer: {
+              id: existingCustomerByPhone._id,
+              name: `${existingCustomerByPhone.firstName} ${existingCustomerByPhone.lastName}`,
+              phoneNumber: existingCustomerByPhone.phoneNumber,
+            },
           },
-        }],
+        ],
       });
     }
 
     // Check for duplicate email if provided
-    if (email && email.trim() !== '') {
-      const existingCustomerByEmail = await Customer.findOne({ email: email.toLowerCase().trim() });
+    if (email && email.trim() !== "") {
+      const existingCustomerByEmail = await Customer.findOne({
+        email: email.toLowerCase().trim(),
+      });
       if (existingCustomerByEmail) {
         return res.status(409).json({
-          error: 'Conflict',
-          message: 'A customer with this email already exists',
+          error: "Conflict",
+          message: "A customer with this email already exists",
           statusCode: 409,
-          details: [{
-            field: 'email',
-            message: 'Email must be unique',
-            existingCustomer: {
-              id: existingCustomerByEmail._id,
-              name: `${existingCustomerByEmail.firstName} ${existingCustomerByEmail.lastName}`,
-              email: existingCustomerByEmail.email,
+          details: [
+            {
+              field: "email",
+              message: "Email must be unique",
+              existingCustomer: {
+                id: existingCustomerByEmail._id,
+                name: `${existingCustomerByEmail.firstName} ${existingCustomerByEmail.lastName}`,
+                email: existingCustomerByEmail.email,
+              },
             },
-          }],
+          ],
         });
       }
     }
@@ -61,7 +69,8 @@ const createCustomer = async(req, res) => {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       phoneNumber: normalizedPhoneNumber,
-      email: email && email.trim() !== '' ? email.toLowerCase().trim() : undefined,
+      email:
+        email && email.trim() !== "" ? email.toLowerCase().trim() : undefined,
     });
 
     await customer.save();
@@ -70,39 +79,42 @@ const createCustomer = async(req, res) => {
     // Handle MongoDB duplicate key errors as backup
     if (error.code === 11000) {
       const duplicateField = Object.keys(error.keyPattern)[0];
-      const fieldDisplayName = duplicateField === 'phoneNumber' ? 'phone number' : duplicateField;
-      
+      const fieldDisplayName =
+        duplicateField === "phoneNumber" ? "phone number" : duplicateField;
+
       return res.status(409).json({
-        error: 'Conflict',
+        error: "Conflict",
         message: `A customer with this ${fieldDisplayName} already exists`,
         statusCode: 409,
-        details: [{
-          field: duplicateField,
-          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
-        }],
+        details: [
+          {
+            field: duplicateField,
+            message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
+          },
+        ],
       });
     }
-    
+
     // Handle Mongoose validation errors
-    if (error.name === 'ValidationError') {
-      const details = Object.values(error.errors).map(err => ({
+    if (error.name === "ValidationError") {
+      const details = Object.values(error.errors).map((err) => ({
         field: err.path,
         message: err.message,
       }));
-      
+
       return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Customer data validation failed',
+        error: "Validation Error",
+        message: "Customer data validation failed",
         statusCode: 400,
         details,
       });
     }
-    
+
     throw error;
   }
 };
 
-const updateCustomer = async(req, res) => {
+const updateCustomer = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -111,8 +123,8 @@ const updateCustomer = async(req, res) => {
     const existingCustomer = await Customer.findById(id);
     if (!existingCustomer) {
       return res.status(404).json({
-        error: 'Not Found',
-        message: 'Customer not found',
+        error: "Not Found",
+        message: "Customer not found",
         statusCode: 404,
       });
     }
@@ -121,124 +133,137 @@ const updateCustomer = async(req, res) => {
     if (updates.phoneNumber) {
       const normalizedUpdatePhone = normalizePhoneNumber(updates.phoneNumber);
       if (normalizedUpdatePhone !== existingCustomer.phoneNumber) {
-        const duplicatePhoneCustomer = await Customer.findOne({ 
+        const duplicatePhoneCustomer = await Customer.findOne({
           phoneNumber: normalizedUpdatePhone,
           _id: { $ne: id }, // Exclude current customer
         });
-      
-      if (duplicatePhoneCustomer) {
-        return res.status(409).json({
-          error: 'Conflict',
-          message: 'A customer with this phone number already exists',
-          statusCode: 409,
-          details: [{
-            field: 'phoneNumber',
-            message: 'Phone number must be unique',
-            existingCustomer: {
-              id: duplicatePhoneCustomer._id,
-              name: `${duplicatePhoneCustomer.firstName} ${duplicatePhoneCustomer.lastName}`,
-              phoneNumber: duplicatePhoneCustomer.phoneNumber,
-            },
-          }],
-        });
+
+        if (duplicatePhoneCustomer) {
+          return res.status(409).json({
+            error: "Conflict",
+            message: "A customer with this phone number already exists",
+            statusCode: 409,
+            details: [
+              {
+                field: "phoneNumber",
+                message: "Phone number must be unique",
+                existingCustomer: {
+                  id: duplicatePhoneCustomer._id,
+                  name: `${duplicatePhoneCustomer.firstName} ${duplicatePhoneCustomer.lastName}`,
+                  phoneNumber: duplicatePhoneCustomer.phoneNumber,
+                },
+              },
+            ],
+          });
+        }
+        // Update the cleanUpdates with normalized phone
+        updates.phoneNumber = normalizedUpdatePhone;
       }
-      // Update the cleanUpdates with normalized phone
-      updates.phoneNumber = normalizedUpdatePhone;
     }
-  }
 
     // Check for duplicate email if being updated
-    if (updates.email && updates.email.trim() !== '' && 
-        updates.email.toLowerCase().trim() !== existingCustomer.email) {
-      const duplicateEmailCustomer = await Customer.findOne({ 
+    if (
+      updates.email &&
+      updates.email.trim() !== "" &&
+      updates.email.toLowerCase().trim() !== existingCustomer.email
+    ) {
+      const duplicateEmailCustomer = await Customer.findOne({
         email: updates.email.toLowerCase().trim(),
         _id: { $ne: id }, // Exclude current customer
       });
-      
+
       if (duplicateEmailCustomer) {
         return res.status(409).json({
-          error: 'Conflict',
-          message: 'A customer with this email already exists',
+          error: "Conflict",
+          message: "A customer with this email already exists",
           statusCode: 409,
-          details: [{
-            field: 'email',
-            message: 'Email must be unique',
-            existingCustomer: {
-              id: duplicateEmailCustomer._id,
-              name: `${duplicateEmailCustomer.firstName} ${duplicateEmailCustomer.lastName}`,
-              email: duplicateEmailCustomer.email,
+          details: [
+            {
+              field: "email",
+              message: "Email must be unique",
+              existingCustomer: {
+                id: duplicateEmailCustomer._id,
+                name: `${duplicateEmailCustomer.firstName} ${duplicateEmailCustomer.lastName}`,
+                email: duplicateEmailCustomer.email,
+              },
             },
-          }],
+          ],
         });
       }
     }
 
     // Prepare clean updates
     const cleanUpdates = { ...updates };
-    
+
     // Clean and normalize data
-    if (cleanUpdates.firstName) {cleanUpdates.firstName = cleanUpdates.firstName.trim();}
-    if (cleanUpdates.lastName) {cleanUpdates.lastName = cleanUpdates.lastName.trim();}
+    if (cleanUpdates.firstName) {
+      cleanUpdates.firstName = cleanUpdates.firstName.trim();
+    }
+    if (cleanUpdates.lastName) {
+      cleanUpdates.lastName = cleanUpdates.lastName.trim();
+    }
     // phoneNumber already normalized above if present
-    
+
     // Handle email normalization
-    if (cleanUpdates.email === '' || cleanUpdates.email === null) {
+    if (cleanUpdates.email === "" || cleanUpdates.email === null) {
       cleanUpdates.email = undefined; // For sparse index
     } else if (cleanUpdates.email) {
       cleanUpdates.email = cleanUpdates.email.toLowerCase().trim();
     }
 
-    const customer = await Customer.findByIdAndUpdate(
-      id,
-      cleanUpdates,
-      { new: true, runValidators: true },
-    );
+    const customer = await Customer.findByIdAndUpdate(id, cleanUpdates, {
+      new: true,
+      runValidators: true,
+    });
 
     res.json(customer.toJSON());
   } catch (error) {
     // Handle MongoDB duplicate key errors
     if (error.code === 11000) {
       const duplicateField = Object.keys(error.keyPattern)[0];
-      const fieldDisplayName = duplicateField === 'phoneNumber' ? 'phone number' : duplicateField;
-      
+      const fieldDisplayName =
+        duplicateField === "phoneNumber" ? "phone number" : duplicateField;
+
       return res.status(409).json({
-        error: 'Conflict',
+        error: "Conflict",
         message: `A customer with this ${fieldDisplayName} already exists`,
         statusCode: 409,
-        details: [{
-          field: duplicateField,
-          message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
-        }],
+        details: [
+          {
+            field: duplicateField,
+            message: `${fieldDisplayName.charAt(0).toUpperCase() + fieldDisplayName.slice(1)} must be unique`,
+          },
+        ],
       });
     }
-    
+
     // Handle Mongoose validation errors
-    if (error.name === 'ValidationError') {
-      const details = Object.values(error.errors).map(err => ({
+    if (error.name === "ValidationError") {
+      const details = Object.values(error.errors).map((err) => ({
         field: err.path,
         message: err.message,
       }));
-      
+
       return res.status(400).json({
-        error: 'Validation Error',
-        message: 'Customer data validation failed',
+        error: "Validation Error",
+        message: "Customer data validation failed",
         statusCode: 400,
         details,
       });
     }
-    
+
     throw error;
   }
 };
 
-const deleteCustomer = async(req, res) => {
+const deleteCustomer = async (req, res) => {
   const { id } = req.params;
 
   const customer = await Customer.findById(id);
   if (!customer) {
     return res.status(404).json({
-      error: 'Not Found',
-      message: 'Customer not found',
+      error: "Not Found",
+      message: "Customer not found",
       statusCode: 404,
     });
   }
@@ -247,7 +272,7 @@ const deleteCustomer = async(req, res) => {
   res.status(204).send();
 };
 
-const getCustomerTransactions = async(req, res) => {
+const getCustomerTransactions = async (req, res) => {
   // Parameter extraction & Setup
   const { id } = req.params;
   const { limit = 10, page = 1, settled } = req.query;
@@ -259,16 +284,16 @@ const getCustomerTransactions = async(req, res) => {
   // Validate pagination parameters
   if (limitNum < 1 || limitNum > 100) {
     return res.status(400).json({
-      error: 'Bad Request',
-      message: 'Limit must be between 1 and 100',
+      error: "Bad Request",
+      message: "Limit must be between 1 and 100",
       statusCode: 400,
     });
   }
 
   if (pageNum < 1) {
     return res.status(400).json({
-      error: 'Bad Request',
-      message: 'Page must be greater than 0',
+      error: "Bad Request",
+      message: "Page must be greater than 0",
       statusCode: 400,
     });
   }
@@ -277,8 +302,8 @@ const getCustomerTransactions = async(req, res) => {
   const customer = await Customer.findById(id);
   if (!customer) {
     return res.status(404).json({
-      error: 'Not Found',
-      message: 'Customer not found',
+      error: "Not Found",
+      message: "Customer not found",
       statusCode: 404,
     });
   }
@@ -286,7 +311,7 @@ const getCustomerTransactions = async(req, res) => {
   // Build filter for sales
   const filter = { customerId: id };
   if (settled !== undefined) {
-    filter.settled = settled === 'true';
+    filter.settled = settled === "true";
   }
 
   // Get total count for pagination
@@ -298,12 +323,12 @@ const getCustomerTransactions = async(req, res) => {
     .sort({ createdAt: -1 }) // Most recent first
     .limit(limitNum)
     .skip((pageNum - 1) * limitNum)
-    .populate('sellerId', 'firstName lastName')
-    .populate('products.productId', 'productName');
+    .populate("sellerId", "firstName lastName")
+    .populate("products.productId", "productName");
 
   res.json({
     customer: customer.toJSON(),
-    transactions: transactions.map(t => t.toJSON()),
+    transactions: transactions.map((t) => t.toJSON()),
     pagination: {
       currentPage: pageNum,
       totalPages,
@@ -318,41 +343,46 @@ const getCustomerTransactions = async(req, res) => {
 // Helper function to validate customer data
 const validateCustomerData = (data) => {
   const errors = [];
-  
+
   // Required field validations
   if (!data.firstName || !data.firstName.toString().trim()) {
-    errors.push({ field: 'firstName', message: 'First name is required' });
+    errors.push({ field: "firstName", message: "First name is required" });
   }
-  
+
   if (!data.lastName || !data.lastName.toString().trim()) {
-    errors.push({ field: 'lastName', message: 'Last name is required' });
+    errors.push({ field: "lastName", message: "Last name is required" });
   }
-  
+
   if (!data.phoneNumber || !data.phoneNumber.toString().trim()) {
-    errors.push({ field: 'phoneNumber', message: 'Phone number is required' });
+    errors.push({ field: "phoneNumber", message: "Phone number is required" });
   } else {
     // Phone number format validation
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(data.phoneNumber.toString().trim())) {
-      errors.push({ field: 'phoneNumber', message: 'Phone number must be exactly 10 digits' });
+      errors.push({
+        field: "phoneNumber",
+        message: "Phone number must be exactly 10 digits",
+      });
     }
   }
-  
+
   return errors;
 };
 
 // Helper function to check for existing customers
-const checkForConflicts = async(customerData) => {
+const checkForConflicts = async (customerData) => {
   const conflicts = [];
   const phoneNumber = normalizePhoneNumber(customerData.phoneNumber.toString());
-  const email = customerData.email ? customerData.email.toString().toLowerCase().trim() : null;
-  
+  const email = customerData.email
+    ? customerData.email.toString().toLowerCase().trim()
+    : null;
+
   // Check for duplicate phone number
   const existingByPhone = await Customer.findOne({ phoneNumber });
   if (existingByPhone) {
     conflicts.push({
-      field: 'phoneNumber',
-      message: 'Phone number already exists',
+      field: "phoneNumber",
+      message: "Phone number already exists",
       existingCustomer: {
         id: existingByPhone._id,
         name: `${existingByPhone.firstName} ${existingByPhone.lastName}`,
@@ -360,14 +390,14 @@ const checkForConflicts = async(customerData) => {
       },
     });
   }
-  
+
   // Check for duplicate email if provided
   if (email) {
     const existingByEmail = await Customer.findOne({ email });
     if (existingByEmail) {
       conflicts.push({
-        field: 'email',
-        message: 'Email already exists',
+        field: "email",
+        message: "Email already exists",
         existingCustomer: {
           id: existingByEmail._id,
           name: `${existingByEmail.firstName} ${existingByEmail.lastName}`,
@@ -376,16 +406,16 @@ const checkForConflicts = async(customerData) => {
       });
     }
   }
-  
+
   return conflicts;
 };
 
-const importCustomersFromCSV = async(req, res) => {
+const importCustomersFromCSV = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
-        error: 'Bad Request',
-        message: 'No CSV file provided',
+        error: "Bad Request",
+        message: "No CSV file provided",
         statusCode: 400,
       });
     }
@@ -397,22 +427,22 @@ const importCustomersFromCSV = async(req, res) => {
 
     // Create a readable stream from the buffer
     const stream = Readable.from(req.file.buffer.toString());
-    
+
     // Process CSV with promise wrapper
     await new Promise((resolve, reject) => {
       stream
         .pipe(csv())
-        .on('data', (data) => {
+        .on("data", (data) => {
           results.push(data);
         })
-        .on('end', resolve)
-        .on('error', reject);
+        .on("end", resolve)
+        .on("error", reject);
     });
 
     // Process each row
     for (const row of results) {
       rowNumber++;
-      
+
       try {
         // Basic validation
         const validationErrors = validateCustomerData(row);
@@ -441,26 +471,34 @@ const importCustomersFromCSV = async(req, res) => {
           firstName: row.firstName.toString().trim(),
           lastName: row.lastName.toString().trim(),
           phoneNumber: normalizePhoneNumber(row.phoneNumber.toString()),
-          email: row.email && row.email.toString().trim() !== '' ? 
-            row.email.toString().toLowerCase().trim() : undefined,
+          email:
+            row.email && row.email.toString().trim() !== ""
+              ? row.email.toString().toLowerCase().trim()
+              : undefined,
         };
 
         const customer = new Customer(customerData);
         await customer.save();
-        
+
         successfulImports.push({
           row: rowNumber,
           customer: customer.toJSON(),
         });
-
       } catch (error) {
         // Handle unexpected errors during customer creation
-        const errorMessage = error.name === 'ValidationError' ? 
-          Object.values(error.errors).map(err => ({
-            field: err.path,
-            message: err.message,
-          })) : [{ field: 'general', message: error.message || 'Unexpected error occurred' }];
-        
+        const errorMessage =
+          error.name === "ValidationError"
+            ? Object.values(error.errors).map((err) => ({
+                field: err.path,
+                message: err.message,
+              }))
+            : [
+                {
+                  field: "general",
+                  message: error.message || "Unexpected error occurred",
+                },
+              ];
+
         failures.push({
           row: rowNumber,
           data: row,
@@ -485,12 +523,11 @@ const importCustomersFromCSV = async(req, res) => {
         failures: failures.length > 20,
       },
     });
-
   } catch (error) {
-    console.error('CSV import error:', error);
+    console.error("CSV import error:", error);
     return res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to process CSV file',
+      error: "Internal Server Error",
+      message: "Failed to process CSV file",
       statusCode: 500,
       details: error.message,
     });
@@ -504,10 +541,10 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'text/csv' || file.originalname.endsWith('.csv')) {
+    if (file.mimetype === "text/csv" || file.originalname.endsWith(".csv")) {
       cb(null, true);
     } else {
-      cb(new Error('Only CSV files are allowed'));
+      cb(new Error("Only CSV files are allowed"));
     }
   },
 });

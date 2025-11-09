@@ -15,7 +15,7 @@
     },
     {
       "description": "Combo meal order",
-      "customerId": "CUSTOMER_ID_2", 
+      "customerId": "CUSTOMER_ID_2",
       "products": [
         {
           "productId": "PHILLY_CHEESESTEAK_ID",
@@ -139,7 +139,7 @@
           "quantity": 1
         }
       ],
-      "amountPaid": 15.00,
+      "amountPaid": 15.0,
       "note": "Total would be $19.98, customer paid $15.00"
     },
     {
@@ -155,7 +155,7 @@
           "quantity": 1
         }
       ],
-      "amountPaid": 18.00,
+      "amountPaid": 18.0,
       "note": "Total is $15.98, customer paid $18.00 (includes tip)"
     }
   ],
@@ -167,8 +167,8 @@
     },
     {
       "description": "Additional payment on existing sale",
-      "saleId": "EXISTING_SALE_ID", 
-      "amountPaid": 25.00
+      "saleId": "EXISTING_SALE_ID",
+      "amountPaid": 25.0
     }
   ],
   "bulkTestSales": [
@@ -181,7 +181,7 @@
           "quantity": 1
         }
       ],
-      "amountPaid": 5.00
+      "amountPaid": 5.0
     },
     {
       "description": "Multi-item test sale",
@@ -200,7 +200,7 @@
           "quantity": 1
         }
       ],
-      "amountPaid": 17.00
+      "amountPaid": 17.0
     },
     {
       "description": "High-value test sale",
@@ -239,7 +239,7 @@
           "quantity": 20
         }
       ],
-      "amountPaid": 39.80
+      "amountPaid": 39.8
     },
     {
       "description": "Mixed price range items",

@@ -3,73 +3,83 @@
  * Tests authentication, activation, and password recovery functions
  */
 
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 // Mock modules before importing
-jest.unstable_mockModule('../../../models/Seller.js', () => {
+jest.unstable_mockModule("../../../models/Seller.js", () => {
   // Create a mock constructor function
-  const SellerMock = jest.fn(function() {
+  const SellerMock = jest.fn(function () {
     // Instance methods
     this.save = jest.fn().mockResolvedValue(this);
     this.toJSON = jest.fn().mockReturnValue({});
     return this;
   });
-  
+
   // Static methods
   SellerMock.findOne = jest.fn();
   SellerMock.findById = jest.fn();
-  
+
   return { default: SellerMock };
 });
 
-jest.unstable_mockModule('../../../models/PendingSeller.js', () => ({
+jest.unstable_mockModule("../../../models/PendingSeller.js", () => ({
   default: {
     findOne: jest.fn(),
     deleteOne: jest.fn(),
   },
 }));
 
-jest.unstable_mockModule('../../../models/PasswordResetToken.js', () => {
+jest.unstable_mockModule("../../../models/PasswordResetToken.js", () => {
   // Create a mock constructor function
-  const PasswordResetTokenMock = jest.fn(function() {
+  const PasswordResetTokenMock = jest.fn(function () {
     // Instance methods
     this.save = jest.fn().mockResolvedValue(this);
     return this;
   });
-  
+
   // Static methods
   PasswordResetTokenMock.findOne = jest.fn();
   PasswordResetTokenMock.deleteOne = jest.fn();
-  
+
   return { default: PasswordResetTokenMock };
 });
 
-jest.unstable_mockModule('../../../utils/jwt.js', () => ({
+jest.unstable_mockModule("../../../utils/jwt.js", () => ({
   generateToken: jest.fn(),
   generateResetToken: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../../utils/emailService.js', () => ({
+jest.unstable_mockModule("../../../utils/emailService.js", () => ({
   sendPasswordResetEmail: jest.fn(),
 }));
 
-jest.unstable_mockModule('mongoose', () => ({
+jest.unstable_mockModule("mongoose", () => ({
   default: {
     startSession: jest.fn(),
   },
 }));
 
 // Now import after mocks are set up
-let authController, Seller, PendingSeller, PasswordResetToken, generateToken, generateResetToken, sendPasswordResetEmail, mongoose;
+let authController,
+  Seller,
+  PendingSeller,
+  PasswordResetToken,
+  generateToken,
+  generateResetToken,
+  sendPasswordResetEmail,
+  mongoose;
 
 beforeAll(async () => {
-  authController = await import('../../../controllers/authController.js');
-  Seller = (await import('../../../models/Seller.js')).default;
-  PendingSeller = (await import('../../../models/PendingSeller.js')).default;
-  PasswordResetToken = (await import('../../../models/PasswordResetToken.js')).default;
-  ({ generateToken, generateResetToken } = await import('../../../utils/jwt.js'));
-  ({ sendPasswordResetEmail } = await import('../../../utils/emailService.js'));
-  mongoose = (await import('mongoose')).default;
+  authController = await import("../../../controllers/authController.js");
+  Seller = (await import("../../../models/Seller.js")).default;
+  PendingSeller = (await import("../../../models/PendingSeller.js")).default;
+  PasswordResetToken = (await import("../../../models/PasswordResetToken.js"))
+    .default;
+  ({ generateToken, generateResetToken } = await import(
+    "../../../utils/jwt.js"
+  ));
+  ({ sendPasswordResetEmail } = await import("../../../utils/emailService.js"));
+  mongoose = (await import("mongoose")).default;
 });
 
 describe("Auth Controller", () => {
@@ -203,7 +213,7 @@ describe("Auth Controller", () => {
         email: "user@example.com",
       });
       expect(mockSeller.comparePassword).toHaveBeenCalledWith(
-        "correctPassword"
+        "correctPassword",
       );
       expect(generateToken).toHaveBeenCalledWith({
         id: "seller123",
@@ -316,7 +326,7 @@ describe("Auth Controller", () => {
         endSession: jest.fn(),
       };
 
-      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+      jest.spyOn(mongoose, "startSession").mockResolvedValue(mockSession);
 
       mockReq.body = {
         email: "john@example.com",
@@ -359,7 +369,7 @@ describe("Auth Controller", () => {
         endSession: jest.fn(),
       };
 
-      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+      jest.spyOn(mongoose, "startSession").mockResolvedValue(mockSession);
 
       mockReq.body = {
         email: "notfound@example.com",
@@ -380,7 +390,8 @@ describe("Auth Controller", () => {
       expect(mockRes.status).toHaveBeenCalledWith(404);
       expect(mockRes.json).toHaveBeenCalledWith({
         error: "Not Found",
-        message: "Pending seller not found or verification details do not match",
+        message:
+          "Pending seller not found or verification details do not match",
         statusCode: 404,
       });
 
@@ -389,11 +400,13 @@ describe("Auth Controller", () => {
 
     it("should handle database errors during activation", async () => {
       const mockSession = {
-        withTransaction: jest.fn().mockRejectedValue(new Error("Database error")),
+        withTransaction: jest
+          .fn()
+          .mockRejectedValue(new Error("Database error")),
         endSession: jest.fn(),
       };
 
-      jest.spyOn(mongoose, 'startSession').mockResolvedValue(mockSession);
+      jest.spyOn(mongoose, "startSession").mockResolvedValue(mockSession);
 
       mockReq.body = {
         email: "error@example.com",
@@ -443,26 +456,29 @@ describe("Auth Controller", () => {
       PasswordResetToken.mockImplementation(() => mockResetToken);
       sendPasswordResetEmail.mockResolvedValue({
         success: true,
-        previewUrl: "https://ethereal.email/message/123"
+        previewUrl: "https://ethereal.email/message/123",
       });
 
       // Mock NODE_ENV as development to get token in response
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      process.env.NODE_ENV = "development";
 
       await authController.recover(mockReq, mockRes);
 
       expect(Seller.findById).toHaveBeenCalledWith("seller123");
       expect(generateResetToken).toHaveBeenCalled();
       expect(mockResetToken.save).toHaveBeenCalled();
-      expect(sendPasswordResetEmail).toHaveBeenCalledWith("user@example.com", "reset_abcdef123456");
+      expect(sendPasswordResetEmail).toHaveBeenCalledWith(
+        "user@example.com",
+        "reset_abcdef123456",
+      );
 
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Password reset email sent successfully",
         sellerId: "seller123",
         expiresAt: mockResetToken.expiresAt,
         token: "reset_abcdef123456",
-        emailPreview: "https://ethereal.email/message/123"
+        emailPreview: "https://ethereal.email/message/123",
       });
 
       // Restore environment

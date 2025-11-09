@@ -1,19 +1,23 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // Helper function to normalize phone numbers
 const normalizePhoneNumber = (phone) => {
-  if (!phone) {return phone;}
-  
+  if (!phone) {
+    return phone;
+  }
+
   // Remove all non-digit characters
-  const digitsOnly = phone.toString().replace(/\D/g, '');
-  
+  const digitsOnly = phone.toString().replace(/\D/g, "");
+
   // Handle Colombian format with country code (+57)
-  if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
+  if (digitsOnly.length === 12 && digitsOnly.startsWith("57")) {
     return digitsOnly.substring(2); // Remove country code '57'
   }
-  
+
   // Return as-is if 10 digits (mobile) or 7 digits (landline), otherwise return original for validation to catch
-  return (digitsOnly.length === 10 || digitsOnly.length === 7) ? digitsOnly : phone;
+  return digitsOnly.length === 10 || digitsOnly.length === 7
+    ? digitsOnly
+    : phone;
 };
 
 const customerSchema = new mongoose.Schema(
@@ -34,12 +38,13 @@ const customerSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       validate: {
-        validator: function(v) {
+        validator: function (v) {
           // Colombian mobile: 10 digits starting with 3 (e.g., 3001234567)
           // Colombian landline: 7 digits (e.g., 6012345)
           return /^3\d{9}$/.test(v) || /^\d{7}$/.test(v);
         },
-        message: 'Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits). Formats like +57 300 123 4567 are automatically normalized.',
+        message:
+          "Phone number must be a valid Colombian number (mobile: 10 digits starting with 3, landline: 7 digits). Formats like +57 300 123 4567 are automatically normalized.",
       },
     },
     email: {
@@ -59,28 +64,31 @@ const customerSchema = new mongoose.Schema(
 );
 
 // Pre-save middleware to normalize phone number
-customerSchema.pre('save', function(next) {
-  if (this.isModified('phoneNumber')) {
+customerSchema.pre("save", function (next) {
+  if (this.isModified("phoneNumber")) {
     this.phoneNumber = normalizePhoneNumber(this.phoneNumber);
   }
   next();
 });
 
 // Pre-findOneAndUpdate middleware to normalize phone number
-customerSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function(next) {
-  const update = this.getUpdate();
-  if (update.phoneNumber) {
-    update.phoneNumber = normalizePhoneNumber(update.phoneNumber);
-  }
-  if (update.$set && update.$set.phoneNumber) {
-    update.$set.phoneNumber = normalizePhoneNumber(update.$set.phoneNumber);
-  }
-  next();
-});
+customerSchema.pre(
+  ["findOneAndUpdate", "updateOne", "updateMany"],
+  function (next) {
+    const update = this.getUpdate();
+    if (update.phoneNumber) {
+      update.phoneNumber = normalizePhoneNumber(update.phoneNumber);
+    }
+    if (update.$set && update.$set.phoneNumber) {
+      update.$set.phoneNumber = normalizePhoneNumber(update.$set.phoneNumber);
+    }
+    next();
+  },
+);
 
 // Transform output
-customerSchema.set('toJSON', {
-  transform: function(doc, ret) {
+customerSchema.set("toJSON", {
+  transform: function (doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -88,7 +96,7 @@ customerSchema.set('toJSON', {
   },
 });
 
-const Customer = mongoose.model('Customer', customerSchema);
+const Customer = mongoose.model("Customer", customerSchema);
 
 export default Customer;
 export { normalizePhoneNumber };

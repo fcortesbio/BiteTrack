@@ -1,10 +1,10 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
-import { authenticate } from '../middleware/auth.js';
+import { authenticate } from "../middleware/auth.js";
 import {
   getSalesAnalytics,
   exportSalesCSV,
-} from '../controllers/reportingController.js';
+} from "../controllers/reportingController.js";
 
 // All reporting routes require authentication
 router.use(authenticate);
@@ -18,7 +18,7 @@ router.use(authenticate);
  * - dateField: Field to filter by (createdAt, updatedAt)
  * - groupBy: Time grouping (hour, day, week, month, year)
  */
-router.get('/sales/analytics', getSalesAnalytics);
+router.get("/sales/analytics", getSalesAnalytics);
 
 /**
  * GET /reporting/sales/export
@@ -32,6 +32,6 @@ router.get('/sales/analytics', getSalesAnalytics);
  * - sellerId: Filter by seller ID
  * - settled: Filter by settlement status (true/false)
  */
-router.get('/sales/export', exportSalesCSV);
+router.get("/sales/export", exportSalesCSV);
 
 export default router;

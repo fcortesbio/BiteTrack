@@ -2,11 +2,11 @@
  * Inventory Drop System Integration Tests
  * Tests all food waste management endpoints
  */
-import request from 'supertest';
-import app from '../../testApp.js';
-import InventoryDrop from '../../models/InventoryDrop.js';
-import Product from '../../models/Product.js';
-import Seller from '../../models/Seller.js';
+import request from "supertest";
+import app from "../../testApp.js";
+import InventoryDrop from "../../models/InventoryDrop.js";
+import Product from "../../models/Product.js";
+import Seller from "../../models/Seller.js";
 
 describe("Inventory Drop System Routes", () => {
   let adminToken;

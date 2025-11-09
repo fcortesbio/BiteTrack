@@ -2,48 +2,48 @@
 
 /**
  * BiteTrack Test Data Population Script
- * 
+ *
  * This script populates the database with comprehensive test data from JSON files.
- * It handles ID relationships, validates data against schemas, and provides 
+ * It handles ID relationships, validates data against schemas, and provides
  * options for different data sets (minimal, full, bulk testing).
- * 
+ *
  * Usage:
  *   node scripts/populate-test-data.js [--preset=<preset>] [--clean] [--verbose]
- * 
+ *
  * Presets:
  *   minimal  - Essential data for basic testing (default)
- *   full     - Complete realistic dataset 
+ *   full     - Complete realistic dataset
  *   bulk     - Large dataset for performance testing
  *   dev      - Development-friendly smaller dataset
  */
 
-import mongoose from 'mongoose';
-import fs from 'fs/promises';
-import { accessSync } from 'fs';
-import path, { dirname } from 'path';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
+import mongoose from "mongoose";
+import fs from "fs/promises";
+import { accessSync } from "fs";
+import path, { dirname } from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Import models
-import Customer from '../models/Customer.js';
-import Product from '../models/Product.js';
-import Sale from '../models/Sale.js';
-import PendingSeller from '../models/PendingSeller.js';
-import Seller from '../models/Seller.js';
+import Customer from "../models/Customer.js";
+import Product from "../models/Product.js";
+import Sale from "../models/Sale.js";
+import PendingSeller from "../models/PendingSeller.js";
+import Seller from "../models/Seller.js";
 
 // Load test data files
-const DATA_DIR = path.join(__dirname, '..', 'test-data');
+const DATA_DIR = path.join(__dirname, "..", "test-data");
 
 class TestDataPopulator {
   constructor(options = {}) {
-    this.preset = options.preset || 'minimal';
+    this.preset = options.preset || "minimal";
     this.verbose = options.verbose || false;
     this.clean = options.clean || false;
     this.envFile = options.envFile || null;
-    
+
     this.createdData = {
       customers: [],
       products: [],
@@ -51,54 +51,62 @@ class TestDataPopulator {
       pendingSellers: [],
       sellers: [],
     };
-    
+
     this.testData = {};
   }
 
   loadEnvironment() {
     if (this.envFile) {
       const envPath = path.resolve(this.envFile);
-      
+
       try {
         // Check if env file exists synchronously (required for script initialization)
-         
+
         accessSync(envPath);
-        
+
         // Load the environment file
         dotenv.config({ path: envPath });
-        
+
         this.log(`✅ Loaded environment from: ${envPath}`);
       } catch (err) {
-        throw new Error(`Failed to load environment file '${envPath}': ${err.message}`);
+        throw new Error(
+          `Failed to load environment file '${envPath}': ${err.message}`,
+        );
       }
     } else {
       // Try to load default .env file if it exists
-      const defaultEnvPath = path.join(process.cwd(), '.env');
-      
+      const defaultEnvPath = path.join(process.cwd(), ".env");
+
       try {
-         
         accessSync(defaultEnvPath);
         dotenv.config({ path: defaultEnvPath });
         this.log(`✅ Loaded default environment from: ${defaultEnvPath}`);
       } catch {
         // No default .env file found, use process environment only
-        this.log('ℹ️  No .env file found, using process environment variables only');
+        this.log(
+          "ℹ️  No .env file found, using process environment variables only",
+        );
       }
     }
   }
 
   async loadTestData() {
     try {
-      const files = ['customers.json', 'products.json', 'sales.json', 'pending-sellers.json'];
-      
+      const files = [
+        "customers.json",
+        "products.json",
+        "sales.json",
+        "pending-sellers.json",
+      ];
+
       for (const file of files) {
         const filePath = path.join(DATA_DIR, file);
-        const content = await fs.readFile(filePath, 'utf8');
-        const key = file.replace('.json', '').replace('-', '');
+        const content = await fs.readFile(filePath, "utf8");
+        const key = file.replace(".json", "").replace("-", "");
         this.testData[key] = JSON.parse(content);
       }
-      
-      this.log('✅ Test data files loaded successfully');
+
+      this.log("✅ Test data files loaded successfully");
     } catch (error) {
       throw new Error(`Failed to load test data: ${error.message}`);
     }
@@ -107,34 +115,37 @@ class TestDataPopulator {
   async connectToDatabase() {
     try {
       // Use environment variables or defaults
-      const mongoUri = process.env.MONGO_URI || 
-                      `mongodb://${process.env.MONGO_ROOT_USERNAME || 'admin'}:${process.env.MONGO_ROOT_PASSWORD || 'supersecret'}@localhost:27017/bitetrack`;
-      
+      const mongoUri =
+        process.env.MONGO_URI ||
+        `mongodb://${process.env.MONGO_ROOT_USERNAME || "admin"}:${process.env.MONGO_ROOT_PASSWORD || "supersecret"}@localhost:27017/bitetrack`;
+
       // Only show URI in verbose mode for security
       if (this.verbose) {
         this.log(`Connecting to MongoDB with URI: ${mongoUri}`);
       } else {
-        this.log('🔌 Connecting to MongoDB...');
+        this.log("🔌 Connecting to MongoDB...");
       }
-      
+
       await mongoose.connect(mongoUri);
-      this.log('✅ Connected to MongoDB');
+      this.log("✅ Connected to MongoDB");
     } catch (error) {
       throw new Error(`Database connection failed: ${error.message}`);
     }
   }
 
   async cleanDatabase() {
-    if (!this.clean) {return;}
-    
+    if (!this.clean) {
+      return;
+    }
+
     try {
       await Sale.deleteMany({});
       await Customer.deleteMany({});
       await Product.deleteMany({});
       await PendingSeller.deleteMany({});
       // Don't clean sellers as they might include the superadmin
-      
-      this.log('✅ Database cleaned (preserved seller accounts)');
+
+      this.log("✅ Database cleaned (preserved seller accounts)");
     } catch (error) {
       throw new Error(`Database cleanup failed: ${error.message}`);
     }
@@ -142,22 +153,22 @@ class TestDataPopulator {
 
   async populateCustomers() {
     const { customers, bulkTestCustomers } = this.testData.customers;
-    
+
     let customerData = [];
-    
+
     switch (this.preset) {
-    case 'minimal':
-      customerData = customers.slice(0, 5);
-      break;
-    case 'dev':
-      customerData = customers.slice(0, 10);
-      break;
-    case 'full':
-      customerData = customers;
-      break;
-    case 'bulk':
-      customerData = [...customers, ...bulkTestCustomers];
-      break;
+      case "minimal":
+        customerData = customers.slice(0, 5);
+        break;
+      case "dev":
+        customerData = customers.slice(0, 10);
+        break;
+      case "full":
+        customerData = customers;
+        break;
+      case "bulk":
+        customerData = [...customers, ...bulkTestCustomers];
+        break;
     }
 
     try {
@@ -171,7 +182,9 @@ class TestDataPopulator {
         createdOrUpdatedCustomers.push(result);
       }
       this.createdData.customers = createdOrUpdatedCustomers;
-      this.log(`✅ Created or updated ${this.createdData.customers.length} customers`);
+      this.log(
+        `✅ Created or updated ${this.createdData.customers.length} customers`,
+      );
     } catch (error) {
       throw new Error(`Customer creation failed: ${error.message}`);
     }
@@ -179,46 +192,46 @@ class TestDataPopulator {
 
   async populateProducts() {
     const { categories, bulkProducts, lowStockItems } = this.testData.products;
-    
+
     let productData = [];
-    
+
     switch (this.preset) {
-    case 'minimal':
-      productData = [
-        ...categories.sandwiches.slice(0, 3),
-        ...categories.beverages.slice(0, 2),
-        ...categories.sides.slice(0, 2),
-      ];
-      break;
-    case 'dev':
-      productData = [
-        ...categories.sandwiches.slice(0, 5),
-        ...categories.beverages.slice(0, 4),
-        ...categories.sides.slice(0, 3),
-        ...categories.desserts.slice(0, 2),
-      ];
-      break;
-    case 'full':
-      productData = [
-        ...categories.sandwiches,
-        ...categories.beverages,
-        ...categories.sides,
-        ...categories.desserts,
-        ...categories.seasonal,
-        ...lowStockItems,
-      ];
-      break;
-    case 'bulk':
-      productData = [
-        ...categories.sandwiches,
-        ...categories.beverages,
-        ...categories.sides,
-        ...categories.desserts,
-        ...categories.seasonal,
-        ...bulkProducts,
-        ...lowStockItems,
-      ];
-      break;
+      case "minimal":
+        productData = [
+          ...categories.sandwiches.slice(0, 3),
+          ...categories.beverages.slice(0, 2),
+          ...categories.sides.slice(0, 2),
+        ];
+        break;
+      case "dev":
+        productData = [
+          ...categories.sandwiches.slice(0, 5),
+          ...categories.beverages.slice(0, 4),
+          ...categories.sides.slice(0, 3),
+          ...categories.desserts.slice(0, 2),
+        ];
+        break;
+      case "full":
+        productData = [
+          ...categories.sandwiches,
+          ...categories.beverages,
+          ...categories.sides,
+          ...categories.desserts,
+          ...categories.seasonal,
+          ...lowStockItems,
+        ];
+        break;
+      case "bulk":
+        productData = [
+          ...categories.sandwiches,
+          ...categories.beverages,
+          ...categories.sides,
+          ...categories.desserts,
+          ...categories.seasonal,
+          ...bulkProducts,
+          ...lowStockItems,
+        ];
+        break;
     }
 
     try {
@@ -231,31 +244,33 @@ class TestDataPopulator {
 
   async populatePendingSellers() {
     const { pendingSellers } = this.testData.pendingsellers;
-    
+
     // Get the superadmin to use as creator
-    const superadmin = await Seller.findOne({ role: 'superadmin' });
+    const superadmin = await Seller.findOne({ role: "superadmin" });
     if (!superadmin) {
-      throw new Error('No superadmin found. Please ensure superadmin is created before populating test data.');
+      throw new Error(
+        "No superadmin found. Please ensure superadmin is created before populating test data.",
+      );
     }
-    
-    let pendingData = pendingSellers.map(seller => ({
+
+    let pendingData = pendingSellers.map((seller) => ({
       ...seller,
       dateOfBirth: new Date(seller.dateOfBirth),
       createdBy: superadmin._id, // Use actual superadmin ObjectId for traceability
       testingUser: true, // Mark as test data for easy identification and cleanup
     }));
-    
+
     switch (this.preset) {
-    case 'minimal':
-      pendingData = pendingData.slice(0, 2);
-      break;
-    case 'dev':
-      pendingData = pendingData.slice(0, 4);
-      break;
-    case 'full':
-    case 'bulk':
-      // Use all pending sellers
-      break;
+      case "minimal":
+        pendingData = pendingData.slice(0, 2);
+        break;
+      case "dev":
+        pendingData = pendingData.slice(0, 4);
+        break;
+      case "full":
+      case "bulk":
+        // Use all pending sellers
+        break;
     }
 
     try {
@@ -269,17 +284,23 @@ class TestDataPopulator {
         createdOrUpdatedPendingSellers.push(result);
       }
       this.createdData.pendingSellers = createdOrUpdatedPendingSellers;
-      this.log(`✅ Created ${this.createdData.pendingSellers.length} pending sellers (created by superadmin)`);
+      this.log(
+        `✅ Created ${this.createdData.pendingSellers.length} pending sellers (created by superadmin)`,
+      );
     } catch (error) {
       throw new Error(`Pending seller creation failed: ${error.message}`);
     }
   }
 
   async populateSales() {
-    const { salesTemplates, partialPaymentScenarios, bulkTestSales } = this.testData.sales;
-    
-    if (this.createdData.customers.length === 0 || this.createdData.products.length === 0) {
-      throw new Error('Cannot create sales without customers and products');
+    const { salesTemplates, partialPaymentScenarios, bulkTestSales } =
+      this.testData.sales;
+
+    if (
+      this.createdData.customers.length === 0 ||
+      this.createdData.products.length === 0
+    ) {
+      throw new Error("Cannot create sales without customers and products");
     }
 
     // Get a seller ID (use first available seller, or create a test seller)
@@ -288,24 +309,33 @@ class TestDataPopulator {
     if (existingSeller) {
       sellerId = existingSeller._id;
     } else {
-      throw new Error('No seller found in database. Please ensure at least one seller exists.');
+      throw new Error(
+        "No seller found in database. Please ensure at least one seller exists.",
+      );
     }
 
     let salesData = [];
-    
+
     switch (this.preset) {
-    case 'minimal':
-      salesData = salesTemplates.slice(0, 3);
-      break;
-    case 'dev':
-      salesData = [...salesTemplates.slice(0, 6), ...partialPaymentScenarios.slice(0, 1)];
-      break;
-    case 'full':
-      salesData = [...salesTemplates, ...partialPaymentScenarios];
-      break;
-    case 'bulk':
-      salesData = [...salesTemplates, ...partialPaymentScenarios, ...bulkTestSales];
-      break;
+      case "minimal":
+        salesData = salesTemplates.slice(0, 3);
+        break;
+      case "dev":
+        salesData = [
+          ...salesTemplates.slice(0, 6),
+          ...partialPaymentScenarios.slice(0, 1),
+        ];
+        break;
+      case "full":
+        salesData = [...salesTemplates, ...partialPaymentScenarios];
+        break;
+      case "bulk":
+        salesData = [
+          ...salesTemplates,
+          ...partialPaymentScenarios,
+          ...bulkTestSales,
+        ];
+        break;
     }
 
     // Convert template sales to real sales with actual IDs
@@ -313,7 +343,9 @@ class TestDataPopulator {
 
     try {
       this.createdData.sales = await Sale.insertMany(realSales);
-      this.log(`✅ Created ${this.createdData.sales.length} sales transactions`);
+      this.log(
+        `✅ Created ${this.createdData.sales.length} sales transactions`,
+      );
     } catch (error) {
       throw new Error(`Sales creation failed: ${error.message}`);
     }
@@ -321,40 +353,42 @@ class TestDataPopulator {
 
   async convertSalesToRealData(salesTemplates, sellerId) {
     const realSales = [];
-    
+
     for (const template of salesTemplates) {
       // Get random customer
-      const randomCustomer = this.createdData.customers[
-        Math.floor(Math.random() * this.createdData.customers.length)
-      ];
-      
+      const randomCustomer =
+        this.createdData.customers[
+          Math.floor(Math.random() * this.createdData.customers.length)
+        ];
+
       // Convert products to real product data
       const realProducts = [];
       let totalAmount = 0;
-      
+
       for (const productTemplate of template.products) {
         // Try to find matching product by name patterns
         let product = this.findProductByTemplate(productTemplate.productId);
-        
+
         if (!product) {
           // Fallback to random product
-          product = this.createdData.products[
-            Math.floor(Math.random() * this.createdData.products.length)
-          ];
+          product =
+            this.createdData.products[
+              Math.floor(Math.random() * this.createdData.products.length)
+            ];
         }
-        
+
         const priceAtSale = product.price;
         const quantity = productTemplate.quantity;
-        
+
         realProducts.push({
           productId: product._id,
           quantity: quantity,
           priceAtSale: priceAtSale,
         });
-        
+
         totalAmount += priceAtSale * quantity;
       }
-      
+
       // Create real sale
       const realSale = {
         customerId: randomCustomer._id,
@@ -364,31 +398,33 @@ class TestDataPopulator {
         amountPaid: template.amountPaid,
         settled: template.amountPaid >= totalAmount,
       };
-      
+
       realSales.push(realSale);
     }
-    
+
     return realSales;
   }
 
   findProductByTemplate(templateId) {
     // Map common template IDs to actual products
     const productMappings = {
-      'TURKEY_CLUB_SANDWICH_ID': 'Turkey Club Sandwich',
-      'PHILLY_CHEESESTEAK_ID': 'Philly Cheesesteak',
-      'ITALIAN_SUB_ID': 'Italian Sub',
-      'VEGGIE_DELUXE_SANDWICH_ID': 'Veggie Deluxe Sandwich',
-      'FRESH_BREWED_COFFEE_ID': 'Fresh Brewed Coffee',
-      'PREMIUM_LATTE_ID': 'Premium Latte',
-      'KETTLE_CHIPS_ID': 'Kettle Chips',
-      'CHOCOLATE_CHIP_COOKIE_ID': 'Chocolate Chip Cookie',
+      TURKEY_CLUB_SANDWICH_ID: "Turkey Club Sandwich",
+      PHILLY_CHEESESTEAK_ID: "Philly Cheesesteak",
+      ITALIAN_SUB_ID: "Italian Sub",
+      VEGGIE_DELUXE_SANDWICH_ID: "Veggie Deluxe Sandwich",
+      FRESH_BREWED_COFFEE_ID: "Fresh Brewed Coffee",
+      PREMIUM_LATTE_ID: "Premium Latte",
+      KETTLE_CHIPS_ID: "Kettle Chips",
+      CHOCOLATE_CHIP_COOKIE_ID: "Chocolate Chip Cookie",
     };
-    
+
     const productName = productMappings[templateId];
     if (productName) {
-      return this.createdData.products.find(p => p.productName === productName);
+      return this.createdData.products.find(
+        (p) => p.productName === productName,
+      );
     }
-    
+
     return null;
   }
 
@@ -408,32 +444,55 @@ class TestDataPopulator {
         firstSale: this.createdData.sales[0]?._id,
       },
       statistics: {
-        totalSalesValue: this.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0),
-        averageOrderValue: this.createdData.sales.length > 0 ? 
-          (this.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0) / this.createdData.sales.length).toFixed(2) : 0,
-        settledSales: this.createdData.sales.filter(sale => sale.settled).length,
-        unsettledSales: this.createdData.sales.filter(sale => !sale.settled).length,
+        totalSalesValue: this.createdData.sales.reduce(
+          (sum, sale) => sum + sale.totalAmount,
+          0,
+        ),
+        averageOrderValue:
+          this.createdData.sales.length > 0
+            ? (
+                this.createdData.sales.reduce(
+                  (sum, sale) => sum + sale.totalAmount,
+                  0,
+                ) / this.createdData.sales.length
+              ).toFixed(2)
+            : 0,
+        settledSales: this.createdData.sales.filter((sale) => sale.settled)
+          .length,
+        unsettledSales: this.createdData.sales.filter((sale) => !sale.settled)
+          .length,
       },
     };
-    
+
     // Write summary to file
-    const summaryPath = path.join(__dirname, '..', 'test-data', `population-summary-${this.preset}.json`);
+    const summaryPath = path.join(
+      __dirname,
+      "..",
+      "test-data",
+      `population-summary-${this.preset}.json`,
+    );
     await fs.writeFile(summaryPath, JSON.stringify(summary, null, 2));
-    
-    console.log('\n📊 POPULATION SUMMARY');
-    console.log('=====================');
+
+    console.log("\n📊 POPULATION SUMMARY");
+    console.log("=====================");
     console.log(`Preset: ${summary.preset}`);
     console.log(`Customers: ${summary.counts.customers}`);
     console.log(`Products: ${summary.counts.products}`);
     console.log(`Sales: ${summary.counts.sales}`);
     console.log(`Pending Sellers: ${summary.counts.pendingSellers}`);
-    console.log(`Total Sales Value: $${summary.statistics.totalSalesValue.toFixed(2)}`);
-    console.log(`Average Order Value: $${summary.statistics.averageOrderValue}`);
-    console.log(`Settled/Unsettled Sales: ${summary.statistics.settledSales}/${summary.statistics.unsettledSales}`);
+    console.log(
+      `Total Sales Value: $${summary.statistics.totalSalesValue.toFixed(2)}`,
+    );
+    console.log(
+      `Average Order Value: $${summary.statistics.averageOrderValue}`,
+    );
+    console.log(
+      `Settled/Unsettled Sales: ${summary.statistics.settledSales}/${summary.statistics.unsettledSales}`,
+    );
     console.log(`\n📁 Summary saved to: ${summaryPath}`);
-    
+
     if (this.verbose) {
-      console.log('\n🔍 SAMPLE IDS (for API testing):');
+      console.log("\n🔍 SAMPLE IDS (for API testing):");
       console.log(`Customer ID: ${summary.sampleIds.firstCustomer}`);
       console.log(`Product ID: ${summary.sampleIds.firstProduct}`);
       console.log(`Sale ID: ${summary.sampleIds.firstSale}`);
@@ -441,33 +500,34 @@ class TestDataPopulator {
   }
 
   log(message) {
-    if (this.verbose || message.includes('✅')) {
+    if (this.verbose || message.includes("✅")) {
       console.log(message);
     }
   }
 
   async populate() {
     try {
-      console.log(`\n🚀 Starting test data population (preset: ${this.preset})\n`);
-      
+      console.log(
+        `\n🚀 Starting test data population (preset: ${this.preset})\n`,
+      );
+
       // Load environment first
       this.loadEnvironment();
-      
+
       await this.loadTestData();
       await this.connectToDatabase();
       await this.cleanDatabase();
-      
+
       await this.populateCustomers();
       await this.populateProducts();
       await this.populatePendingSellers();
       await this.populateSales();
-      
+
       await this.generateSummaryReport();
-      
-      console.log('\n🎉 Test data population completed successfully!');
-      
+
+      console.log("\n🎉 Test data population completed successfully!");
     } catch (error) {
-      console.error('\n❌ Population failed:', error.message);
+      console.error("\n❌ Population failed:", error.message);
       process.exit(1);
     } finally {
       await mongoose.disconnect();
@@ -478,24 +538,24 @@ class TestDataPopulator {
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
-  
+
   const options = {
-    preset: 'minimal',
+    preset: "minimal",
     clean: false,
     verbose: false,
     envFile: null,
   };
-  
-  args.forEach(arg => {
-    if (arg.startsWith('--preset=')) {
-      options.preset = arg.split('=')[1];
-    } else if (arg.startsWith('--env-file=')) {
-      options.envFile = arg.split('=')[1];
-    } else if (arg === '--clean') {
+
+  args.forEach((arg) => {
+    if (arg.startsWith("--preset=")) {
+      options.preset = arg.split("=")[1];
+    } else if (arg.startsWith("--env-file=")) {
+      options.envFile = arg.split("=")[1];
+    } else if (arg === "--clean") {
       options.clean = true;
-    } else if (arg === '--verbose') {
+    } else if (arg === "--verbose") {
       options.verbose = true;
-    } else if (arg === '--help') {
+    } else if (arg === "--help") {
       console.log(`
 BiteTrack Test Data Population Script
 
@@ -523,20 +583,20 @@ Examples:
       process.exit(0);
     }
   });
-  
-  if (!['minimal', 'dev', 'full', 'bulk'].includes(options.preset)) {
-    console.error('❌ Invalid preset. Use: minimal, dev, full, or bulk');
+
+  if (!["minimal", "dev", "full", "bulk"].includes(options.preset)) {
+    console.error("❌ Invalid preset. Use: minimal, dev, full, or bulk");
     process.exit(1);
   }
-  
+
   const populator = new TestDataPopulator(options);
   await populator.populate();
 }
 
 // Run if called directly (ESM equivalent)
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(error => {
-    console.error('❌ Script failed:', error);
+  main().catch((error) => {
+    console.error("❌ Script failed:", error);
     process.exit(1);
   });
 }

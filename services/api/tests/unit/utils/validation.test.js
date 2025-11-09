@@ -3,12 +3,12 @@
  * Tests validation rules and middleware
  */
 
-import { jest } from '@jest/globals';
+import { jest } from "@jest/globals";
 
 // Mock express-validator for ESM
 const mockValidationResult = jest.fn();
 
-jest.unstable_mockModule('express-validator', () => ({
+jest.unstable_mockModule("express-validator", () => ({
   validationResult: mockValidationResult,
   body: jest.fn(() => ({
     isEmail: jest.fn().mockReturnThis(),
@@ -36,10 +36,12 @@ jest.unstable_mockModule('express-validator', () => ({
 
 let validationRules, validate;
 beforeAll(async () => {
-  ({ validationRules, validate } = await import('../../../utils/validation.js'));
+  ({ validationRules, validate } = await import(
+    "../../../utils/validation.js"
+  ));
 });
 
-describe('Validation Utils', () => {
+describe("Validation Utils", () => {
   let mockReq, mockRes, mockNext;
 
   beforeEach(() => {
@@ -52,39 +54,39 @@ describe('Validation Utils', () => {
     jest.clearAllMocks();
   });
 
-  describe('validationRules', () => {
-    it('should have all required validation rule sets', () => {
+  describe("validationRules", () => {
+    it("should have all required validation rule sets", () => {
       const expectedRules = [
-        'login',
-        'activate',
-        'resetPassword',
-        'getSellerByEmail',
-        'createPendingSeller',
-        'updateSeller',
-        'changeRole',
-        'createCustomer',
-        'updateCustomer',
-        'createProduct',
-        'updateProduct',
-        'createSale',
-        'settleSale',
+        "login",
+        "activate",
+        "resetPassword",
+        "getSellerByEmail",
+        "createPendingSeller",
+        "updateSeller",
+        "changeRole",
+        "createCustomer",
+        "updateCustomer",
+        "createProduct",
+        "updateProduct",
+        "createSale",
+        "settleSale",
       ];
 
-      expectedRules.forEach(rule => {
+      expectedRules.forEach((rule) => {
         expect(validationRules).toHaveProperty(rule);
         expect(Array.isArray(validationRules[rule])).toBe(true);
       });
     });
 
-    it('should have non-empty validation arrays', () => {
-      Object.keys(validationRules).forEach(key => {
+    it("should have non-empty validation arrays", () => {
+      Object.keys(validationRules).forEach((key) => {
         expect(validationRules[key].length).toBeGreaterThan(0);
       });
     });
   });
 
-  describe('validate middleware', () => {
-    it('should call next() when no validation errors', () => {
+  describe("validate middleware", () => {
+    it("should call next() when no validation errors", () => {
       const mockErrors = {
         isEmpty: jest.fn().mockReturnValue(true),
       };
@@ -96,12 +98,12 @@ describe('Validation Utils', () => {
       expect(mockRes.status).not.toHaveBeenCalled();
     });
 
-    it('should return 400 error when validation fails', () => {
+    it("should return 400 error when validation fails", () => {
       const mockErrorDetails = [
-        { path: 'email', msg: 'Valid email is required' },
-        { path: 'password', msg: 'Password is required' },
+        { path: "email", msg: "Valid email is required" },
+        { path: "password", msg: "Password is required" },
       ];
-      
+
       const mockErrors = {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
@@ -112,22 +114,22 @@ describe('Validation Utils', () => {
 
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Validation Error',
-        message: 'Invalid input data',
+        error: "Validation Error",
+        message: "Invalid input data",
         details: [
-          { field: 'email', message: 'Valid email is required' },
-          { field: 'password', message: 'Password is required' },
+          { field: "email", message: "Valid email is required" },
+          { field: "password", message: "Password is required" },
         ],
         statusCode: 400,
       });
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('should map error details correctly', () => {
+    it("should map error details correctly", () => {
       const mockErrorDetails = [
-        { path: 'firstName', msg: 'First name is required' },
+        { path: "firstName", msg: "First name is required" },
       ];
-      
+
       const mockErrors = {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
@@ -138,20 +140,18 @@ describe('Validation Utils', () => {
 
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          details: [
-            { field: 'firstName', message: 'First name is required' },
-          ],
+          details: [{ field: "firstName", message: "First name is required" }],
         }),
       );
     });
 
-    it('should handle multiple validation errors', () => {
+    it("should handle multiple validation errors", () => {
       const mockErrorDetails = [
-        { path: 'email', msg: 'Valid email is required' },
-        { path: 'password', msg: 'Password must be at least 8 characters' },
-        { path: 'firstName', msg: 'First name is required' },
+        { path: "email", msg: "Valid email is required" },
+        { path: "password", msg: "Password must be at least 8 characters" },
+        { path: "firstName", msg: "First name is required" },
       ];
-      
+
       const mockErrors = {
         isEmpty: jest.fn().mockReturnValue(false),
         array: jest.fn().mockReturnValue(mockErrorDetails),
@@ -163,32 +163,35 @@ describe('Validation Utils', () => {
       expect(mockRes.json).toHaveBeenCalledWith(
         expect.objectContaining({
           details: expect.arrayContaining([
-            { field: 'email', message: 'Valid email is required' },
-            { field: 'password', message: 'Password must be at least 8 characters' },
-            { field: 'firstName', message: 'First name is required' },
+            { field: "email", message: "Valid email is required" },
+            {
+              field: "password",
+              message: "Password must be at least 8 characters",
+            },
+            { field: "firstName", message: "First name is required" },
           ]),
         }),
       );
     });
   });
 
-  describe('validation rule structure', () => {
-    it('should have proper structure for login validation', () => {
+  describe("validation rule structure", () => {
+    it("should have proper structure for login validation", () => {
       expect(validationRules.login).toBeDefined();
       expect(Array.isArray(validationRules.login)).toBe(true);
     });
 
-    it('should have proper structure for createCustomer validation', () => {
+    it("should have proper structure for createCustomer validation", () => {
       expect(validationRules.createCustomer).toBeDefined();
       expect(Array.isArray(validationRules.createCustomer)).toBe(true);
     });
 
-    it('should have proper structure for createProduct validation', () => {
+    it("should have proper structure for createProduct validation", () => {
       expect(validationRules.createProduct).toBeDefined();
       expect(Array.isArray(validationRules.createProduct)).toBe(true);
     });
 
-    it('should have proper structure for createSale validation', () => {
+    it("should have proper structure for createSale validation", () => {
       expect(validationRules.createSale).toBeDefined();
       expect(Array.isArray(validationRules.createSale)).toBe(true);
     });

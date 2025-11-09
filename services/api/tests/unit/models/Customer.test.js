@@ -3,28 +3,28 @@
  * Tests schema validation, phone normalization, and pre-save middleware
  */
 
-import Customer from '../../../models/Customer.js';
-import { jest } from '@jest/globals';
+import Customer from "../../../models/Customer.js";
+import { jest } from "@jest/globals";
 
-describe('Customer Model', () => {
-  describe('Schema Validation', () => {
-    it('should create a valid customer with required fields', () => {
+describe("Customer Model", () => {
+  describe("Schema Validation", () => {
+    it("should create a valid customer with required fields", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile number
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile number
       };
 
       const customer = new Customer(customerData);
       const validationError = customer.validateSync();
 
       expect(validationError).toBeUndefined();
-      expect(customer.firstName).toBe('John');
-      expect(customer.lastName).toBe('Doe');
-      expect(customer.phoneNumber).toBe('3001234567');
+      expect(customer.firstName).toBe("John");
+      expect(customer.lastName).toBe("Doe");
+      expect(customer.phoneNumber).toBe("3001234567");
     });
 
-    it('should fail validation when required fields are missing', () => {
+    it("should fail validation when required fields are missing", () => {
       const customer = new Customer({});
       const validationError = customer.validateSync();
 
@@ -34,37 +34,37 @@ describe('Customer Model', () => {
       expect(validationError.errors.phoneNumber).toBeDefined();
     });
 
-    it('should trim firstName and lastName', () => {
+    it("should trim firstName and lastName", () => {
       const customerData = {
-        firstName: '  John  ',
-        lastName: '  Doe  ',
-        phoneNumber: '3001234567', // Colombian mobile
+        firstName: "  John  ",
+        lastName: "  Doe  ",
+        phoneNumber: "3001234567", // Colombian mobile
       };
 
       const customer = new Customer(customerData);
 
-      expect(customer.firstName).toBe('John');
-      expect(customer.lastName).toBe('Doe');
+      expect(customer.firstName).toBe("John");
+      expect(customer.lastName).toBe("Doe");
     });
 
-    it('should lowercase and trim email', () => {
+    it("should lowercase and trim email", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile
-        email: '  JOHN.DOE@EXAMPLE.COM  ',
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile
+        email: "  JOHN.DOE@EXAMPLE.COM  ",
       };
 
       const customer = new Customer(customerData);
 
-      expect(customer.email).toBe('john.doe@example.com');
+      expect(customer.email).toBe("john.doe@example.com");
     });
 
-    it('should allow undefined email (sparse index)', () => {
+    it("should allow undefined email (sparse index)", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile
       };
 
       const customer = new Customer(customerData);
@@ -74,11 +74,11 @@ describe('Customer Model', () => {
       expect(customer.email).toBeUndefined();
     });
 
-    it('should default lastTransaction to null', () => {
+    it("should default lastTransaction to null", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile
       };
 
       const customer = new Customer(customerData);
@@ -86,15 +86,15 @@ describe('Customer Model', () => {
       expect(customer.lastTransaction).toBeNull();
     });
 
-    it('should accept valid Colombian phone numbers', () => {
+    it("should accept valid Colombian phone numbers", () => {
       // Colombian mobile: 10 digits starting with 3
       // Colombian landline: 7 digits
-      const validPhones = ['3001234567', '3209876543', '3157654321', '6012345'];
+      const validPhones = ["3001234567", "3209876543", "3157654321", "6012345"];
 
-      validPhones.forEach(phoneNumber => {
+      validPhones.forEach((phoneNumber) => {
         const customerData = {
-          firstName: 'Test',
-          lastName: 'Customer',
+          firstName: "Test",
+          lastName: "Customer",
           phoneNumber,
         };
 
@@ -106,22 +106,22 @@ describe('Customer Model', () => {
       });
     });
 
-    it('should reject invalid phone number formats', () => {
+    it("should reject invalid phone number formats", () => {
       // Invalid: too short, too long, letters, US numbers not starting with 3, formatted strings
       const invalidPhones = [
-        '123',           // Too short
-        '12345678901',   // Too long  
-        'abcdefghij',    // Letters
-        '2001234567',    // 10 digits but doesn't start with 3
-        '5551234567',    // US number (doesn't start with 3)
-        '555-123-4567',  // Formatted (has non-digits)
-        '(300) 123-4567' // Formatted (has non-digits)
+        "123", // Too short
+        "12345678901", // Too long
+        "abcdefghij", // Letters
+        "2001234567", // 10 digits but doesn't start with 3
+        "5551234567", // US number (doesn't start with 3)
+        "555-123-4567", // Formatted (has non-digits)
+        "(300) 123-4567", // Formatted (has non-digits)
       ];
 
-      invalidPhones.forEach(phoneNumber => {
+      invalidPhones.forEach((phoneNumber) => {
         const customerData = {
-          firstName: 'Test',
-          lastName: 'Customer',
+          firstName: "Test",
+          lastName: "Customer",
           phoneNumber,
         };
 
@@ -133,11 +133,11 @@ describe('Customer Model', () => {
       });
     });
 
-    it('should have timestamps configured', () => {
+    it("should have timestamps configured", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile
       };
 
       const customer = new Customer(customerData);
@@ -147,22 +147,22 @@ describe('Customer Model', () => {
     });
   });
 
-  describe('Phone Number Normalization', () => {
-    describe('normalizePhoneNumber helper function', () => {
+  describe("Phone Number Normalization", () => {
+    describe("normalizePhoneNumber helper function", () => {
       // Access the helper function through the model's static methods or test it indirectly
       const testNormalization = (input, expected) => {
         const _customer = new Customer({
-          firstName: 'Test',
-          lastName: 'Customer',
+          firstName: "Test",
+          lastName: "Customer",
           phoneNumber: input,
         });
 
         // Manually trigger the Colombian normalization by calling the pre-save middleware logic
-        if (typeof input === 'string') {
-          const digitsOnly = input.replace(/\D/g, '');
+        if (typeof input === "string") {
+          const digitsOnly = input.replace(/\D/g, "");
           let normalized;
           // Handle Colombian country code +57 (12 digits total)
-          if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
+          if (digitsOnly.length === 12 && digitsOnly.startsWith("57")) {
             normalized = digitsOnly.substring(2);
           } else if (digitsOnly.length === 10 || digitsOnly.length === 7) {
             // Colombian mobile (10 digits) or landline (7 digits)
@@ -175,44 +175,44 @@ describe('Customer Model', () => {
         }
       };
 
-      it('should normalize Colombian phone number with country code', () => {
+      it("should normalize Colombian phone number with country code", () => {
         // +57 3001234567 -> 3001234567
-        testNormalization('+57 3001234567', '3001234567');
+        testNormalization("+57 3001234567", "3001234567");
       });
 
-      it('should normalize formatted Colombian phone numbers', () => {
-        testNormalization('+57 300 123 4567', '3001234567');
-        testNormalization('(300) 123-4567', '3001234567');
-        testNormalization('300-123-4567', '3001234567');
+      it("should normalize formatted Colombian phone numbers", () => {
+        testNormalization("+57 300 123 4567", "3001234567");
+        testNormalization("(300) 123-4567", "3001234567");
+        testNormalization("300-123-4567", "3001234567");
       });
 
-      it('should leave valid Colombian numbers unchanged', () => {
-        testNormalization('3001234567', '3001234567');
-        testNormalization('6012345', '6012345'); // 7-digit landline
+      it("should leave valid Colombian numbers unchanged", () => {
+        testNormalization("3001234567", "3001234567");
+        testNormalization("6012345", "6012345"); // 7-digit landline
       });
 
-      it('should return original for invalid lengths', () => {
-        testNormalization('123', '123');
-        testNormalization('12345678901234', '12345678901234');
+      it("should return original for invalid lengths", () => {
+        testNormalization("123", "123");
+        testNormalization("12345678901234", "12345678901234");
       });
 
-      it('should handle null and undefined', () => {
+      it("should handle null and undefined", () => {
         const customer = new Customer({
-          firstName: 'Test',
-          lastName: 'Customer',
-          phoneNumber: '3001234567', // Valid Colombian mobile
+          firstName: "Test",
+          lastName: "Customer",
+          phoneNumber: "3001234567", // Valid Colombian mobile
         });
 
-        expect(customer.phoneNumber).toBe('3001234567');
+        expect(customer.phoneNumber).toBe("3001234567");
       });
     });
 
-    describe('pre-save middleware', () => {
-      it('should normalize phone number on save', async() => {
+    describe("pre-save middleware", () => {
+      it("should normalize phone number on save", async () => {
         const customer = new Customer({
-          firstName: 'John',
-          lastName: 'Doe',
-          phoneNumber: '+57 300 123 4567', // Colombian format with country code
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "+57 300 123 4567", // Colombian format with country code
         });
 
         // Mock isModified method
@@ -220,12 +220,12 @@ describe('Customer Model', () => {
 
         // Simulate the pre-save middleware behavior
         const mockNext = jest.fn();
-        
+
         // Manually execute Colombian normalization logic
-        if (customer.isModified('phoneNumber')) {
-          const digitsOnly = customer.phoneNumber.replace(/\D/g, '');
+        if (customer.isModified("phoneNumber")) {
+          const digitsOnly = customer.phoneNumber.replace(/\D/g, "");
           // Handle Colombian country code +57 (12 digits total)
-          if (digitsOnly.length === 12 && digitsOnly.startsWith('57')) {
+          if (digitsOnly.length === 12 && digitsOnly.startsWith("57")) {
             customer.phoneNumber = digitsOnly.substring(2);
           } else if (digitsOnly.length === 10 || digitsOnly.length === 7) {
             customer.phoneNumber = digitsOnly;
@@ -234,23 +234,23 @@ describe('Customer Model', () => {
         mockNext();
 
         expect(mockNext).toHaveBeenCalled();
-        expect(customer.phoneNumber).toBe('3001234567');
+        expect(customer.phoneNumber).toBe("3001234567");
       });
 
-      it('should not normalize phone number if not modified', async() => {
+      it("should not normalize phone number if not modified", async () => {
         const customer = new Customer({
-          firstName: 'John',
-          lastName: 'Doe',
-          phoneNumber: '3001234567', // Colombian mobile
+          firstName: "John",
+          lastName: "Doe",
+          phoneNumber: "3001234567", // Colombian mobile
         });
 
         const originalPhone = customer.phoneNumber;
         customer.isModified = jest.fn().mockReturnValue(false);
 
         const mockNext = jest.fn();
-        
+
         // Simulate middleware that doesn't modify when not changed
-        if (customer.isModified('phoneNumber')) {
+        if (customer.isModified("phoneNumber")) {
           // This shouldn't execute since isModified returns false
         }
         mockNext();
@@ -261,13 +261,13 @@ describe('Customer Model', () => {
     });
   });
 
-  describe('toJSON Transform', () => {
-    it('should transform _id to id', () => {
+  describe("toJSON Transform", () => {
+    it("should transform _id to id", () => {
       const customerData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        phoneNumber: '3001234567', // Colombian mobile
-        email: 'john@example.com',
+        firstName: "John",
+        lastName: "Doe",
+        phoneNumber: "3001234567", // Colombian mobile
+        email: "john@example.com",
       };
 
       const customer = new Customer(customerData);
@@ -276,35 +276,35 @@ describe('Customer Model', () => {
       expect(json._id).toBeUndefined();
       expect(json.__v).toBeUndefined();
       expect(json.id).toBeDefined();
-      expect(json.firstName).toBe('John');
-      expect(json.lastName).toBe('Doe');
-      expect(json.phoneNumber).toBe('3001234567');
-      expect(json.email).toBe('john@example.com');
+      expect(json.firstName).toBe("John");
+      expect(json.lastName).toBe("Doe");
+      expect(json.phoneNumber).toBe("3001234567");
+      expect(json.email).toBe("john@example.com");
     });
 
-    it('should preserve all valid fields in JSON output', () => {
+    it("should preserve all valid fields in JSON output", () => {
       const customer = new Customer({
-        firstName: 'Jane',
-        lastName: 'Smith',
-        phoneNumber: '3209876543', // Colombian mobile
-        email: 'jane@example.com',
-        lastTransaction: new Date('2023-01-01'),
+        firstName: "Jane",
+        lastName: "Smith",
+        phoneNumber: "3209876543", // Colombian mobile
+        email: "jane@example.com",
+        lastTransaction: new Date("2023-01-01"),
       });
 
       const json = customer.toJSON();
 
-      expect(json.firstName).toBe('Jane');
-      expect(json.lastName).toBe('Smith');
-      expect(json.phoneNumber).toBe('3209876543');
-      expect(json.email).toBe('jane@example.com');
+      expect(json.firstName).toBe("Jane");
+      expect(json.lastName).toBe("Smith");
+      expect(json.phoneNumber).toBe("3209876543");
+      expect(json.email).toBe("jane@example.com");
       expect(json.lastTransaction).toBeInstanceOf(Date);
     });
 
-    it('should handle null lastTransaction in JSON output', () => {
+    it("should handle null lastTransaction in JSON output", () => {
       const customer = new Customer({
-        firstName: 'Test',
-        lastName: 'User',
-        phoneNumber: '3001234567', // Colombian mobile
+        firstName: "Test",
+        lastName: "User",
+        phoneNumber: "3001234567", // Colombian mobile
       });
 
       const json = customer.toJSON();
@@ -313,18 +313,18 @@ describe('Customer Model', () => {
     });
   });
 
-  describe('Schema Structure', () => {
-    it('should have correct field types', () => {
+  describe("Schema Structure", () => {
+    it("should have correct field types", () => {
       const schema = Customer.schema;
 
-      expect(schema.paths.firstName.instance).toBe('String');
-      expect(schema.paths.lastName.instance).toBe('String');
-      expect(schema.paths.phoneNumber.instance).toBe('String');
-      expect(schema.paths.email.instance).toBe('String');
-      expect(schema.paths.lastTransaction.instance).toBe('Date');
+      expect(schema.paths.firstName.instance).toBe("String");
+      expect(schema.paths.lastName.instance).toBe("String");
+      expect(schema.paths.phoneNumber.instance).toBe("String");
+      expect(schema.paths.email.instance).toBe("String");
+      expect(schema.paths.lastTransaction.instance).toBe("Date");
     });
 
-    it('should have correct field requirements', () => {
+    it("should have correct field requirements", () => {
       const schema = Customer.schema;
 
       expect(schema.paths.firstName.options.required).toBe(true);
@@ -334,19 +334,19 @@ describe('Customer Model', () => {
       expect(schema.paths.lastTransaction.options.required).toBeUndefined();
     });
 
-    it('should have unique constraint on phoneNumber', () => {
+    it("should have unique constraint on phoneNumber", () => {
       const schema = Customer.schema;
-      
+
       expect(schema.paths.phoneNumber.options.unique).toBe(true);
     });
 
-    it('should have sparse index on email', () => {
+    it("should have sparse index on email", () => {
       const schema = Customer.schema;
-      
+
       expect(schema.paths.email.options.sparse).toBe(true);
     });
 
-    it('should have timestamps enabled', () => {
+    it("should have timestamps enabled", () => {
       const schema = Customer.schema;
 
       expect(schema.paths.createdAt).toBeDefined();

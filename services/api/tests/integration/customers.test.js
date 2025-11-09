@@ -2,12 +2,12 @@
  * Customer Management Routes Integration Tests
  * Tests all customer management endpoints
  */
-import request from 'supertest';
-import app from '../../testApp.js';
-import Customer from '../../models/Customer.js';
-import Seller from '../../models/Seller.js';
-import Sale from '../../models/Sale.js';
-import Product from '../../models/Product.js';
+import request from "supertest";
+import app from "../../testApp.js";
+import Customer from "../../models/Customer.js";
+import Seller from "../../models/Seller.js";
+import Sale from "../../models/Sale.js";
+import Product from "../../models/Product.js";
 
 describe("Customer Management Routes", () => {
   let authToken;
@@ -124,7 +124,9 @@ describe("Customer Management Routes", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("details");
-      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      const phoneError = response.body.details.find(
+        (d) => d.field === "phoneNumber",
+      );
       expect(phoneError).toBeTruthy();
       expect(phoneError.message).toContain("Phone number");
     });
@@ -141,7 +143,9 @@ describe("Customer Management Routes", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("details");
-      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      const phoneError = response.body.details.find(
+        (d) => d.field === "phoneNumber",
+      );
       expect(phoneError).toBeTruthy();
       expect(phoneError.message).toContain("Phone number");
     });
@@ -158,7 +162,9 @@ describe("Customer Management Routes", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("details");
-      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      const phoneError = response.body.details.find(
+        (d) => d.field === "phoneNumber",
+      );
       expect(phoneError).toBeTruthy();
       expect(phoneError.message).toContain("Phone number");
     });
@@ -175,7 +181,9 @@ describe("Customer Management Routes", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("details");
-      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      const phoneError = response.body.details.find(
+        (d) => d.field === "phoneNumber",
+      );
       expect(phoneError).toBeTruthy();
       expect(phoneError.message).toContain("Colombian");
     });
@@ -199,8 +207,18 @@ describe("Customer Management Routes", () => {
     it("should list all customers", async () => {
       // Create test customers
       await Customer.create([
-        { firstName: "Alice", lastName: "Johnson", email: "alice@test.com", phoneNumber: "3101234567" },
-        { firstName: "Bob", lastName: "Williams", email: "bob@test.com", phoneNumber: "3209876543" },
+        {
+          firstName: "Alice",
+          lastName: "Johnson",
+          email: "alice@test.com",
+          phoneNumber: "3101234567",
+        },
+        {
+          firstName: "Bob",
+          lastName: "Williams",
+          email: "bob@test.com",
+          phoneNumber: "3209876543",
+        },
         { firstName: "Charlie", lastName: "Brown", phoneNumber: "3157654321" },
       ]);
 
@@ -310,7 +328,9 @@ describe("Customer Management Routes", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toHaveProperty("details");
-      const phoneError = response.body.details.find(d => d.field === 'phoneNumber');
+      const phoneError = response.body.details.find(
+        (d) => d.field === "phoneNumber",
+      );
       expect(phoneError).toBeTruthy();
       expect(phoneError.message).toContain("Phone number");
     });

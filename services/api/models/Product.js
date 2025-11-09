@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
-      default: '',
+      default: "",
     },
     count: {
       type: Number,
@@ -30,14 +30,14 @@ const productSchema = new mongoose.Schema(
 );
 
 // Add virtual field for API compatibility
-productSchema.virtual('name').get(function() {
+productSchema.virtual("name").get(function () {
   return this.productName;
 });
 
 // Transform output with virtuals enabled
-productSchema.set('toJSON', {
+productSchema.set("toJSON", {
   virtuals: true,
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     ret.id = ret._id;
     ret.name = ret.productName; // Ensure name field is available for API consistency
     delete ret._id;
@@ -46,4 +46,4 @@ productSchema.set('toJSON', {
   },
 });
 
-export default mongoose.model('Product', productSchema);
+export default mongoose.model("Product", productSchema);

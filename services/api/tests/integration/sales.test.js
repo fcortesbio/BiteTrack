@@ -2,12 +2,12 @@
  * Sales Transaction Routes Integration Tests
  * Tests all sales management endpoints
  */
-import request from 'supertest';
-import app from '../../testApp.js';
-import Sale from '../../models/Sale.js';
-import Product from '../../models/Product.js';
-import Customer from '../../models/Customer.js';
-import Seller from '../../models/Seller.js';
+import request from "supertest";
+import app from "../../testApp.js";
+import Sale from "../../models/Sale.js";
+import Product from "../../models/Product.js";
+import Customer from "../../models/Customer.js";
+import Seller from "../../models/Seller.js";
 
 describe("Sales Transaction Routes", () => {
   let authToken;

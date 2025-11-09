@@ -1,16 +1,16 @@
-import TestDataPopulator from '../scripts/04-populate-test-data.js';
-import Customer from '../models/Customer.js';
-import Product from '../models/Product.js';
-import Sale from '../models/Sale.js';
-import PendingSeller from '../models/PendingSeller.js';
-import Seller from '../models/Seller.js';
+import TestDataPopulator from "../scripts/04-populate-test-data.js";
+import Customer from "../models/Customer.js";
+import Product from "../models/Product.js";
+import Sale from "../models/Sale.js";
+import PendingSeller from "../models/PendingSeller.js";
+import Seller from "../models/Seller.js";
 
 /**
  * Test Data Management Controller
- * 
+ *
  * Provides API endpoints for managing test data in development/testing environments.
  * These endpoints should be disabled in production for security reasons.
- * 
+ *
  * All endpoints require admin or superadmin privileges.
  */
 
@@ -20,25 +20,29 @@ import Seller from '../models/Seller.js';
  * @access  Admin/SuperAdmin only
  * @body    { preset?, cleanBefore?, verbose? }
  */
-const populateTestData = async(req, res) => {
+const populateTestData = async (req, res) => {
   try {
     // Security check - only allow in non-production environments
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Test data endpoints are disabled in production',
+        error: "Forbidden",
+        message: "Test data endpoints are disabled in production",
         statusCode: 403,
       });
     }
 
-    const { preset = 'minimal', cleanBefore = false, verbose = false } = req.body;
+    const {
+      preset = "minimal",
+      cleanBefore = false,
+      verbose = false,
+    } = req.body;
 
     // Validate preset
-    const validPresets = ['minimal', 'dev', 'full', 'bulk'];
+    const validPresets = ["minimal", "dev", "full", "bulk"];
     if (!validPresets.includes(preset)) {
       return res.status(400).json({
-        error: 'Validation Error',
-        message: `Invalid preset. Must be one of: ${validPresets.join(', ')}`,
+        error: "Validation Error",
+        message: `Invalid preset. Must be one of: ${validPresets.join(", ")}`,
         statusCode: 400,
       });
     }
@@ -82,25 +86,35 @@ const populateTestData = async(req, res) => {
         firstSale: populator.createdData.sales[0]?._id,
       },
       statistics: {
-        totalSalesValue: populator.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0),
-        averageOrderValue: populator.createdData.sales.length > 0 ? 
-          (populator.createdData.sales.reduce((sum, sale) => sum + sale.totalAmount, 0) / populator.createdData.sales.length) : 0,
-        settledSales: populator.createdData.sales.filter(sale => sale.settled).length,
-        unsettledSales: populator.createdData.sales.filter(sale => !sale.settled).length,
+        totalSalesValue: populator.createdData.sales.reduce(
+          (sum, sale) => sum + sale.totalAmount,
+          0,
+        ),
+        averageOrderValue:
+          populator.createdData.sales.length > 0
+            ? populator.createdData.sales.reduce(
+                (sum, sale) => sum + sale.totalAmount,
+                0,
+              ) / populator.createdData.sales.length
+            : 0,
+        settledSales: populator.createdData.sales.filter((sale) => sale.settled)
+          .length,
+        unsettledSales: populator.createdData.sales.filter(
+          (sale) => !sale.settled,
+        ).length,
       },
     };
 
     res.status(201).json({
-      message: 'Test data populated successfully',
+      message: "Test data populated successfully",
       summary,
       statusCode: 201,
     });
-
   } catch (error) {
-    console.error('Test data population error:', error);
+    console.error("Test data population error:", error);
     res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message || 'Failed to populate test data',
+      error: "Internal Server Error",
+      message: error.message || "Failed to populate test data",
       statusCode: 500,
     });
   }
@@ -112,13 +126,13 @@ const populateTestData = async(req, res) => {
  * @access  Admin/SuperAdmin only
  * @body    { confirmClean?, preserveData? }
  */
-const cleanTestData = async(req, res) => {
+const cleanTestData = async (req, res) => {
   try {
     // Security check - only allow in non-production environments
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Test data endpoints are disabled in production',
+        error: "Forbidden",
+        message: "Test data endpoints are disabled in production",
         statusCode: 403,
       });
     }
@@ -128,9 +142,9 @@ const cleanTestData = async(req, res) => {
     // Require explicit confirmation for safety
     if (!confirmClean) {
       return res.status(400).json({
-        error: 'Confirmation Required',
-        message: 'Must set confirmClean: true to proceed with data deletion',
-        hint: 'This is a safety measure to prevent accidental data loss',
+        error: "Confirmation Required",
+        message: "Must set confirmClean: true to proceed with data deletion",
+        hint: "This is a safety measure to prevent accidental data loss",
         statusCode: 400,
       });
     }
@@ -150,46 +164,52 @@ const cleanTestData = async(req, res) => {
     };
 
     // Delete sales first (due to foreign key relationships)
-    if (!preserveData.includes('sales')) {
+    if (!preserveData.includes("sales")) {
       const salesResult = await Sale.deleteMany({});
       deletionSummary.deletedCounts.sales = salesResult.deletedCount;
     }
 
     // Delete customers
-    if (!preserveData.includes('customers')) {
+    if (!preserveData.includes("customers")) {
       const customersResult = await Customer.deleteMany({});
       deletionSummary.deletedCounts.customers = customersResult.deletedCount;
     }
 
     // Delete products
-    if (!preserveData.includes('products')) {
+    if (!preserveData.includes("products")) {
       const productsResult = await Product.deleteMany({});
       deletionSummary.deletedCounts.products = productsResult.deletedCount;
     }
 
     // Delete pending sellers (only those marked as testing users)
-    if (!preserveData.includes('pendingSellers')) {
-      const pendingSellersResult = await PendingSeller.deleteMany({ testingUser: true });
-      deletionSummary.deletedCounts.pendingSellers = pendingSellersResult.deletedCount;
+    if (!preserveData.includes("pendingSellers")) {
+      const pendingSellersResult = await PendingSeller.deleteMany({
+        testingUser: true,
+      });
+      deletionSummary.deletedCounts.pendingSellers =
+        pendingSellersResult.deletedCount;
     }
 
     // Delete testing sellers (but never real admin accounts)
     const testingSellersResult = await Seller.deleteMany({ testingUser: true });
-    deletionSummary.deletedCounts.testingSellers = testingSellersResult.deletedCount;
+    deletionSummary.deletedCounts.testingSellers =
+      testingSellersResult.deletedCount;
 
-    const totalDeleted = Object.values(deletionSummary.deletedCounts).reduce((sum, count) => sum + count, 0);
+    const totalDeleted = Object.values(deletionSummary.deletedCounts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
 
     res.status(200).json({
       message: `Successfully cleaned test data. Deleted ${totalDeleted} records.`,
       summary: deletionSummary,
       statusCode: 200,
     });
-
   } catch (error) {
-    console.error('Test data cleanup error:', error);
+    console.error("Test data cleanup error:", error);
     res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message || 'Failed to clean test data',
+      error: "Internal Server Error",
+      message: error.message || "Failed to clean test data",
       statusCode: 500,
     });
   }
@@ -200,13 +220,13 @@ const cleanTestData = async(req, res) => {
  * @route   GET /api/test-data/status
  * @access  Admin/SuperAdmin only
  */
-const getTestDataStatus = async(req, res) => {
+const getTestDataStatus = async (req, res) => {
   try {
     // Security check - only allow in non-production environments
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Test data endpoints are disabled in production',
+        error: "Forbidden",
+        message: "Test data endpoints are disabled in production",
         statusCode: 403,
       });
     }
@@ -229,7 +249,10 @@ const getTestDataStatus = async(req, res) => {
       PendingSeller.countDocuments({ testingUser: true }),
       Seller.countDocuments({ testingUser: true }),
       Seller.countDocuments(),
-      Sale.find({}).sort({ createdAt: -1 }).limit(5).populate('customerId sellerId', 'firstName lastName'),
+      Sale.find({})
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate("customerId sellerId", "firstName lastName"),
     ]);
 
     // Calculate sales statistics
@@ -237,13 +260,13 @@ const getTestDataStatus = async(req, res) => {
       {
         $group: {
           _id: null,
-          totalSalesValue: { $sum: '$totalAmount' },
-          averageOrderValue: { $avg: '$totalAmount' },
+          totalSalesValue: { $sum: "$totalAmount" },
+          averageOrderValue: { $avg: "$totalAmount" },
           settledCount: {
-            $sum: { $cond: [{ $eq: ['$settled', true] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$settled", true] }, 1, 0] },
           },
           unsettledCount: {
-            $sum: { $cond: [{ $eq: ['$settled', false] }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$settled", false] }, 1, 0] },
           },
         },
       },
@@ -257,7 +280,7 @@ const getTestDataStatus = async(req, res) => {
     };
 
     res.status(200).json({
-      environment: process.env.NODE_ENV || 'development',
+      environment: process.env.NODE_ENV || "development",
       timestamp: new Date().toISOString(),
       counts: {
         customers: customerCount,
@@ -276,22 +299,25 @@ const getTestDataStatus = async(req, res) => {
         settledSales: stats.settledCount,
         unsettledSales: stats.unsettledCount,
       },
-      recentSales: recentSales.map(sale => ({
+      recentSales: recentSales.map((sale) => ({
         id: sale.id,
-        customer: sale.customerId ? `${sale.customerId.firstName} ${sale.customerId.lastName}` : 'Unknown',
-        seller: sale.sellerId ? `${sale.sellerId.firstName} ${sale.sellerId.lastName}` : 'Unknown',
+        customer: sale.customerId
+          ? `${sale.customerId.firstName} ${sale.customerId.lastName}`
+          : "Unknown",
+        seller: sale.sellerId
+          ? `${sale.sellerId.firstName} ${sale.sellerId.lastName}`
+          : "Unknown",
         totalAmount: sale.totalAmount,
         settled: sale.settled,
         createdAt: sale.createdAt,
       })),
       statusCode: 200,
     });
-
   } catch (error) {
-    console.error('Test data status error:', error);
+    console.error("Test data status error:", error);
     res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message || 'Failed to get test data status',
+      error: "Internal Server Error",
+      message: error.message || "Failed to get test data status",
       statusCode: 500,
     });
   }
@@ -303,49 +329,49 @@ const getTestDataStatus = async(req, res) => {
  * @access  SuperAdmin only
  * @body    { scenario, confirmReset }
  */
-const resetToScenario = async(req, res) => {
+const resetToScenario = async (req, res) => {
   try {
     // Security check - only allow in non-production environments
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Test data endpoints are disabled in production',
+        error: "Forbidden",
+        message: "Test data endpoints are disabled in production",
         statusCode: 403,
       });
     }
 
     // Only superadmins can reset (more destructive operation)
-    if (req.user.role !== 'superadmin') {
+    if (req.user.role !== "superadmin") {
       return res.status(403).json({
-        error: 'Forbidden',
-        message: 'Only superadmins can perform database resets',
+        error: "Forbidden",
+        message: "Only superadmins can perform database resets",
         statusCode: 403,
       });
     }
 
-    const { scenario = 'clean', confirmReset = false } = req.body;
+    const { scenario = "clean", confirmReset = false } = req.body;
 
     if (!confirmReset) {
       return res.status(400).json({
-        error: 'Confirmation Required',
-        message: 'Must set confirmReset: true to proceed with database reset',
-        availableScenarios: ['clean', 'minimal', 'dev', 'full'],
+        error: "Confirmation Required",
+        message: "Must set confirmReset: true to proceed with database reset",
+        availableScenarios: ["clean", "minimal", "dev", "full"],
         statusCode: 400,
       });
     }
 
     let summary;
 
-    if (scenario === 'clean') {
+    if (scenario === "clean") {
       // Clean everything except sellers
       await Sale.deleteMany({});
       await Customer.deleteMany({});
       await Product.deleteMany({});
       await PendingSeller.deleteMany({});
-      
+
       summary = {
-        scenario: 'clean',
-        message: 'Database cleaned - only seller accounts remain',
+        scenario: "clean",
+        message: "Database cleaned - only seller accounts remain",
         counts: { customers: 0, products: 0, sales: 0, pendingSellers: 0 },
       };
     } else {
@@ -381,7 +407,7 @@ const resetToScenario = async(req, res) => {
     }
 
     res.status(200).json({
-      message: 'Database reset completed successfully',
+      message: "Database reset completed successfully",
       summary: {
         ...summary,
         timestamp: new Date().toISOString(),
@@ -390,20 +416,14 @@ const resetToScenario = async(req, res) => {
       },
       statusCode: 200,
     });
-
   } catch (error) {
-    console.error('Database reset error:', error);
+    console.error("Database reset error:", error);
     res.status(500).json({
-      error: 'Internal Server Error',
-      message: error.message || 'Failed to reset database',
+      error: "Internal Server Error",
+      message: error.message || "Failed to reset database",
       statusCode: 500,
     });
   }
 };
 
-export {
-  populateTestData,
-  cleanTestData,
-  getTestDataStatus,
-  resetToScenario,
-};
+export { populateTestData, cleanTestData, getTestDataStatus, resetToScenario };

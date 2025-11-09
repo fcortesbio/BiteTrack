@@ -1,24 +1,24 @@
-import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 /**
  * Swagger Configuration for BiteTrack API
- * 
+ *
  * Dynamically generates OpenAPI documentation from JSDoc comments in routes.
  * The static docs/openapi.yaml serves as a reference for developers.
  */
 
 // Swagger JSDoc configuration for dynamic generation from route comments
 const swaggerDefinition = {
-  openapi: '3.1.0',
+  openapi: "3.1.0",
   info: {
-    title: 'BiteTrack API',
-    version: '2.0.0',
+    title: "BiteTrack API",
+    version: "2.0.0",
     description: `
       <div style="margin-bottom: 20px;">
         <h3>🍔 BiteTrack Enterprise Business Intelligence Platform</h3>
@@ -63,23 +63,23 @@ const swaggerDefinition = {
       </div>
     `,
     contact: {
-      name: 'BiteTrack API Support',
-      url: 'https://github.com/fcortesbio/BiteTrack',
-      email: 'support@bitetrack.api',
+      name: "BiteTrack API Support",
+      url: "https://github.com/fcortesbio/BiteTrack",
+      email: "support@bitetrack.api",
     },
     license: {
-      name: 'MIT License',
-      url: 'https://github.com/fcortesbio/BiteTrack/blob/main/LICENSE',
+      name: "MIT License",
+      url: "https://github.com/fcortesbio/BiteTrack/blob/main/LICENSE",
     },
   },
-  servers: [],  // Will be set dynamically
+  servers: [], // Will be set dynamically
   components: {
     securitySchemes: {
       BearerAuth: {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'JWT token obtained from /auth/login endpoint',
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "JWT token obtained from /auth/login endpoint",
       },
     },
   },
@@ -91,20 +91,20 @@ const swaggerDefinition = {
 };
 
 // Swagger JSDoc options - scans route files for JSDoc comments
-const swaggerOptions = (port, host = 'localhost') => ({
+const swaggerOptions = (port, host = "localhost") => ({
   definition: {
     ...swaggerDefinition,
     servers: [
       {
         url: `http://${host}:${port}/bitetrack`,
-        description: `${process.env.NODE_ENV || 'development'} server (Port ${port})`,
+        description: `${process.env.NODE_ENV || "development"} server (Port ${port})`,
       },
     ],
   },
   // Scan route files for JSDoc comments
   apis: [
-    path.join(__dirname, '../routes/*.js'),
-    path.join(__dirname, '../controllers/*.js'),
+    path.join(__dirname, "../routes/*.js"),
+    path.join(__dirname, "../controllers/*.js"),
   ],
 });
 
@@ -142,17 +142,17 @@ const swaggerUiOptions = {
       margin-bottom: 10px;
     }
   `,
-  customSiteTitle: 'BiteTrack API Documentation - Interactive Portal',
-  customfavIcon: '/favicon.ico',
+  customSiteTitle: "BiteTrack API Documentation - Interactive Portal",
+  customfavIcon: "/favicon.ico",
   swaggerOptions: {
-    docExpansion: 'none',
+    docExpansion: "none",
     filter: true,
     showRequestHeaders: true,
     showCommonExtensions: true,
     tryItOutEnabled: true,
     requestInterceptor: (req) => {
       // Add custom headers or modify requests if needed
-      req.headers['User-Agent'] = 'BiteTrack-Swagger-UI/2.0.0';
+      req.headers["User-Agent"] = "BiteTrack-Swagger-UI/2.0.0";
       return req;
     },
     responseInterceptor: (res) => {
@@ -160,8 +160,8 @@ const swaggerUiOptions = {
       return res;
     },
     // Group operations by tags for better organization
-    tagsSorter: 'alpha',
-    operationsSorter: 'alpha',
+    tagsSorter: "alpha",
+    operationsSorter: "alpha",
     // Default auth configuration
     persistAuthorization: true,
     // Show request duration
@@ -171,27 +171,34 @@ const swaggerUiOptions = {
 };
 
 // Helper function to serve Swagger UI with dynamic configuration from JSDoc comments
-export const setupSwaggerUI = (app, port, host = 'localhost') => {
-    // Generate specification dynamically from JSDoc comments in routes
-    const swaggerSpec = swaggerJSDoc(swaggerOptions(port, host));
-    
-    // Swagger UI endpoint
-    app.use('/bitetrack/api-docs', swaggerUi.serve);
-    app.get('/bitetrack/api-docs', swaggerUi.setup(swaggerSpec, swaggerUiOptions));
-    
-    // JSON endpoint for raw spec
-    app.get('/bitetrack/api-docs.json', (req, res) => {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(swaggerSpec);
-    });
-    
-    // Dynamic logging with correct port information
-    const environment = process.env.NODE_ENV || 'development';
-    console.log(`Swagger UI Documentation Portal initialized (${environment})`);
-    console.log(`Docs generated from JSDoc comments in routes`);
-    console.log(`Interactive docs available at: http://${host}:${port}/bitetrack/api-docs`);
-    console.log(`JSON specification at: http://${host}:${port}/bitetrack/api-docs.json`);
-    
+export const setupSwaggerUI = (app, port, host = "localhost") => {
+  // Generate specification dynamically from JSDoc comments in routes
+  const swaggerSpec = swaggerJSDoc(swaggerOptions(port, host));
+
+  // Swagger UI endpoint
+  app.use("/bitetrack/api-docs", swaggerUi.serve);
+  app.get(
+    "/bitetrack/api-docs",
+    swaggerUi.setup(swaggerSpec, swaggerUiOptions),
+  );
+
+  // JSON endpoint for raw spec
+  app.get("/bitetrack/api-docs.json", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
+
+  // Dynamic logging with correct port information
+  const environment = process.env.NODE_ENV || "development";
+  console.log(`Swagger UI Documentation Portal initialized (${environment})`);
+  console.log(`Docs generated from JSDoc comments in routes`);
+  console.log(
+    `Interactive docs available at: http://${host}:${port}/bitetrack/api-docs`,
+  );
+  console.log(
+    `JSON specification at: http://${host}:${port}/bitetrack/api-docs.json`,
+  );
+
   // Return the spec for potential use elsewhere
   return swaggerSpec;
 };

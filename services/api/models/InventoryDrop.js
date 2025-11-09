@@ -1,81 +1,81 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const inventoryDropSchema = new mongoose.Schema(
   {
     // Product information (snapshot at time of drop)
     productId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: [true, 'Product ID is required'],
+      ref: "Product",
+      required: [true, "Product ID is required"],
       index: true,
     },
     productName: {
       type: String,
-      required: [true, 'Product name is required'],
+      required: [true, "Product name is required"],
       trim: true,
     },
     category: {
       type: String,
       trim: true,
     },
-    
+
     // Drop details
     quantityDropped: {
       type: Number,
-      required: [true, 'Quantity dropped is required'],
-      min: [0, 'Quantity dropped must be non-negative'],
+      required: [true, "Quantity dropped is required"],
+      min: [0, "Quantity dropped must be non-negative"],
     },
     originalQuantity: {
       type: Number,
-      required: [true, 'Original quantity before drop is required'],
-      min: [0, 'Original quantity must be non-negative'],
+      required: [true, "Original quantity before drop is required"],
+      min: [0, "Original quantity must be non-negative"],
     },
     remainingQuantity: {
       type: Number,
-      required: [true, 'Remaining quantity after drop is required'],
-      min: [0, 'Remaining quantity must be non-negative'],
+      required: [true, "Remaining quantity after drop is required"],
+      min: [0, "Remaining quantity must be non-negative"],
     },
     pricePerUnit: {
       type: Number,
-      required: [true, 'Price per unit is required'],
-      min: [0, 'Price per unit must be non-negative'],
+      required: [true, "Price per unit is required"],
+      min: [0, "Price per unit must be non-negative"],
     },
-    
+
     // Financial impact
     totalValueLost: {
       type: Number,
-      min: [0, 'Total value must be non-negative'],
+      min: [0, "Total value must be non-negative"],
     },
-    
+
     // Drop reason and context
     reason: {
       type: String,
-      required: [true, 'Drop reason is required'],
+      required: [true, "Drop reason is required"],
       enum: {
         values: [
-          'expired', 
-          'end_of_day', 
-          'quality_issue', 
-          'damaged', 
-          'contaminated',
-          'overproduction',
-          'other',
+          "expired",
+          "end_of_day",
+          "quality_issue",
+          "damaged",
+          "contaminated",
+          "overproduction",
+          "other",
         ],
-        message: 'Invalid drop reason',
+        message: "Invalid drop reason",
       },
-      default: 'end_of_day',
+      default: "end_of_day",
     },
     notes: {
       type: String,
       trim: true,
-      maxlength: [500, 'Notes cannot exceed 500 characters'],
+      maxlength: [500, "Notes cannot exceed 500 characters"],
     },
-    
+
     // Tracking information
     droppedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Seller',
-      required: [true, 'Dropped by user is required'],
+      ref: "Seller",
+      required: [true, "Dropped by user is required"],
       index: true,
     },
     droppedAt: {
@@ -84,7 +84,7 @@ const inventoryDropSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    
+
     // Undo functionality (8-hour window)
     canBeUndone: {
       type: Boolean,
@@ -102,7 +102,7 @@ const inventoryDropSchema = new mongoose.Schema(
     },
     undoneBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Seller',
+      ref: "Seller",
     },
     undoneAt: {
       type: Date,
@@ -110,9 +110,9 @@ const inventoryDropSchema = new mongoose.Schema(
     undoReason: {
       type: String,
       trim: true,
-      maxlength: [300, 'Undo reason cannot exceed 300 characters'],
+      maxlength: [300, "Undo reason cannot exceed 300 characters"],
     },
-    
+
     // Production context for food safety compliance
     productionDate: {
       type: Date,
@@ -122,7 +122,7 @@ const inventoryDropSchema = new mongoose.Schema(
       type: Date,
       index: true,
     },
-    
+
     // Batch/lot information if applicable
     batchId: {
       type: String,
@@ -145,79 +145,90 @@ inventoryDropSchema.index({ canBeUndone: 1, undoExpiresAt: 1 });
 inventoryDropSchema.index({ isUndone: 1, droppedAt: -1 });
 
 // Virtual for drop efficiency percentage
-inventoryDropSchema.virtual('dropPercentage').get(function() {
-  if (this.originalQuantity === 0) {return 0;}
+inventoryDropSchema.virtual("dropPercentage").get(function () {
+  if (this.originalQuantity === 0) {
+    return 0;
+  }
   return ((this.quantityDropped / this.originalQuantity) * 100).toFixed(2);
 });
 
 // Virtual for checking if drop can still be undone
-inventoryDropSchema.virtual('undoAvailable').get(function() {
+inventoryDropSchema.virtual("undoAvailable").get(function () {
   return this.canBeUndone && !this.isUndone && new Date() < this.undoExpiresAt;
 });
 
 // Virtual for time remaining for undo (in minutes)
-inventoryDropSchema.virtual('undoTimeRemaining').get(function() {
-  if (!this.undoAvailable) {return 0;}
+inventoryDropSchema.virtual("undoTimeRemaining").get(function () {
+  if (!this.undoAvailable) {
+    return 0;
+  }
   const diffMs = this.undoExpiresAt - new Date();
   return Math.max(0, Math.floor(diffMs / (1000 * 60))); // minutes
 });
 
 // Virtual for checking if this was a partial drop
-inventoryDropSchema.virtual('isPartialDrop').get(function() {
+inventoryDropSchema.virtual("isPartialDrop").get(function () {
   return this.remainingQuantity > 0;
 });
 
 // Virtual for days since production (food safety metric)
-inventoryDropSchema.virtual('daysSinceProduction').get(function() {
-  if (!this.productionDate) {return null;}
+inventoryDropSchema.virtual("daysSinceProduction").get(function () {
+  if (!this.productionDate) {
+    return null;
+  }
   const diffTime = Math.abs(this.droppedAt - this.productionDate);
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 });
 
 // Pre-save middleware
-inventoryDropSchema.pre('save', function(next) {
+inventoryDropSchema.pre("save", function (next) {
   // Calculate total value lost
   this.totalValueLost = this.quantityDropped * this.pricePerUnit;
-  
+
   // Set undo expiration to 8 hours from drop time
   if (this.isNew) {
     // Ensure droppedAt is set
     if (!this.droppedAt) {
       this.droppedAt = new Date();
     }
-    
+
     const eightHoursFromNow = new Date(this.droppedAt);
     eightHoursFromNow.setHours(eightHoursFromNow.getHours() + 8);
     this.undoExpiresAt = eightHoursFromNow;
   }
-  
+
   next();
 });
 
 // Method to check if drop can be undone
-inventoryDropSchema.methods.canUndo = function() {
+inventoryDropSchema.methods.canUndo = function () {
   return this.canBeUndone && !this.isUndone && new Date() < this.undoExpiresAt;
 };
 
 // Method to undo the drop
-inventoryDropSchema.methods.undoDrop = async function(undoneByUserId, undoReason = '') {
+inventoryDropSchema.methods.undoDrop = async function (
+  undoneByUserId,
+  undoReason = "",
+) {
   if (!this.canUndo()) {
-    throw new Error('This inventory drop cannot be undone (expired or already undone)');
+    throw new Error(
+      "This inventory drop cannot be undone (expired or already undone)",
+    );
   }
-  
+
   this.isUndone = true;
   this.undoneBy = undoneByUserId;
   this.undoneAt = new Date();
   this.undoReason = undoReason;
   this.canBeUndone = false; // Prevent future undo attempts
-  
+
   return await this.save();
 };
 
 // Transform output for API
-inventoryDropSchema.set('toJSON', {
+inventoryDropSchema.set("toJSON", {
   virtuals: true,
-  transform: function(doc, ret) {
+  transform: function (doc, ret) {
     ret.id = ret._id;
     delete ret._id;
     delete ret.__v;
@@ -226,12 +237,16 @@ inventoryDropSchema.set('toJSON', {
 });
 
 // Static method for analytics - get drop summary by date range
-inventoryDropSchema.statics.getDropAnalytics = async function(startDate, endDate, filters = {}) {
+inventoryDropSchema.statics.getDropAnalytics = async function (
+  startDate,
+  endDate,
+  filters = {},
+) {
   const match = {
     droppedAt: { $gte: startDate, $lte: endDate },
     isUndone: false, // Exclude undone drops from analytics
   };
-  
+
   // Apply additional filters
   if (filters.productId) {
     match.productId = new mongoose.Types.ObjectId(filters.productId);
@@ -242,45 +257,45 @@ inventoryDropSchema.statics.getDropAnalytics = async function(startDate, endDate
   if (filters.droppedBy) {
     match.droppedBy = new mongoose.Types.ObjectId(filters.droppedBy);
   }
-  
+
   return await this.aggregate([
     { $match: match },
     {
       $group: {
         _id: {
-          reason: '$reason',
-          productId: '$productId',
-          productName: '$productName',
+          reason: "$reason",
+          productId: "$productId",
+          productName: "$productName",
         },
-        totalQuantityDropped: { $sum: '$quantityDropped' },
-        totalValueLost: { $sum: '$totalValueLost' },
+        totalQuantityDropped: { $sum: "$quantityDropped" },
+        totalValueLost: { $sum: "$totalValueLost" },
         dropCount: { $sum: 1 },
-        avgQuantityPerDrop: { $avg: '$quantityDropped' },
-        partialDrops: { 
-          $sum: { 
-            $cond: [{ $gt: ['$remainingQuantity', 0] }, 1, 0], 
-          }, 
+        avgQuantityPerDrop: { $avg: "$quantityDropped" },
+        partialDrops: {
+          $sum: {
+            $cond: [{ $gt: ["$remainingQuantity", 0] }, 1, 0],
+          },
         },
       },
     },
     {
       $group: {
-        _id: '$_id.reason',
+        _id: "$_id.reason",
         products: {
           $push: {
-            productId: '$_id.productId',
-            productName: '$_id.productName',
-            totalQuantityDropped: '$totalQuantityDropped',
-            totalValueLost: '$totalValueLost',
-            dropCount: '$dropCount',
-            avgQuantityPerDrop: '$avgQuantityPerDrop',
-            partialDrops: '$partialDrops',
+            productId: "$_id.productId",
+            productName: "$_id.productName",
+            totalQuantityDropped: "$totalQuantityDropped",
+            totalValueLost: "$totalValueLost",
+            dropCount: "$dropCount",
+            avgQuantityPerDrop: "$avgQuantityPerDrop",
+            partialDrops: "$partialDrops",
           },
         },
-        totalQuantityDropped: { $sum: '$totalQuantityDropped' },
-        totalValueLost: { $sum: '$totalValueLost' },
-        totalDropCount: { $sum: '$dropCount' },
-        totalPartialDrops: { $sum: '$partialDrops' },
+        totalQuantityDropped: { $sum: "$totalQuantityDropped" },
+        totalValueLost: { $sum: "$totalValueLost" },
+        totalDropCount: { $sum: "$dropCount" },
+        totalPartialDrops: { $sum: "$partialDrops" },
       },
     },
     { $sort: { totalValueLost: -1 } },
@@ -288,13 +303,13 @@ inventoryDropSchema.statics.getDropAnalytics = async function(startDate, endDate
 };
 
 // Static method for daily drop summary
-inventoryDropSchema.statics.getDailyDropSummary = async function(date) {
+inventoryDropSchema.statics.getDailyDropSummary = async function (date) {
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
-  
+
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
-  
+
   return await this.aggregate([
     {
       $match: {
@@ -304,26 +319,26 @@ inventoryDropSchema.statics.getDailyDropSummary = async function(date) {
     },
     {
       $group: {
-        _id: '$reason',
-        totalQuantity: { $sum: '$quantityDropped' },
-        totalValue: { $sum: '$totalValueLost' },
+        _id: "$reason",
+        totalQuantity: { $sum: "$quantityDropped" },
+        totalValue: { $sum: "$totalValueLost" },
         dropCount: { $sum: 1 },
-        products: { $addToSet: '$productName' },
-        partialDrops: { 
-          $sum: { 
-            $cond: [{ $gt: ['$remainingQuantity', 0] }, 1, 0], 
-          }, 
+        products: { $addToSet: "$productName" },
+        partialDrops: {
+          $sum: {
+            $cond: [{ $gt: ["$remainingQuantity", 0] }, 1, 0],
+          },
         },
       },
     },
     {
       $project: {
-        reason: '$_id',
+        reason: "$_id",
         totalQuantity: 1,
         totalValue: 1,
         dropCount: 1,
         partialDrops: 1,
-        uniqueProducts: { $size: '$products' },
+        uniqueProducts: { $size: "$products" },
         _id: 0,
       },
     },
@@ -332,23 +347,23 @@ inventoryDropSchema.statics.getDailyDropSummary = async function(date) {
 };
 
 // Static method to get drops that can still be undone
-inventoryDropSchema.statics.getUndoableDrops = async function(userId = null) {
+inventoryDropSchema.statics.getUndoableDrops = async function (userId = null) {
   const match = {
     canBeUndone: true,
     isUndone: false,
     undoExpiresAt: { $gt: new Date() },
   };
-  
+
   if (userId) {
     match.droppedBy = new mongoose.Types.ObjectId(userId);
   }
-  
+
   return await this.find(match)
-    .populate('productId', 'productName category')
-    .populate('droppedBy', 'firstName lastName')
+    .populate("productId", "productName category")
+    .populate("droppedBy", "firstName lastName")
     .sort({ droppedAt: -1 });
 };
 
-const InventoryDrop = mongoose.model('InventoryDrop', inventoryDropSchema);
+const InventoryDrop = mongoose.model("InventoryDrop", inventoryDropSchema);
 
 export default InventoryDrop;

@@ -1,9 +1,17 @@
-import mongoose from 'mongoose';
-import Seller from '../models/Seller.js';
-import PendingSeller from '../models/PendingSeller.js';
-import PasswordResetToken from '../models/PasswordResetToken.js';
-import { generateToken, generateResetToken } from '../utils/jwt.js';
-import { sendPasswordResetEmail } from '../utils/emailService.js';
+import mongoose from "mongoose";
+import Seller from "../models/Seller.js";
+import PendingSeller from "../models/PendingSeller.js";
+import PasswordResetToken from "../models/PasswordResetToken.js";
+import { generateToken, generateResetToken } from "../utils/jwt.js";
+import { sendPasswordResetEmail } from "../utils/emailService.js";
+
+class HttpError extends Error {
+  constructor(statusCode, error, message) {
+    super(message);
+    this.statusCode = statusCode;
+    this.error = error;
+  }
+}
 
 const getSellerByEmail = async (req, res) => {
   try {
@@ -36,7 +44,7 @@ const getSellerByEmail = async (req, res) => {
       statusCode: 404,
     });
   } catch (error) {
-    console.error('Error in getSellerByEmail:', error);
+    console.error("Error in getSellerByEmail:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred while retrieving seller information",
@@ -70,7 +78,7 @@ const login = async (req, res) => {
       seller: sellerResponse,
     });
   } catch (error) {
-    console.error('Error in login:', error);
+    console.error("Error in login:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during login",
@@ -81,7 +89,7 @@ const login = async (req, res) => {
 
 const activate = async (req, res) => {
   const session = await mongoose.startSession();
-  
+
   try {
     await session.withTransaction(async () => {
       const { email, dateOfBirth, lastName, password } = req.body;
@@ -89,11 +97,11 @@ const activate = async (req, res) => {
       // Check if seller already exists (race condition protection)
       const existingSeller = await Seller.findOne({ email }).session(session);
       if (existingSeller) {
-        throw {
-          statusCode: 409,
-          error: "Conflict",
-          message: "An active account with this email already exists",
-        };
+        throw new HttpError(
+          409,
+          "Conflict",
+          "An active account with this email already exists",
+        );
       }
 
       // Find pending seller
@@ -104,11 +112,11 @@ const activate = async (req, res) => {
       }).session(session);
 
       if (!pendingSeller) {
-        throw {
-          statusCode: 404,
-          error: "Not Found",
-          message: "Pending seller not found or verification details do not match",
-        };
+        throw new HttpError(
+          404,
+          "Not Found",
+          "Pending seller not found or verification details do not match",
+        );
       }
 
       // Create activated seller
@@ -125,7 +133,9 @@ const activate = async (req, res) => {
       await seller.save({ session });
 
       // Delete pending seller
-      await PendingSeller.deleteOne({ _id: pendingSeller._id }).session(session);
+      await PendingSeller.deleteOne({ _id: pendingSeller._id }).session(
+        session,
+      );
 
       // Store seller for response (outside transaction to avoid issues)
       res.locals.activatedSeller = seller;
@@ -134,8 +144,8 @@ const activate = async (req, res) => {
     // Transaction succeeded
     res.status(201).json(res.locals.activatedSeller.toJSON());
   } catch (error) {
-    console.error('Error in activate:', error);
-    
+    console.error("Error in activate:", error);
+
     // Handle custom errors from transaction
     if (error.statusCode) {
       return res.status(error.statusCode).json({
@@ -144,7 +154,7 @@ const activate = async (req, res) => {
         statusCode: error.statusCode,
       });
     }
-    
+
     // Handle duplicate key errors
     if (error.code === 11000) {
       return res.status(409).json({
@@ -153,7 +163,7 @@ const activate = async (req, res) => {
         statusCode: 409,
       });
     }
-    
+
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during account activation",
@@ -186,10 +196,10 @@ const recover = async (req, res) => {
     });
 
     await resetToken.save();
-    
+
     // Send password reset email
     const emailResult = await sendPasswordResetEmail(seller.email, token);
-    
+
     if (!emailResult.success) {
       return res.status(500).json({
         error: "Email Service Error",
@@ -204,16 +214,16 @@ const recover = async (req, res) => {
       sellerId,
       expiresAt: resetToken.expiresAt,
     };
-    
+
     // In development, include the token and preview URL for testing
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       responseData.token = token;
       responseData.emailPreview = emailResult.previewUrl;
     }
 
     res.json(responseData);
   } catch (error) {
-    console.error('Error in recover:', error);
+    console.error("Error in recover:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during password recovery",
@@ -235,7 +245,8 @@ const requestRecovery = async (req, res) => {
     if (!seller) {
       // Don't reveal whether email exists (security best practice)
       return res.json({
-        message: "If an account exists with this email and date of birth, a password reset link has been sent",
+        message:
+          "If an account exists with this email and date of birth, a password reset link has been sent",
       });
     }
 
@@ -247,32 +258,34 @@ const requestRecovery = async (req, res) => {
     });
 
     await resetToken.save();
-    
+
     // Send password reset email
     const emailResult = await sendPasswordResetEmail(seller.email, token);
-    
+
     if (!emailResult.success) {
       // Still return success message to not reveal email service issues
-      console.error('Failed to send password reset email:', emailResult);
+      console.error("Failed to send password reset email:", emailResult);
       return res.json({
-        message: "If an account exists with this email and date of birth, a password reset link has been sent",
+        message:
+          "If an account exists with this email and date of birth, a password reset link has been sent",
       });
     }
 
     // Return same message whether or not account exists (security)
     const responseData = {
-      message: "If an account exists with this email and date of birth, a password reset link has been sent",
+      message:
+        "If an account exists with this email and date of birth, a password reset link has been sent",
     };
-    
+
     // In development, include the token and preview URL for testing
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       responseData.token = token;
       responseData.emailPreview = emailResult.previewUrl;
     }
 
     res.json(responseData);
   } catch (error) {
-    console.error('Error in requestRecovery:', error);
+    console.error("Error in requestRecovery:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during password recovery request",
@@ -325,7 +338,7 @@ const reset = async (req, res) => {
       message: "Password reset successful",
     });
   } catch (error) {
-    console.error('Error in reset:', error);
+    console.error("Error in reset:", error);
     return res.status(500).json({
       error: "Internal Server Error",
       message: "An error occurred during password reset",
@@ -334,11 +347,4 @@ const reset = async (req, res) => {
   }
 };
 
-export {
-  login,
-  activate,
-  recover,
-  requestRecovery,
-  reset,
-  getSellerByEmail,
-};
+export { login, activate, recover, requestRecovery, reset, getSellerByEmail };

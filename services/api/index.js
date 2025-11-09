@@ -31,15 +31,15 @@ if (isDevelopment) {
   console.log("🔧 Development mode detected - Enhanced verbosity enabled");
   console.log(
     "Environment file:",
-    process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env"
+    process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : ".env",
   );
   console.log(
     "MongoDB URI:",
-    process.env.MONGO_URI ? "✅ Configured" : "❌ Missing"
+    process.env.MONGO_URI ? "✅ Configured" : "❌ Missing",
   );
   console.log(
     "JWT Secret:",
-    process.env.JWT_SECRET ? "✅ Configured" : "❌ Missing"
+    process.env.JWT_SECRET ? "✅ Configured" : "❌ Missing",
   );
   console.log("Frontend URLs:", process.env.FRONTEND_URLS || "Using defaults");
 }
@@ -92,19 +92,19 @@ if (isDevelopment) {
   // Detailed development logging with colors and request details
   app.use(
     morgan(
-      ":date[clf] :method :url :status :res[content-length] - :response-time ms :user-agent"
-    )
+      ":date[clf] :method :url :status :res[content-length] - :response-time ms :user-agent",
+    ),
   );
 
   // Log environment variables confirmation (once)
   console.log(
-    "🔍 Development logging enabled - Full request details will be shown"
+    "🔍 Development logging enabled - Full request details will be shown",
   );
   console.log("📋 CORS origins:", corsOptions.origin);
 } else {
   // Standard production logging
   app.use(
-    morgan(":method :url :status :res[content-length] - :response-time ms")
+    morgan(":method :url :status :res[content-length] - :response-time ms"),
   );
 }
 
@@ -118,7 +118,7 @@ mongoose
       console.log("MongoDB connection established successfully");
       console.log(`MongoDB database: ${connectionInfo.name}`);
       console.log(
-        `MongoDB host: ${connectionInfo.host}:${connectionInfo.port}`
+        `MongoDB host: ${connectionInfo.host}:${connectionInfo.port}`,
       );
       console.log(`MongoDB connection ID: ${connectionInfo.id}`);
     } else {
@@ -129,10 +129,10 @@ mongoose
     console.error("🔴 MongoDB connection error:", error);
     if (isDevelopment) {
       console.error(
-        "🧪 Check your .env.development file and MongoDB service status"
+        "🧪 Check your .env.development file and MongoDB service status",
       );
       console.error(
-        "📌 MongoDB URI format should be: mongodb://username:password@host:port/database"
+        "📌 MongoDB URI format should be: mongodb://username:password@host:port/database",
       );
     }
     process.exit(1);
@@ -309,12 +309,12 @@ const server = app.listen(PORT, () => {
     console.log("\nDevelopment Server Information:");
     console.log(`API Base URL: http://localhost:${PORT}/bitetrack`);
     console.log(
-      `Interactive Docs: http://localhost:${PORT}/bitetrack/api-docs`
+      `Interactive Docs: http://localhost:${PORT}/bitetrack/api-docs`,
     );
     console.log(`Health Check: http://localhost:${PORT}/bitetrack/health`);
     console.log(`API Overview: http://localhost:${PORT}/`);
     console.log(
-      "\nReady for development! File changes will trigger automatic restart."
+      "\nReady for development! File changes will trigger automatic restart.",
     );
     console.log("Watching files: *.js, *.json, *.yaml");
   }

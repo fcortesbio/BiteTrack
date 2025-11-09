@@ -2,9 +2,9 @@
  * Authentication Helper Utilities for Testing
  * Provides common authentication patterns and JWT token management
  */
-import request from 'supertest';
-import jwt from 'jsonwebtoken';
-import Seller from '../../models/Seller.js';
+import request from "supertest";
+import jwt from "jsonwebtoken";
+import Seller from "../../models/Seller.js";
 
 /**
  * Login a user and return response with token
@@ -12,11 +12,11 @@ import Seller from '../../models/Seller.js';
  * @param {Object} credentials - Login credentials
  * @returns {Promise<Object>} Login response with token
  */
-const loginUser = async(app, credentials) => {
+const loginUser = async (app, credentials) => {
   const response = await request(app)
-    .post('/bitetrack/auth/login')
+    .post("/bitetrack/auth/login")
     .send(credentials);
-  
+
   return response;
 };
 
@@ -26,26 +26,26 @@ const loginUser = async(app, credentials) => {
  * @param {Object} userData - User registration data
  * @returns {Promise<string>} JWT token
  */
-const getAuthToken = async(app, userData = null) => {
+const getAuthToken = async (app, userData = null) => {
   // Use provided data or create default test user
   const defaultUserData = userData || testUtils.createTestUser();
-  
+
   // Register user
-  await request(app)
-    .post('/bitetrack/auth/register')
-    .send(defaultUserData);
-  
+  await request(app).post("/bitetrack/auth/register").send(defaultUserData);
+
   // Login user
   const loginResponse = await loginUser(app, {
     email: defaultUserData.email,
     password: defaultUserData.password,
   });
-  
+
   if (loginResponse.status === 200 && loginResponse.body.token) {
     return loginResponse.body.token;
   }
-  
-  throw new Error(`Failed to get auth token: ${loginResponse.body.message || 'Unknown error'}`);
+
+  throw new Error(
+    `Failed to get auth token: ${loginResponse.body.message || "Unknown error"}`,
+  );
 };
 
 /**
@@ -54,20 +54,20 @@ const getAuthToken = async(app, userData = null) => {
  * @param {string} role - User role ('seller', 'admin', 'superadmin')
  * @returns {Promise<string>} JWT token
  */
-const getAuthTokenForRole = async(app, role = 'seller') => {
+const getAuthTokenForRole = async (app, role = "seller") => {
   let userData;
-  
+
   switch (role) {
-  case 'admin':
-  case 'superadmin':
-    userData = testUtils.createAdminUser();
-    userData.role = role;
-    break;
-  default:
-    userData = testUtils.createTestUser();
-    userData.role = role;
+    case "admin":
+    case "superadmin":
+      userData = testUtils.createAdminUser();
+      userData.role = role;
+      break;
+    default:
+      userData = testUtils.createTestUser();
+      userData.role = role;
   }
-  
+
   return await getAuthToken(app, userData);
 };
 
@@ -78,7 +78,7 @@ const getAuthTokenForRole = async(app, role = 'seller') => {
  * @returns {supertest.Test} Request with authorization header
  */
 const createAuthenticatedRequest = (requestObject, token) => {
-  return requestObject.set('Authorization', `Bearer ${token}`);
+  return requestObject.set("Authorization", `Bearer ${token}`);
 };
 
 /**
@@ -86,27 +86,27 @@ const createAuthenticatedRequest = (requestObject, token) => {
  * @param {Object} userData - User data
  * @returns {Promise<Object>} Created user object
  */
-const createUserDirectly = async(userData = null) => {
+const createUserDirectly = async (userData = null) => {
   const defaultUserData = userData || testUtils.createTestUser();
-  
+
   const user = new Seller(defaultUserData);
   await user.save();
-  
+
   return user;
 };
 
 /**
- * Create admin user directly in database  
+ * Create admin user directly in database
  * @param {string} role - Admin role ('admin' or 'superadmin')
  * @returns {Promise<Object>} Created admin user object
  */
-const createAdminUserDirectly = async(role = 'admin') => {
+const createAdminUserDirectly = async (role = "admin") => {
   const adminData = testUtils.createAdminUser();
   adminData.role = role;
-  
+
   const admin = new Seller(adminData);
   await admin.save();
-  
+
   return admin;
 };
 
@@ -117,16 +117,16 @@ const createAdminUserDirectly = async(role = 'admin') => {
  */
 const verifyTokenStructure = (token) => {
   expect(token).toBeTruthy();
-  expect(typeof token).toBe('string');
-  
+  expect(typeof token).toBe("string");
+
   // Decode without verification to check structure
   const decoded = jwt.decode(token);
-  expect(decoded).toHaveProperty('userId');
-  expect(decoded).toHaveProperty('email');
-  expect(decoded).toHaveProperty('role');
-  expect(decoded).toHaveProperty('iat');
-  expect(decoded).toHaveProperty('exp');
-  
+  expect(decoded).toHaveProperty("userId");
+  expect(decoded).toHaveProperty("email");
+  expect(decoded).toHaveProperty("role");
+  expect(decoded).toHaveProperty("iat");
+  expect(decoded).toHaveProperty("exp");
+
   return decoded;
 };
 
@@ -159,14 +159,19 @@ const isTokenExpired = (token) => {
 const createExpiredToken = (payload = {}) => {
   const expiredPayload = {
     userId: testUtils.generateObjectId(),
-    email: 'test@example.com',
-    role: 'seller',
+    email: "test@example.com",
+    role: "seller",
     ...payload,
   };
-  
-  return jwt.sign(expiredPayload, process.env.JWT_SECRET || 'test-jwt-secret-key-for-testing-only-not-for-production', {
-    expiresIn: '-1h', // Expired 1 hour ago
-  });
+
+  return jwt.sign(
+    expiredPayload,
+    process.env.JWT_SECRET ||
+      "test-jwt-secret-key-for-testing-only-not-for-production",
+    {
+      expiresIn: "-1h", // Expired 1 hour ago
+    },
+  );
 };
 
 /**
@@ -174,7 +179,7 @@ const createExpiredToken = (payload = {}) => {
  * @returns {string} Malformed token
  */
 const createMalformedToken = () => {
-  return 'invalid.jwt.token.structure';
+  return "invalid.jwt.token.structure";
 };
 
 export {

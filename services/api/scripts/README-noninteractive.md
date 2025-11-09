@@ -64,7 +64,7 @@ The non-interactive script performs all the same steps as the interactive versio
 These parameters are **required** and must be provided either as command line arguments or environment variables:
 
 - **MongoDB Password**: `--mongo-password` or `BITETRACK_MONGO_PASSWORD`
-- **Admin Email**: `--admin-email` or `BITETRACK_ADMIN_EMAIL`  
+- **Admin Email**: `--admin-email` or `BITETRACK_ADMIN_EMAIL`
 - **Admin Password**: `--admin-password` or `BITETRACK_ADMIN_PASSWORD`
 - **Admin First Name**: `--admin-first-name` or `BITETRACK_ADMIN_FIRST_NAME`
 - **Admin Last Name**: `--admin-last-name` or `BITETRACK_ADMIN_LAST_NAME`
@@ -85,6 +85,7 @@ All other parameters have sensible defaults:
 ## Usage Examples
 
 ### Minimal Setup (Skip Optional Steps)
+
 ```bash
 ./scripts/init-noninteractive.sh \
   --mongo-password 'SecurePass123' \
@@ -98,6 +99,7 @@ All other parameters have sensible defaults:
 ```
 
 ### Full Setup with Custom Configuration
+
 ```bash
 ./scripts/init-noninteractive.sh \
   --mongo-user 'mycompany-admin' \
@@ -114,6 +116,7 @@ All other parameters have sensible defaults:
 ```
 
 ### CI/CD Pipeline Usage
+
 ```bash
 #!/bin/bash
 # For automated deployments
@@ -134,8 +137,8 @@ All other parameters have sensible defaults:
 
 Once the script completes successfully, your BiteTrack instance will be ready with:
 
-- 🌐 **API**: http://localhost:3000/bitetrack/*
-- 📚 **Documentation**: http://localhost:3000/bitetrack/api-docs  
+- 🌐 **API**: http://localhost:3000/bitetrack/\*
+- 📚 **Documentation**: http://localhost:3000/bitetrack/api-docs
 - ❤️ **Health Check**: http://localhost:3000/bitetrack/health
 - 🔐 **Credentials**: Stored in `.secrets` file
 

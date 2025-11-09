@@ -2,13 +2,13 @@
  * BiteTrack Authentication Routes Integration Tests
  * Tests for actual available authentication endpoints
  */
-import request from 'supertest';
-import app from '../../testApp.js';
-import Seller from '../../models/Seller.js';
-import PendingSeller from '../../models/PendingSeller.js';
-import PasswordResetToken from '../../models/PasswordResetToken.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import request from "supertest";
+import app from "../../testApp.js";
+import Seller from "../../models/Seller.js";
+import PendingSeller from "../../models/PendingSeller.js";
+import PasswordResetToken from "../../models/PasswordResetToken.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 describe("BiteTrack Authentication Routes", () => {
   describe("POST /bitetrack/auth/login", () => {
