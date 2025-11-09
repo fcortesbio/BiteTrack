@@ -395,4 +395,25 @@ Sales creation automatically:
 - **Professional Logging:** Morgan middleware with request/response tracking
 - **Security Monitoring:** Rate limiting, authentication, and authorization audit trails
 
-**🎆 Platform Status**: Production-ready enterprise business intelligence platform with 38 endpoints across 9 business categories, comprehensive testing infrastructure, and professional documentation portal!
+**Platform Status**: Production-ready enterprise business intelligence platform with 38 endpoints across 9 business categories, comprehensive testing infrastructure, and professional documentation portal!
+
+## Coding Standards & Guidelines
+
+### Console Output & Logging
+- **NO EMOJIS in console logs or terminal output** - Terminal does not display emojis well
+- Use plain text labels instead: "ERROR:", "WARNING:", "INFO:", etc.
+- Console logs should be clear and readable in all terminal environments
+- Use descriptive text prefixes for log levels and categories
+
+### Code Style
+- Use Prettier for formatting (configured in project)
+- Follow existing JSDoc conventions for documentation
+- Keep functions focused and modular
+- Use descriptive variable and function names
+- Add comprehensive error handling
+
+### Git Commit Messages
+- Follow conventional commits format: `type: description`
+- Types: feat, fix, docs, refactor, test, chore
+- Use present tense and imperative mood
+- Include detailed body for complex changes
