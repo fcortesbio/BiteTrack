@@ -52,22 +52,24 @@ services:
     container_name: bitetrack-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017" # Expose for local development
+      - "27017:27017" # Exposed for local development
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
     volumes:
       - mongodb_data:/data/db
-      - ../keyfile.example:/etc/mongodb-keyfile:ro
+      - ../keyfile:/etc/mongodb-keyfile:ro
     networks:
-      - backend # Private network only
-    entrypoint: >
-      bash -c "
-        cp /etc/mongodb-keyfile /tmp/keyfile &&
-        chmod 400 /tmp/keyfile &&
-        chown mongodb:mongodb /tmp/keyfile &&
+      - backend
+      - web # Also on web network for external access
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /etc/mongodb-keyfile /tmp/keyfile
+        chmod 400 /tmp/keyfile
+        chown mongodb:mongodb /tmp/keyfile
         exec docker-entrypoint.sh mongod --replSet rs0 --bind_ip_all --keyFile /tmp/keyfile
-      "
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s

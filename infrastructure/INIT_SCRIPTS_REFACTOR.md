@@ -1,9 +1,11 @@
 # Init Scripts Monorepo Refactoring
 
 ## Objective
+
 Refactor initialization scripts to properly support BiteTrack's monorepo structure with unified environment management.
 
 ## Current Issues
+
 - Init scripts located in `services/api/scripts/` assume single-app structure
 - Scripts expect `docker-compose.yml` in current directory
 - No support for dual dev/production environments with shared MongoDB
@@ -13,6 +15,7 @@ Refactor initialization scripts to properly support BiteTrack's monorepo structu
 ## Target Architecture
 
 ### Directory Structure
+
 ```
 BiteTrack/
 ├── infrastructure/
@@ -32,6 +35,7 @@ BiteTrack/
 ### Environment Configuration
 
 #### Development (.env.development)
+
 ```bash
 # MongoDB (shared with production)
 MONGO_URI=mongodb://bitetrack-admin:PASSWORD@localhost:27017/bitetrack?authSource=bitetrack
@@ -42,7 +46,7 @@ MONGO_ROOT_PASSWORD=PASSWORD
 API_PORT=3001
 API_URL=http://localhost:3001
 
-# MCP Server  
+# MCP Server
 MCP_PORT=4001
 MCP_URL=http://localhost:4001
 
@@ -61,10 +65,11 @@ NODE_ENV=development
 ```
 
 #### Production (.env.production)
+
 ```bash
 # Same structure but with production ports:
 API_PORT=3000
-MCP_PORT=4000  
+MCP_PORT=4000
 FRONTEND_PORT=5000
 NODE_ENV=production
 ```
@@ -72,11 +77,13 @@ NODE_ENV=production
 ## Implementation Plan
 
 ### Phase 1: Script Migration
+
 - [ ] Copy relevant scripts from `services/api/scripts/` to `infrastructure/scripts/`
 - [ ] Update script paths to work from repository root
 - [ ] Remove hardcoded paths and make them configurable
 
 ### Phase 2: Environment Management
+
 - [ ] Create `setup-env.sh` for generating `.env.development` and `.env.production`
 - [ ] Add interactive prompts for:
   - MongoDB password
@@ -86,12 +93,14 @@ NODE_ENV=production
 - [ ] Generate JWT secrets automatically
 
 ### Phase 3: MongoDB Setup
+
 - [ ] Fix docker-compose.yml port mapping issue
 - [ ] Ensure MongoDB exposes port 27017 to localhost
 - [ ] Create database and users for both environments
 - [ ] Initialize replica set if needed
 
 ### Phase 4: NPM Scripts Integration
+
 - [ ] Add `npm run init` to root package.json:
   ```json
   "init": "bash infrastructure/scripts/init.sh",
@@ -104,16 +113,19 @@ NODE_ENV=production
   - Provide helpful error messages if not
 
 ### Phase 5: Docker Compose Fix
+
 - [ ] Investigate why port mapping isn't working with custom entrypoint
 - [ ] Consider simplified MongoDB setup without replica set for dev
 - [ ] Ensure single MongoDB instance serves both dev and production
 
 ### Phase 6: SuperAdmin Creation
+
 - [ ] Update `create-superadmin.sh` for ESM compatibility
 - [ ] Support both interactive and non-interactive modes
 - [ ] Properly hash passwords using bcryptjs
 
 ### Phase 7: Documentation & Testing
+
 - [ ] Update README.md with new initialization process
 - [ ] Create CONTRIBUTING.md with development setup guide
 - [ ] Test full flow: clean install → init → dev → production
@@ -122,6 +134,7 @@ NODE_ENV=production
 ## User Experience
 
 ### Quick Start (Interactive)
+
 ```bash
 npm run init
 # Prompts for MongoDB password, GenAI key, ports, environment type
@@ -129,6 +142,7 @@ npm run init
 ```
 
 ### Automated Setup (CI/CD)
+
 ```bash
 infrastructure/scripts/init-noninteractive.sh \
   --env both \
@@ -139,6 +153,7 @@ infrastructure/scripts/init-noninteractive.sh \
 ```
 
 ### Development Workflow
+
 ```bash
 npm run dev          # Auto-checks prerequisites, starts all services
 npm run dev:api      # Start only API (port 3001)
@@ -147,6 +162,7 @@ npm run dev:frontend # Start only frontend (port 5001)
 ```
 
 ## Success Criteria
+
 - ✅ Single `npm run init` command sets up entire stack
 - ✅ Support for both dev and production environments
 - ✅ Shared MongoDB instance accessible at localhost:27017
@@ -155,12 +171,15 @@ npm run dev:frontend # Start only frontend (port 5001)
 - ✅ All existing functionality preserved
 
 ## Breaking Changes
+
 - Init scripts moved from `services/api/scripts/` to `infrastructure/scripts/`
 - Environment files moved to repository root
 - Port defaults changed for dev environment
 
 ## Migration Guide
+
 For existing installations:
+
 1. Run `npm run init` to regenerate environment files
 2. Update any custom scripts referencing old paths
 3. Restart services to pick up new ports

@@ -26,6 +26,7 @@
   },
   "scripts": {
     "start": "node index.js",
+    "predev": "bash ../../infrastructure/scripts/check-dev-env.sh",
     "dev": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
     "dev:manual": "NODE_ENV=development node --loader ./config/dotenv.js index.js",
     "dev:watch": "NODE_ENV=development nodemon --loader ./config/dotenv.js index.js",
