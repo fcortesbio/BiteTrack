@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "echo \"No tests yet\""
   },
   "keywords": ["types", "shared", "bitetrack"],
   "author": "fcortesbio",
