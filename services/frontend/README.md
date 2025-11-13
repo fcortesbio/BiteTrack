@@ -50,6 +50,7 @@ The frontend expects these backend services to be available (via Traefik routing
 ## 🎨 Features (Boilerplate)
 
 Current implementation includes:
+
 - ✅ Landing page with system status
 - ✅ Service health checks
 - ✅ Responsive design
@@ -87,12 +88,16 @@ frontend/
 ## 🔧 Configuration
 
 ### Development
+
 Vite dev server configured in `vite.config.js`:
+
 - Host: `0.0.0.0` (Docker compatible)
 - Port: `5173`
 
 ### Production
+
 Nginx serves static files from `/usr/share/nginx/html`:
+
 - Gzip compression enabled
 - SPA routing (all routes → index.html)
 - Static asset caching

@@ -3,14 +3,17 @@
 This document outlines all the integration tests that need to be implemented for the Product management endpoints in `tests/integration/products.test.js`.
 
 ## Current Status
+
 ✅ **COMPLETED:**
+
 - POST /bitetrack/products - Basic creation with valid data
-- POST /bitetrack/products - Creation with minimum required fields  
+- POST /bitetrack/products - Creation with minimum required fields
 - POST /bitetrack/products - Validation error handling
 
 ## Endpoints to Test
 
 Based on the routes defined in `routes/products.js`, we have the following endpoints:
+
 - `GET /bitetrack/products` - List products
 - `POST /bitetrack/products` - Create product (✅ COMPLETED)
 - `PATCH /bitetrack/products/:id` - Update product
@@ -34,7 +37,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
   - Validate: Each product has all required fields (id, productName, description, price, count, createdAt, updatedAt)
   - Validate: Products are returned as array of objects
 
-- [ ] **should return products with correct data transformation** 
+- [ ] **should return products with correct data transformation**
   - Validate: MongoDB `_id` is transformed to `id`
   - Validate: `__v` field is not included in response
   - Validate: `createdAt` and `updatedAt` are properly formatted
@@ -76,7 +79,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
   - Validate: `updatedAt` timestamp is modified
 
 - [ ] **should update product with partial valid data**
-  - Setup: Create a test product  
+  - Setup: Create a test product
   - Test: Update only `productName` and `price`
   - Validate: 200 status, only specified fields updated
   - Validate: Other fields remain unchanged
@@ -90,12 +93,12 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
   - Test: Update only description field (including setting to empty string)
   - Validate: Other fields remain unchanged
 
-- [ ] **should update only price** 
+- [ ] **should update only price**
   - Test: Update only price field
   - Validate: Other fields remain unchanged
 
 - [ ] **should update only count**
-  - Test: Update only count field  
+  - Test: Update only count field
   - Validate: Other fields remain unchanged
 
 #### ✅ **Validation Error Tests**
@@ -171,7 +174,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 #### ✅ **Error Handling Tests**
 
 - [ ] **should return 404 for non-existent product ID**
-  - Test: Use valid MongoDB ObjectId format but non-existent ID  
+  - Test: Use valid MongoDB ObjectId format but non-existent ID
   - Validate: 404 status, "Product not found" error message
   - Validate: Proper error response structure
 
@@ -196,7 +199,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 
 #### ✅ **Edge Cases**
 
-- [ ] **should handle deletion when product is referenced elsewhere** *(if applicable)*
+- [ ] **should handle deletion when product is referenced elsewhere** _(if applicable)_
   - Test: Delete product that might be referenced in orders/sales
   - Validate: Proper error handling or cascading deletion behavior
   - Note: Check if your system has referential integrity constraints
@@ -215,7 +218,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
   - Test: Maximum integer values for count
   - Validate: System can handle large inventory numbers
 
-- [ ] **should validate productName length limits** *(if any)*
+- [ ] **should validate productName length limits** _(if any)_
   - Test: Very long product names
   - Validate: System behavior with edge cases
 
@@ -247,7 +250,7 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 
 ---
 
-## 🔄 **TO-DO: Performance & Load Tests** *(Optional but Recommended)*
+## 🔄 **TO-DO: Performance & Load Tests** _(Optional but Recommended)_
 
 - [ ] **should handle concurrent product creation**
   - Test: Multiple simultaneous POST requests
@@ -263,27 +266,32 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 ## Testing Best Practices to Follow
 
 ### ✅ **Test Structure**
+
 - Use clear `Arrange → Act → Assert` pattern
 - Group related tests in `describe` blocks
 - Use descriptive test names that explain what is being tested
 
 ### ✅ **Data Management**
+
 - Clean database between tests (already handled by `afterEach`)
 - Create test data programmatically using `testUtils` helpers
 - Use realistic but deterministic test data
 
 ### ✅ **Assertions**
+
 - Verify HTTP status codes
 - Check response body structure and content
 - Validate database state when necessary
 - Test both positive and negative scenarios
 
 ### ✅ **Error Testing**
+
 - Test all validation rules from `utils/validation.js`
 - Verify error message format and content
 - Test authentication and authorization scenarios
 
 ### ✅ **Coverage Goals**
+
 - Aim for 100% line coverage on Product controller
 - Test all validation rules
 - Cover all error conditions
@@ -301,8 +309,9 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 6. **Error Format**: API returns errors in format: `{ error, message, statusCode, details? }`
 
 ## Estimated Timeline
+
 - **GET /products**: 1-2 days
-- **PATCH /products/:id**: 2-3 days  
+- **PATCH /products/:id**: 2-3 days
 - **DELETE /products/:id**: 1-2 days
 - **Additional edge cases**: 1 day
 - **Integration tests**: 1 day
@@ -311,4 +320,4 @@ Based on the routes defined in `routes/products.js`, we have the following endpo
 
 ---
 
-*Remember to run `npm run test -- tests/integration/products.test.js` frequently to ensure tests are passing as you implement them!*
+_Remember to run `npm run test -- tests/integration/products.test.js` frequently to ensure tests are passing as you implement them!_

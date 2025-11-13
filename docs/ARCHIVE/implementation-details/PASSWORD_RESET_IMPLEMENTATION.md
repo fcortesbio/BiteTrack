@@ -1,6 +1,7 @@
 # Password Reset Implementation Review
 
 ## Overview
+
 The password reset functionality has been successfully implemented with email integration using Nodemailer. The implementation follows enterprise security practices with environment-based configuration and development/production separation.
 
 ## Architecture
@@ -8,6 +9,7 @@ The password reset functionality has been successfully implemented with email in
 ### Components
 
 #### 1. **AuthController (`controllers/authController.js`)**
+
 - `recover()` - Initiates password reset flow (SuperAdmin only)
   - Generates secure reset token
   - Saves token to database with 24-hour expiration
@@ -22,6 +24,7 @@ The password reset functionality has been successfully implemented with email in
   - Deletes used token (one-time use)
 
 #### 2. **EmailService (`utils/emailService.js`)**
+
 - `sendPasswordResetEmail()` - Main email sending function
   - Validates email configuration
   - Creates reset link with token
@@ -35,6 +38,7 @@ The password reset functionality has been successfully implemented with email in
   - Logs preview URLs for email inspection
 
 #### 3. **PasswordResetToken Model**
+
 - Stores reset tokens with 24-hour expiration
 - Links tokens to seller accounts
 - One-time use enforcement (deleted after successful reset)
@@ -42,18 +46,20 @@ The password reset functionality has been successfully implemented with email in
 ## Security Features
 
 ### ✅ Implemented
+
 - **Token Security**: Unique, cryptographically secure tokens
 - **Expiration**: 24-hour token lifetime
 - **One-Time Use**: Tokens deleted after successful reset
 - **Identity Verification**: Email + date of birth validation
 - **Password Hashing**: bcrypt (12 salt rounds)
-- **Environment Separation**: 
+- **Environment Separation**:
   - Development: Returns token + preview URL for testing
   - Production: Only sends email, no token exposure
 - **Role-Based Access**: SuperAdmin only can initiate recovery
 - **Error Handling**: Proper error responses without leaking sensitive info
 
 ### Configuration Best Practices
+
 - Email credentials stored in `.secrets` file (not versioned)
 - SMTP configuration via environment variables
 - Support for multiple email services (Ethereal, SendGrid, AWS SES, etc.)
@@ -62,6 +68,7 @@ The password reset functionality has been successfully implemented with email in
 ## Configuration Setup
 
 ### Development Setup
+
 ```bash
 # The .secrets file includes development email configuration:
 SMTP_HOST=smtp.ethereal.email
@@ -73,6 +80,7 @@ CLIENT_URL=http://localhost:3173
 ```
 
 ### Production Setup
+
 1. Add email service credentials to `.env.production`
 2. Example with SendGrid:
    ```
@@ -87,7 +95,9 @@ CLIENT_URL=http://localhost:3173
 ## API Usage Flow
 
 ### 1. Initiate Password Recovery
+
 **Endpoint**: `POST /bitetrack/auth/recover`
+
 - **Authentication**: Required (JWT)
 - **Authorization**: SuperAdmin only
 - **Request**:
@@ -116,7 +126,9 @@ CLIENT_URL=http://localhost:3173
   ```
 
 ### 2. Reset Password
+
 **Endpoint**: `POST /bitetrack/auth/reset`
+
 - **Authentication**: Not required (public endpoint)
 - **Request**:
   ```json
@@ -137,7 +149,9 @@ CLIENT_URL=http://localhost:3173
 ## Testing
 
 ### Manual Testing Flow
+
 1. **Get JWT Token**
+
    ```bash
    curl -X POST http://localhost:3000/bitetrack/auth/login \
      -H "Content-Type: application/json" \
@@ -145,6 +159,7 @@ CLIENT_URL=http://localhost:3173
    ```
 
 2. **Initiate Recovery**
+
    ```bash
    curl -X POST http://localhost:3000/bitetrack/auth/recover \
      -H "Authorization: Bearer YOUR_TOKEN" \
@@ -191,13 +206,13 @@ CLIENT_URL=http://localhost:3173
 
 ## Error Scenarios Handled
 
-| Scenario | Status Code | Response |
-|----------|------------|----------|
-| Seller not found | 404 | "Seller not found" |
-| Email service failure | 500 | "Failed to send password reset email" |
-| Invalid/expired token | 400 | "Reset token is invalid or expired" |
-| Seller details mismatch | 400 | "Seller details do not match" |
-| Missing email config | 500 | "Email service not configured" |
+| Scenario                | Status Code | Response                              |
+| ----------------------- | ----------- | ------------------------------------- |
+| Seller not found        | 404         | "Seller not found"                    |
+| Email service failure   | 500         | "Failed to send password reset email" |
+| Invalid/expired token   | 400         | "Reset token is invalid or expired"   |
+| Seller details mismatch | 400         | "Seller details do not match"         |
+| Missing email config    | 500         | "Email service not configured"        |
 
 ## Production Deployment Checklist
 

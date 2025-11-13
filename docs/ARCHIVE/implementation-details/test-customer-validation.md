@@ -1,6 +1,7 @@
 # Customer Validation Enhancement - Manual Testing Guide
 
 ## 🎯 **Enhancement Summary**
+
 - ✅ **Phone Number Validation**: Must be exactly 10 digits
 - ✅ **Duplicate Prevention**: Phone numbers must be unique
 - ✅ **Email Uniqueness**: Email addresses must be unique (when provided)
@@ -11,6 +12,7 @@
 ## 📋 **Test Cases**
 
 ### **1. Valid Customer Creation**
+
 ```bash
 curl -X POST http://localhost:3001/bitetrack/customers \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -22,9 +24,11 @@ curl -X POST http://localhost:3001/bitetrack/customers \
     "email": "john.doe@example.com"
   }'
 ```
+
 **Expected**: ✅ 201 Created with customer data
 
 ### **2. Invalid Phone Number Format**
+
 ```bash
 curl -X POST http://localhost:3001/bitetrack/customers \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -36,9 +40,11 @@ curl -X POST http://localhost:3001/bitetrack/customers \
     "email": "jane.smith@example.com"
   }'
 ```
+
 **Expected**: ❌ 400 Bad Request - "Phone number must be exactly 10 digits"
 
 ### **3. Phone Number Too Short**
+
 ```bash
 curl -X POST http://localhost:3001/bitetrack/customers \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -49,9 +55,11 @@ curl -X POST http://localhost:3001/bitetrack/customers \
     "phoneNumber": "123456789"
   }'
 ```
+
 **Expected**: ❌ 400 Bad Request - "Phone number must be exactly 10 digits"
 
 ### **4. Duplicate Phone Number**
+
 ```bash
 # First, create a customer
 curl -X POST http://localhost:3001/bitetrack/customers \
@@ -73,9 +81,11 @@ curl -X POST http://localhost:3001/bitetrack/customers \
     "phoneNumber": "5559876543"
   }'
 ```
+
 **Expected**: ❌ 409 Conflict with existing customer information
 
 ### **5. Duplicate Email**
+
 ```bash
 # Create customer with email
 curl -X POST http://localhost:3001/bitetrack/customers \
@@ -99,9 +109,11 @@ curl -X POST http://localhost:3001/bitetrack/customers \
     "email": "unique@example.com"
   }'
 ```
+
 **Expected**: ❌ 409 Conflict with existing customer information
 
 ### **6. Update with Invalid Phone**
+
 ```bash
 # First get an existing customer ID, then:
 curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
@@ -111,9 +123,11 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
     "phoneNumber": "abc1234567"
   }'
 ```
+
 **Expected**: ❌ 400 Bad Request - "Phone number must be exactly 10 digits"
 
 ### **7. Update with Duplicate Phone**
+
 ```bash
 # Try to update customer with existing phone number
 curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
@@ -123,6 +137,7 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
     "phoneNumber": "5559876543"
   }'
 ```
+
 **Expected**: ❌ 409 Conflict with existing customer information
 
 ---
@@ -130,6 +145,7 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
 ## 🔍 **Expected Response Formats**
 
 ### **Validation Error (400)**
+
 ```json
 {
   "error": "Validation Error",
@@ -145,6 +161,7 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
 ```
 
 ### **Duplicate Conflict (409)**
+
 ```json
 {
   "error": "Conflict",
@@ -165,6 +182,7 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
 ```
 
 ### **Success Response (201)**
+
 ```json
 {
   "id": "507f1f77bcf86cd799439012",
@@ -212,16 +230,19 @@ curl -X PATCH http://localhost:3001/bitetrack/customers/CUSTOMER_ID \
 ## 🔧 **Technical Implementation Details**
 
 ### **Database Level**
+
 - Added `unique: true` constraint to phoneNumber field
 - Custom validator function for phone number format
 - Maintained sparse index on email field
 
 ### **Application Level**
+
 - Pre-flight duplicate checks with informative error messages
 - Comprehensive input sanitization and normalization
 - Fallback error handling for edge cases
 
 ### **API Level**
+
 - Express-validator integration for request validation
 - Consistent error response format across operations
 - Professional HTTP status codes and messaging

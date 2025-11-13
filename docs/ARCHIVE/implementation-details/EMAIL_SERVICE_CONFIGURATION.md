@@ -3,6 +3,7 @@
 ## Overview
 
 BiteTrack uses Nodemailer for email delivery with support for:
+
 - **Development**: Ethereal Email (free test service)
 - **Production**: SendGrid, AWS SES, or any SMTP-compatible service
 
@@ -11,13 +12,17 @@ BiteTrack uses Nodemailer for email delivery with support for:
 ## 🚀 Quick Setup
 
 ### Development (Automatic)
+
 No configuration needed! The email service automatically:
+
 1. Creates a test Ethereal account on first run
 2. Logs credentials to console
 3. Provides preview URLs for viewing emails
 
 ### Production
+
 Set these environment variables in `.env.production`:
+
 ```env
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
@@ -33,19 +38,19 @@ CLIENT_URL=https://yourdomain.com
 
 ### Required Variables
 
-| Variable | Purpose | Example |
-|----------|---------|---------|
-| `SMTP_HOST` | Email server hostname | smtp.sendgrid.net |
-| `SMTP_PORT` | Email server port | 587 (TLS) or 465 (SSL) |
-| `EMAIL_USER` | SMTP username | apikey (for SendGrid) |
-| `EMAIL_PASSWORD` | SMTP password/token | sg.xxxx... |
-| `EMAIL_FROM` | Sender email address | noreply@yourdomain.com |
-| `CLIENT_URL` | Frontend base URL | https://app.yourdomain.com |
+| Variable         | Purpose               | Example                    |
+| ---------------- | --------------------- | -------------------------- |
+| `SMTP_HOST`      | Email server hostname | smtp.sendgrid.net          |
+| `SMTP_PORT`      | Email server port     | 587 (TLS) or 465 (SSL)     |
+| `EMAIL_USER`     | SMTP username         | apikey (for SendGrid)      |
+| `EMAIL_PASSWORD` | SMTP password/token   | sg.xxxx...                 |
+| `EMAIL_FROM`     | Sender email address  | noreply@yourdomain.com     |
+| `CLIENT_URL`     | Frontend base URL     | https://app.yourdomain.com |
 
 ### Optional Variables
 
-| Variable | Purpose | Default |
-|----------|---------|---------|
+| Variable   | Purpose          | Default     |
+| ---------- | ---------------- | ----------- |
 | `NODE_ENV` | Environment mode | development |
 
 ---
@@ -59,17 +64,20 @@ CLIENT_URL=https://yourdomain.com
 **Best For:** Local development & testing
 
 #### Quick Start
+
 ```bash
 # Just run the server
 npm run dev
 ```
 
 The server will automatically:
+
 1. Generate Ethereal test credentials
 2. Log them to console
 3. Create test accounts on demand
 
 #### Console Output
+
 ```
 === USING TEST EMAIL ACCOUNT ===
 Username: test.account@ethereal.email
@@ -79,6 +87,7 @@ Preview URL: https://ethereal.email/message/WjYjEu...
 ```
 
 #### View Test Emails
+
 ```bash
 # Click the preview URL from console output
 # Or visit: https://ethereal.email
@@ -93,11 +102,13 @@ Preview URL: https://ethereal.email/message/WjYjEu...
 **Best For:** Production deployments
 
 #### Step 1: Create SendGrid Account
+
 1. Go to [sendgrid.com/pricing](https://sendgrid.com/pricing)
 2. Sign up for free account
 3. Verify email address
 
 #### Step 2: Generate API Key
+
 1. Login to SendGrid dashboard
 2. Navigate to **Settings** → **API Keys**
 3. Click **Create API Key**
@@ -106,6 +117,7 @@ Preview URL: https://ethereal.email/message/WjYjEu...
 6. Copy the generated key (starts with `SG.`)
 
 #### Step 3: Update `.env.production`
+
 ```env
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
@@ -116,11 +128,13 @@ CLIENT_URL=https://yourdomain.com
 ```
 
 #### Step 4: Verify Sender Email
+
 1. In SendGrid dashboard, go to **Settings** → **Sender Authentication**
 2. Add your domain or verify single sender email
 3. Follow verification steps
 
 #### Troubleshooting SendGrid
+
 ```bash
 # Test SendGrid connection
 curl --url 'smtp://smtp.sendgrid.net:587' \
@@ -138,6 +152,7 @@ curl --url 'smtp://smtp.sendgrid.net:587' \
 **Best For:** AWS-hosted deployments
 
 #### Step 1: Configure AWS SES
+
 1. Open AWS SES console
 2. Go to **Verified identities**
 3. Click **Create identity**
@@ -145,12 +160,14 @@ curl --url 'smtp://smtp.sendgrid.net:587' \
 5. Request production access (if needed)
 
 #### Step 2: Generate SMTP Credentials
+
 1. Navigate to **Account dashboard**
 2. Go to **SMTP settings**
 3. Click **Create My SMTP credentials**
 4. Copy username and password
 
 #### Step 3: Update `.env.production`
+
 ```env
 SMTP_HOST=email-smtp.us-east-1.amazonaws.com
 SMTP_PORT=587
@@ -169,6 +186,7 @@ CLIENT_URL=https://yourdomain.com
 **Best For:** Testing only
 
 #### Step 1: Generate App Password
+
 1. Go to [myaccount.google.com](https://myaccount.google.com)
 2. Enable 2-Factor Authentication
 3. Go to **App passwords**
@@ -176,6 +194,7 @@ CLIENT_URL=https://yourdomain.com
 5. Copy the 16-character password
 
 #### Step 2: Update Configuration
+
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -192,6 +211,7 @@ CLIENT_URL=https://yourdomain.com
 ### 5. Custom SMTP Server
 
 #### General Setup
+
 ```env
 SMTP_HOST=mail.yourserver.com
 SMTP_PORT=587          # or 465 for SSL
@@ -202,6 +222,7 @@ CLIENT_URL=https://yourdomain.com
 ```
 
 **Test Connection:**
+
 ```bash
 telnet mail.yourserver.com 587
 ```
@@ -211,36 +232,42 @@ telnet mail.yourserver.com 587
 ## 🔐 Security Best Practices
 
 ### 1. Use Environment Variables
+
 **Never** hardcode credentials in code:
+
 ```javascript
 // ❌ BAD
 const transporter = nodemailer.createTransport({
-  user: 'apikey:SG_XXXXX'
+  user: "apikey:SG_XXXXX",
 });
 
 // ✅ GOOD
 const transporter = nodemailer.createTransport({
-  user: process.env.EMAIL_USER
+  user: process.env.EMAIL_USER,
 });
 ```
 
 ### 2. Protect `.env` Files
+
 ```bash
 # Add to .gitignore
 echo ".env.production" >> .gitignore
 ```
 
 ### 3. Use API Keys Over Passwords
+
 - SendGrid: Use API keys (not user password)
 - AWS SES: Use IAM credentials
 - Gmail: Use app-specific passwords
 
 ### 4. Rotate Credentials Regularly
+
 - Monthly: SendGrid API keys
 - Quarterly: AWS SES credentials
 - Every 6 months: Custom SMTP passwords
 
 ### 5. Monitor Email Delivery
+
 - SendGrid: Dashboard analytics
 - AWS SES: CloudWatch metrics
 - Custom: Check server logs
@@ -250,6 +277,7 @@ echo ".env.production" >> .gitignore
 ## 🧪 Testing Email Configuration
 
 ### Manual Test
+
 ```bash
 # Start development server
 npm run dev
@@ -264,6 +292,7 @@ curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
 ```
 
 ### Run Email Tests
+
 ```bash
 # All tests (including email)
 npm test
@@ -273,6 +302,7 @@ npm test -- tests/integration/auth-real.test.js
 ```
 
 ### Verify Email Receipt
+
 - **Ethereal**: Check console output for preview URL
 - **SendGrid**: Login to dashboard, check "Activity"
 - **AWS SES**: Check CloudWatch logs
@@ -287,6 +317,7 @@ npm test -- tests/integration/auth-real.test.js
 **Cause:** Missing `EMAIL_USER` or `EMAIL_PASSWORD`
 
 **Fix:**
+
 ```bash
 # Check if variables are set
 echo $EMAIL_USER
@@ -299,13 +330,16 @@ nano .env.production
 ### Issue: "Failed to send email"
 
 **Common Causes:**
+
 1. **Invalid SMTP credentials**
+
    ```bash
    # Test connection
    telnet smtp.sendgrid.net 587
    ```
 
 2. **Port blocked by firewall**
+
    ```bash
    # Try port 465 instead of 587
    SMTP_PORT=465
@@ -322,6 +356,7 @@ nano .env.production
 ### Issue: Emails not received
 
 **Check:**
+
 1. Sender email is verified with provider
 2. Email not in spam folder
 3. Email address is correct
@@ -332,6 +367,7 @@ nano .env.production
 ## 📊 Configuration by Environment
 
 ### Development
+
 ```env
 # .secrets (or .env.development)
 SMTP_HOST=smtp.ethereal.email
@@ -343,6 +379,7 @@ CLIENT_URL=http://localhost:3173
 ```
 
 ### Staging
+
 ```env
 # .env.staging
 SMTP_HOST=smtp.sendgrid.net
@@ -354,6 +391,7 @@ CLIENT_URL=https://staging.yourdomain.com
 ```
 
 ### Production
+
 ```env
 # .env.production
 SMTP_HOST=smtp.sendgrid.net
@@ -373,11 +411,13 @@ CLIENT_URL=https://yourdomain.com
 **Template Location:** `utils/emailService.js` (lines 81-88)
 
 **Variables:**
+
 - `resetLink`: Full URL with token
 - `clientUrl`: Frontend base URL
 - `token`: Reset token
 
 **Customization:**
+
 ```javascript
 // Edit HTML in utils/emailService.js
 html: `
@@ -386,7 +426,7 @@ html: `
     <p>Click <a href="${resetLink}">here</a> to reset your password</p>
     <p>Link expires in 24 hours</p>
   </div>
-`
+`;
 ```
 
 ---
@@ -394,12 +434,14 @@ html: `
 ## 🔄 Environment-Specific Behavior
 
 ### Development
+
 - Returns token in response: `{ token: "..." }`
 - Provides email preview URL: `{ emailPreview: "..." }`
 - Auto-creates test accounts
 - Logs credentials to console
 
 ### Production
+
 - Does NOT return token (security)
 - Generic success message always
 - Silent email failures (no info leakage)
@@ -434,6 +476,7 @@ html: `
 ## 🆘 Support
 
 For email configuration issues:
+
 1. Check console for error messages
 2. Verify credentials with email provider
 3. Test SMTP connection with telnet/curl

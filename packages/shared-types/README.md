@@ -5,6 +5,7 @@ Shared constants, types, and validation schemas used across all BiteTrack servic
 ## Purpose
 
 This package eliminates duplication and ensures consistency between:
+
 - **API** (backend validation and business logic)
 - **Frontend** (UI components and form validation)
 - **MCP Server** (AI tool definitions and schemas)
@@ -13,7 +14,7 @@ This package eliminates duplication and ensures consistency between:
 
 ```javascript
 // In any service (API, frontend, MCP)
-import { USER_ROLES, PAYMENT_STATUS } from '@bitetrack/shared-types';
+import { USER_ROLES, PAYMENT_STATUS } from "@bitetrack/shared-types";
 
 if (user.role === USER_ROLES.ADMIN) {
   // Admin-specific logic
@@ -23,6 +24,7 @@ if (user.role === USER_ROLES.ADMIN) {
 ## What to Put Here
 
 ✅ **Good candidates:**
+
 - Constants (user roles, status enums, categories)
 - API endpoint paths
 - Validation schemas (when using Zod/Joi)
@@ -30,6 +32,7 @@ if (user.role === USER_ROLES.ADMIN) {
 - Error codes and messages
 
 ❌ **Don't put here:**
+
 - Database models (Mongoose schemas stay in API)
 - Business logic (keep in services)
 - Environment-specific configs

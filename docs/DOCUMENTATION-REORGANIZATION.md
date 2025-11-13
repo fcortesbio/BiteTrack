@@ -12,16 +12,19 @@ Reorganize BiteTrack documentation to improve clarity, reduce confusion, and mai
 ### ✅ Documents Moved to Archive (15 files)
 
 #### Planning Documents → `docs/ARCHIVE/planning/`
+
 - `ESM-MIGRATION-ROADMAP.md` - Migration planning (completed Nov 2025)
 - `MIGRATION-ROADMAP.md` - ES Modules + MCP/AI strategy
 - `NEW-STRATEGY-SUMMARY.md` - Strategic decision documentation
 - `DAILY_ANALYSIS_REPORT.md` - Historical project snapshot (Oct 6, 2025)
 
 #### Status Snapshots → `docs/ARCHIVE/status-snapshots/`
+
 - `PROJECT-STATUS.md` - Point-in-time status (Nov 4, 2025)
 - `DOCUMENTATION-UPDATE-SUMMARY.md` - Historical update log
 
 #### Implementation Details → `docs/ARCHIVE/implementation-details/`
+
 - `PASSWORD_RESET_IMPLEMENTATION.md`
 - `REQUEST_RECOVERY_ENDPOINT.md`
 - `REQUEST_RECOVERY_TESTS.md`
@@ -49,12 +52,14 @@ Reorganize BiteTrack documentation to improve clarity, reduce confusion, and mai
 ### ✅ Documents Remaining Active (5 core docs)
 
 #### Root Level
+
 - `README.md` - Main setup guide ✅
 - `ROADMAP.md` - Strategic roadmap ✅
 - `WARP.md` - AI assistant guide ✅
 - `ESM-MIGRATION-COMPLETE.md` - Success record ✅
 
 #### docs/ Directory
+
 - `API-documentation.md` - Complete API reference ✅
 - `TESTING-STATUS.md` - Testing infrastructure ✅
 - `TEST-DATA-API.md` - Test data endpoints ✅
@@ -102,12 +107,14 @@ BiteTrack/
 ## 🔍 Key Improvements
 
 ### Before
+
 - 19+ markdown files in docs/ directory
 - Mix of current, historical, and planning docs
 - Unclear which docs are active vs. archived
 - Test status conflicting (0% vs. 100%)
 
 ### After
+
 - 5 core markdown files in docs/ directory
 - Clear separation: current vs. archived
 - All historical docs preserved in organized archive
@@ -116,6 +123,7 @@ BiteTrack/
 ## 📝 Git History Preservation
 
 All file moves used `git mv` to preserve complete git history:
+
 - File history traceable through renames
 - No loss of commit context
 - Clean diff showing relocations (not deletions/additions)
@@ -123,12 +131,14 @@ All file moves used `git mv` to preserve complete git history:
 ## 🚀 Next Steps
 
 ### For Current Work
+
 - Use `README.md` for setup and overview
 - Use `ROADMAP.md` for strategic planning
 - Use `docs/API-documentation.md` for API reference
 - Use `docs/TESTING-STATUS.md` for testing info
 
 ### For Historical Context
+
 - Check `docs/ARCHIVE/README.md` for archive guide
 - Browse archive categories for specific historical docs
 - Reference implementation details from completed features
@@ -136,6 +146,7 @@ All file moves used `git mv` to preserve complete git history:
 ## 📚 Documentation Maintenance Policy
 
 **Moving Forward:**
+
 1. Keep active docs up-to-date (README, ROADMAP, API docs)
 2. Archive completed planning documents
 3. Archive point-in-time status reports
@@ -163,6 +174,7 @@ npm test
 ## 🎉 Summary
 
 Successfully reorganized BiteTrack documentation with:
+
 - ✅ 15 files archived (history preserved)
 - ✅ 3 files updated (accurate information)
 - ✅ Clean, professional structure

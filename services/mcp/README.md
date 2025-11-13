@@ -5,6 +5,7 @@ AI-powered conversational interface for BiteTrack operations using Model Context
 ## 🎯 Purpose
 
 Provide natural language access to all BiteTrack API operations, enabling:
+
 - Conversational sales processing ("Create a sale for John with 2 coffees")
 - Inventory queries ("Do we have enough milk?")
 - Business analytics ("Show me this week's top products")
@@ -13,6 +14,7 @@ Provide natural language access to all BiteTrack API operations, enabling:
 ## 🚀 Quick Start
 
 ### Development
+
 ```bash
 npm install
 npm run dev
@@ -21,12 +23,14 @@ npm run dev
 Server runs on `http://localhost:3001`
 
 ### Docker
+
 ```bash
 docker build -t bitetrack-mcp .
 docker run -p 3001:3001 bitetrack-mcp
 ```
 
 ### With Full Stack
+
 ```bash
 cd ../../infrastructure
 docker compose up -d
@@ -37,16 +41,19 @@ Access via Traefik: `http://localhost/mcp/` or `https://yourdomain.com/mcp/`
 ## 📡 API Endpoints
 
 ### Health Check
+
 ```bash
 GET /health
 ```
 
 ### Root Information
+
 ```bash
 GET /
 ```
 
 ### Chat Interface (Coming Soon)
+
 ```bash
 POST /chat
 Content-Type: application/json
@@ -61,6 +68,7 @@ Content-Type: application/json
 ```
 
 ### Tool Execution (Coming Soon)
+
 ```bash
 POST /tools/execute
 Content-Type: application/json
@@ -77,24 +85,28 @@ Content-Type: application/json
 ## 🏗️ Implementation Roadmap
 
 ### Phase 1: Boilerplate (✅ Complete)
+
 - [x] Basic Express server
 - [x] Health check endpoint
 - [x] Docker containerization
 - [x] Traefik integration
 
 ### Phase 2: MCP Integration (Planned)
+
 - [ ] Google Gemini API integration
 - [ ] MCP protocol implementation
 - [ ] Tool definitions for BiteTrack API
 - [ ] Conversation context management
 
 ### Phase 3: BiteTrack Integration (Planned)
+
 - [ ] JWT authentication forwarding
 - [ ] API client for BiteTrack endpoints
 - [ ] Role-based access control
 - [ ] Error handling and retry logic
 
 ### Phase 4: Advanced Features (Planned)
+
 - [ ] Multi-turn conversations
 - [ ] Conversation history storage
 - [ ] Predictive analytics

@@ -1,6 +1,7 @@
 # User-Initiated Password Recovery
 
 ## Overview
+
 Added a new public endpoint `/auth/request-recovery` that allows users to request a password reset by providing their email and date of birth. This addresses the security requirement for users to self-initiate password recovery without needing SuperAdmin assistance.
 
 ## Endpoint Details
@@ -21,6 +22,7 @@ Added a new public endpoint `/auth/request-recovery` that allows users to reques
 ```
 
 **Validation:**
+
 - `email`: Required, must be valid email format
 - `dateOfBirth`: Required, must be ISO 8601 date format
 
@@ -35,6 +37,7 @@ Added a new public endpoint `/auth/request-recovery` that allows users to reques
 ```
 
 **Development Mode Only:**
+
 ```json
 {
   "message": "If an account exists with this email and date of birth, a password reset link has been sent",
@@ -58,17 +61,20 @@ Added a new public endpoint `/auth/request-recovery` that allows users to reques
 ## Security Features
 
 ### User Privacy
+
 - **Same Response for Valid/Invalid Emails**: The endpoint always returns the same generic message whether or not an account is found with the provided email and date of birth
 - **Prevents Email Enumeration**: Attackers cannot use this endpoint to determine which emails are registered
 - **Identity Verification**: Users must provide both email AND date of birth to match their account
 
 ### Token Security
+
 - **Secure Generation**: Cryptographically secure token generated for each request
 - **24-Hour Expiration**: Tokens expire after 24 hours
 - **One-Time Use**: Tokens are deleted after successful password reset
 - **Database Storage**: Tokens linked to seller ID in PasswordResetToken collection
 
 ### Email Delivery
+
 - Development: Shows Ethereal preview URL for testing
 - Production: Silently handles email delivery failures (still returns success message)
 - Email contains secure reset link with embedded token
@@ -76,7 +82,9 @@ Added a new public endpoint `/auth/request-recovery` that allows users to reques
 ## User Flow
 
 ### Step 1: Request Recovery
+
 User provides email and date of birth:
+
 ```bash
 curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
   -H "Content-Type: application/json" \
@@ -87,12 +95,15 @@ curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
 ```
 
 ### Step 2: Check Email
+
 - User receives password reset email
 - Email contains reset link with token embedded
 - Link format: `{CLIENT_URL}/reset-password?token={GENERATED_TOKEN}`
 
 ### Step 3: Complete Reset
+
 User clicks reset link and completes password reset via `/auth/reset` endpoint:
+
 ```bash
 curl -X POST http://localhost:3000/bitetrack/auth/reset \
   -H "Content-Type: application/json" \
@@ -107,6 +118,7 @@ curl -X POST http://localhost:3000/bitetrack/auth/reset \
 ## Development Testing
 
 ### Using Ethereal Email Preview
+
 In development mode, the response includes a preview URL:
 
 ```json
@@ -119,6 +131,7 @@ In development mode, the response includes a preview URL:
 Click the `emailPreview` URL to see the rendered email. Copy the token from the email or use the token directly from the response.
 
 ### Testing Workflow
+
 ```bash
 # 1. Request recovery with test user details
 TOKEN_RESP=$(curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
@@ -147,17 +160,18 @@ curl -X POST http://localhost:3000/bitetrack/auth/reset \
 
 ## Differences from SuperAdmin Recovery Endpoint
 
-| Feature | `/auth/recover` (SuperAdmin) | `/auth/request-recovery` (User) |
-|---------|------------------------------|--------------------------------|
-| Authentication | Required (SuperAdmin) | None (Public) |
-| Input | sellerId | email + dateOfBirth |
-| Intent | Admin-initiated | User self-service |
-| User Privacy | None (admin action) | High (same response for all cases) |
-| Use Case | Account lockouts | Forgotten passwords |
+| Feature        | `/auth/recover` (SuperAdmin) | `/auth/request-recovery` (User)    |
+| -------------- | ---------------------------- | ---------------------------------- |
+| Authentication | Required (SuperAdmin)        | None (Public)                      |
+| Input          | sellerId                     | email + dateOfBirth                |
+| Intent         | Admin-initiated              | User self-service                  |
+| User Privacy   | None (admin action)          | High (same response for all cases) |
+| Use Case       | Account lockouts             | Forgotten passwords                |
 
 ## Implementation Details
 
 ### Files Modified
+
 - `controllers/authController.js` - Added `requestRecovery()` function
 - `routes/auth.js` - Added `/request-recovery` route
 - `utils/validation.js` - Added `requestRecovery` validation rules
@@ -185,6 +199,7 @@ curl -X POST http://localhost:3000/bitetrack/auth/reset \
 ## Configuration
 
 No additional configuration needed beyond existing password reset setup. The endpoint uses:
+
 - Existing SMTP configuration (from `.secrets` or environment variables)
 - Existing `CLIENT_URL` for reset links
 - Existing `PasswordResetToken` model and expiration (24 hours)
@@ -192,6 +207,7 @@ No additional configuration needed beyond existing password reset setup. The end
 ## Error Handling
 
 The endpoint handles these scenarios:
+
 - **Valid account**: Generates token, sends email, returns generic success
 - **Invalid email**: Returns generic success message (security)
 - **Invalid date of birth**: Returns generic success message (security)

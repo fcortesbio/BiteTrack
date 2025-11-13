@@ -738,7 +738,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 **CSV Requirements:**
 
 - **firstName**: Required, non-empty string
-- **lastName**: Required, non-empty string  
+- **lastName**: Required, non-empty string
 - **phoneNumber**: Required, exactly 10 digits, must be unique
 - **email**: Optional, must be unique if provided
 - Maximum file size: 5MB
@@ -1091,7 +1091,7 @@ Authorization: Bearer <jwt_token>
         }
       ],
       "totalAmount": 35.97,
-      "amountPaid": 20.00,
+      "amountPaid": 20.0,
       "settled": false,
       "createdAt": "2024-01-15T15:30:00.000Z",
       "updatedAt": "2024-01-15T15:30:00.000Z"
@@ -1144,7 +1144,7 @@ Content-Type: application/json
       "quantity": 2
     }
   ],
-  "amountPaid": 25.00
+  "amountPaid": 25.0
 }
 ```
 
@@ -1168,7 +1168,7 @@ Content-Type: application/json
     }
   ],
   "totalAmount": 31.97,
-  "amountPaid": 25.00,
+  "amountPaid": 25.0,
   "settled": false,
   "createdAt": "2024-01-15T22:00:00.000Z",
   "updatedAt": "2024-01-15T22:00:00.000Z"
@@ -1416,7 +1416,7 @@ GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
   "summary": {
     "totalSales": 127,
     "totalRevenue": 2845.73,
-    "totalAmountPaid": 2720.50,
+    "totalAmountPaid": 2720.5,
     "averageOrderValue": 22.41,
     "averageItemsPerOrder": 2.3
   },
@@ -1450,13 +1450,13 @@ GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
   "paymentAnalytics": {
     "settled": {
       "count": 115,
-      "totalAmount": 2720.50,
-      "totalPaid": 2720.50
+      "totalAmount": 2720.5,
+      "totalPaid": 2720.5
     },
     "unsettled": {
       "count": 12,
       "totalAmount": 125.23,
-      "totalPaid": 75.00
+      "totalPaid": 75.0
     }
   }
 }
@@ -1995,7 +1995,7 @@ All passwords must meet the following criteria:
 - At least 1 lowercase letter
 - At least 1 uppercase letter
 - At least 1 number
-- At least 1 special character (@$!%*?&)
+- At least 1 special character (@$!%\*?&)
 
 **Valid password example:** `SecurePass123!`
 
