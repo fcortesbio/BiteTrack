@@ -24,7 +24,7 @@ Authorization: Bearer <jwt_token>
 
 ## Authentication Endpoints
 
-### 🔐 Login
+### Login
 
 **Endpoint:** `POST /auth/login`
 
@@ -88,7 +88,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔓 Activate Account
+### Activate Account
 
 **Endpoint:** `POST /auth/activate`
 
@@ -121,7 +121,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔄 Password Recovery
+### Password Recovery
 
 **Endpoint:** `POST /auth/recover` (superadmin only)
 
@@ -152,7 +152,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔑 Reset Password
+### Reset Password
 
 **Endpoint:** `POST /auth/reset`
 
@@ -177,7 +177,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔍 Check Seller Account Status
+### Check Seller Account Status
 
 **Endpoint:** `GET /auth/seller-status`
 
@@ -235,7 +235,7 @@ Content-Type: application/json
 
 ## Seller Management
 
-### 👥 List Sellers
+### List Sellers
 
 **Endpoint:** `GET /sellers` (admin/superadmin only)
 
@@ -265,7 +265,7 @@ Authorization: Bearer <admin_jwt_token>
 ]
 ```
 
-### ➕ Create Pending Seller
+### Create Pending Seller
 
 **Endpoint:** `POST /sellers/pending` (admin/superadmin only)
 
@@ -304,7 +304,7 @@ Content-Type: application/json
 }
 ```
 
-### ✏️ Update Seller Information
+### Update Seller Information
 
 **Endpoint:** `PATCH /sellers/{id}`
 
@@ -344,7 +344,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔄 Change Seller Role
+### Change Seller Role
 
 **Endpoint:** `PATCH /sellers/{id}/role` (superadmin only)
 
@@ -381,7 +381,7 @@ Content-Type: application/json
 }
 ```
 
-### ❌ Deactivate Seller
+### Deactivate Seller
 
 **Endpoint:** `DELETE /sellers/{id}` (superadmin only)
 
@@ -399,7 +399,7 @@ Authorization: Bearer <superadmin_jwt_token>
 
 ## Customer Management
 
-### 📋 List Customers
+### List Customers
 
 **Endpoint:** `GET /customers`
 
@@ -428,7 +428,7 @@ Authorization: Bearer <jwt_token>
 ]
 ```
 
-### ➕ Create Customer
+### Create Customer
 
 **Endpoint:** `POST /customers`
 
@@ -467,7 +467,7 @@ Content-Type: application/json
 }
 ```
 
-### ✏️ Update Customer
+### Update Customer
 
 **Endpoint:** `PATCH /customers/{id}`
 
@@ -504,7 +504,7 @@ Content-Type: application/json
 }
 ```
 
-### 📈 Get Customer Transaction History
+### Get Customer Transaction History
 
 **Endpoint:** `GET /customers/{id}/transactions`
 
@@ -607,7 +607,7 @@ GET /customers/507f1f77bcf86cd799439020/transactions?settled=false
 }
 ```
 
-### 📊 Import Customers from CSV
+### Import Customers from CSV
 
 **Endpoint:** `POST /customers/import`
 
@@ -694,7 +694,7 @@ Jane,Smith,+1-555-0102,jane.smith@email.com
 }
 ```
 
-### ➖ Delete Customer
+### Delete Customer
 
 **Endpoint:** `DELETE /customers/{id}`
 
@@ -708,7 +708,7 @@ Authorization: Bearer <jwt_token>
 
 **Response (204 No Content):** Empty response body
 
-### 📥 Import Customers from CSV
+### Import Customers from CSV
 
 **Endpoint:** `POST /customers/import`
 
@@ -738,7 +738,7 @@ Alice,Williams,5551111111,alice.williams@test.com
 **CSV Requirements:**
 
 - **firstName**: Required, non-empty string
-- **lastName**: Required, non-empty string  
+- **lastName**: Required, non-empty string
 - **phoneNumber**: Required, exactly 10 digits, must be unique
 - **email**: Optional, must be unique if provided
 - Maximum file size: 5MB
@@ -902,7 +902,7 @@ curl -X POST http://localhost:3000/bitetrack/customers/import \
 
 ## Product Management
 
-### 📦 List Products
+### List Products
 
 **Endpoint:** `GET /products`
 
@@ -930,7 +930,7 @@ Authorization: Bearer <jwt_token>
 ]
 ```
 
-### ➕ Create Product
+### Create Product
 
 **Endpoint:** `POST /products`
 
@@ -968,7 +968,7 @@ Content-Type: application/json
 }
 ```
 
-### ✏️ Update Product
+### Update Product
 
 **Endpoint:** `PATCH /products/{id}`
 
@@ -1004,7 +1004,7 @@ Content-Type: application/json
 }
 ```
 
-### ❌ Remove Product
+### Remove Product
 
 **Endpoint:** `DELETE /products/{id}`
 
@@ -1022,7 +1022,7 @@ Authorization: Bearer <jwt_token>
 
 ## Sales Management
 
-### 📊 List Sales
+### List Sales
 
 **Endpoint:** `GET /sales`
 
@@ -1116,7 +1116,7 @@ Authorization: Bearer <jwt_token>
 }
 ```
 
-### ➕ Create Sale
+### Create Sale
 
 **Endpoint:** `POST /sales`
 
@@ -1175,7 +1175,7 @@ Content-Type: application/json
 }
 ```
 
-### 📄 Get Sale Details
+### Get Sale Details
 
 **Endpoint:** `GET /sales/{id}`
 
@@ -1209,7 +1209,7 @@ Authorization: Bearer <jwt_token>
 }
 ```
 
-### 📊 Import Sales from CSV
+### Import Sales from CSV
 
 **Endpoint:** `POST /sales/import`
 
@@ -1319,7 +1319,7 @@ customerId,productId,quantity,amountPaid
 }
 ```
 
-### 💰 Settle Sale
+### Settle Sale
 
 **Endpoint:** `PATCH /sales/{id}/settle`
 
@@ -1371,7 +1371,7 @@ Content-Type: application/json
 
 ## Sales Reporting & Analytics
 
-### 📊 Get Sales Analytics
+### Get Sales Analytics
 
 **Endpoint:** `GET /reporting/sales/analytics`
 
@@ -1462,7 +1462,7 @@ GET /reporting/sales/analytics?dateField=updatedAt&groupBy=month
 }
 ```
 
-### 📄 Export Sales Data as CSV
+### Export Sales Data as CSV
 
 **Endpoint:** `GET /reporting/sales/export`
 
@@ -1603,7 +1603,7 @@ For input validation errors:
 
 ## Health Check
 
-### ❤️ API Health Check
+### API Health Check
 
 **Endpoint:** `GET /bitetrack/health`
 
@@ -1636,9 +1636,9 @@ For input validation errors:
 
 ## Inventory Drop System (Food Waste Management)
 
-**⚠️ Admin/SuperAdmin Access Only:** All inventory drop endpoints require `admin` or `superadmin` role.
+** Admin/SuperAdmin Access Only:** All inventory drop endpoints require `admin` or `superadmin` role.
 
-### 🗑️ Drop Inventory
+### Drop Inventory
 
 **Endpoint:** `POST /inventory-drops`
 
@@ -1725,7 +1725,7 @@ Content-Type: application/json
 }
 ```
 
-### ↩️ Undo Inventory Drop
+### ↩ Undo Inventory Drop
 
 **Endpoint:** `POST /inventory-drops/:dropId/undo`
 
@@ -1772,7 +1772,7 @@ Content-Type: application/json
 }
 ```
 
-### 📋 List Inventory Drops
+### List Inventory Drops
 
 **Endpoint:** `GET /inventory-drops`
 
@@ -1821,7 +1821,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔄 Get Undoable Drops
+### Get Undoable Drops
 
 **Endpoint:** `GET /inventory-drops/undoable`
 
@@ -1851,7 +1851,7 @@ Content-Type: application/json
 }
 ```
 
-### 📊 Waste Analytics
+### Waste Analytics
 
 **Endpoint:** `GET /inventory-drops/analytics`
 
@@ -1908,7 +1908,7 @@ Content-Type: application/json
 }
 ```
 
-### 🔍 Get Drop Details
+### Get Drop Details
 
 **Endpoint:** `GET /inventory-drops/:dropId`
 

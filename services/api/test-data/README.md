@@ -2,19 +2,19 @@
 
 This directory contains comprehensive test data for populating your BiteTrack database with realistic business data for development, testing, and demonstration purposes.
 
-## 📁 File Structure
+## File Structure
 
 ```
 test-data/
-├── README.md                    # This file - comprehensive guide
-├── pending-sellers.json         # Pending seller accounts + activation data
-├── customers.json               # Diverse customer profiles
-├── products.json                # Food business product catalog
-├── sales.json                   # Sales transaction templates
-└── environment-data.json        # Test values and configurations
+ README.md # This file - comprehensive guide
+ pending-sellers.json # Pending seller accounts + activation data
+ customers.json # Diverse customer profiles
+ products.json # Food business product catalog
+ sales.json # Sales transaction templates
+ environment-data.json # Test values and configurations
 ```
 
-## 🚀 Quick Start - Database Seeding Workflow
+## Quick Start - Database Seeding Workflow
 
 ### Prerequisites
 
@@ -116,40 +116,40 @@ POST /sales
 }
 ```
 
-## 📊 Data Categories Overview
+## Data Categories Overview
 
-### 👥 Sellers
+### Sellers
 
 - **8 Pending sellers** ready for activation testing
 - **4 Activation templates** with valid credentials
 - Various demographic backgrounds and roles
 
-### 👤 Customers
+### Customers
 
 - **20+ Diverse customers** with different contact preferences
 - **5 Bulk test customers** for automation
 - Mix of customers with/without email addresses
 - Various phone number formats
 
-### 🍕 Products
+### Products
 
 - **30+ Food items** across categories:
-  - 🥪 **Sandwiches** (10 items) - $8.99-$14.99
-  - ☕ **Beverages** (8 items) - $1.99-$6.49
-  - 🥗 **Sides** (8 items) - $1.49-$5.49
-  - 🍰 **Desserts** (4 items) - $2.99-$6.49
-  - 🎃 **Seasonal** (4 items) - $3.99-$13.99
+  - **Sandwiches** (10 items) - $8.99-$14.99
+  - **Beverages** (8 items) - $1.99-$6.49
+  - **Sides** (8 items) - $1.49-$5.49
+  - **Desserts** (4 items) - $2.99-$6.49
+  - **Seasonal** (4 items) - $3.99-$13.99
 - **Edge case items**: Out of stock, expensive, low stock
 - **Test items** for automation
 
-### 💰 Sales
+### Sales
 
 - **Realistic scenarios**: Single items, combos, family orders, catering
 - **Payment scenarios**: Exact payment, overpayment, partial payment
 - **Edge cases**: Low-cost items, bulk orders, mixed pricing
 - **Settlement examples**: Payment updates and adjustments
 
-## 🛠 Environment Configuration
+## Environment Configuration
 
 Use values from `environment-data.json`:
 
@@ -166,7 +166,7 @@ Use values from `environment-data.json`:
 - **Phone formats**: Different valid phone number formats
 - **Price ranges**: Low ($0.99-$4.99) to Premium ($50+)
 
-## 🔧 Postman Collection Integration
+## Postman Collection Integration
 
 ### Using with Existing Collection
 
@@ -191,37 +191,37 @@ pm.test("Item created successfully", function () {
 });
 ```
 
-## 📈 Testing Scenarios
+## Testing Scenarios
 
 ### Authentication Testing
 
-- ✅ Seller status checks (active/pending/not found)
-- ✅ Login with different role levels
-- ✅ Account activation workflow
-- ✅ Password recovery process
+- Seller status checks (active/pending/not found)
+- Login with different role levels
+- Account activation workflow
+- Password recovery process
 
 ### CRUD Operations Testing
 
-- ✅ **Create**: All entity types with valid data
-- ✅ **Read**: List operations with filtering
-- ✅ **Update**: Profile changes, inventory updates
-- ✅ **Delete**: Account deactivation, item removal
+- **Create**: All entity types with valid data
+- **Read**: List operations with filtering
+- **Update**: Profile changes, inventory updates
+- **Delete**: Account deactivation, item removal
 
 ### Business Logic Testing
 
-- ✅ **Inventory management**: Stock updates during sales
-- ✅ **Payment processing**: Exact, partial, overpayment scenarios
-- ✅ **Role-based access**: Permission enforcement
-- ✅ **Data relationships**: Customer-sales connections
+- **Inventory management**: Stock updates during sales
+- **Payment processing**: Exact, partial, overpayment scenarios
+- **Role-based access**: Permission enforcement
+- **Data relationships**: Customer-sales connections
 
 ### Edge Case Testing
 
-- ✅ **Out of stock scenarios**
-- ✅ **Large quantity orders**
-- ✅ **Invalid data inputs**
-- ✅ **Permission boundary testing**
+- **Out of stock scenarios**
+- **Large quantity orders**
+- **Invalid data inputs**
+- **Permission boundary testing**
 
-## 🎯 Recommended Seeding Order
+## Recommended Seeding Order
 
 1. **Setup Base Accounts** (1-2 minutes)
    - Login as superadmin
@@ -243,7 +243,7 @@ pm.test("Item created successfully", function () {
 
 **Total Setup Time: ~20-30 minutes**
 
-## 🚨 Important Notes
+## Important Notes
 
 ### ID Replacement Required
 
@@ -264,7 +264,7 @@ pm.test("Item created successfully", function () {
 - **Products must exist** before creating sales
 - **Pending sellers must exist** before activation
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -280,7 +280,7 @@ pm.test("Item created successfully", function () {
 - Passwords must meet complexity requirements
 - Dates must be in YYYY-MM-DD format
 
-## 📝 Next Steps
+## Next Steps
 
 1. **Import the data** following the seeding workflow
 2. **Customize as needed** for your specific test scenarios
@@ -290,6 +290,6 @@ pm.test("Item created successfully", function () {
 
 ---
 
-**Happy Testing!** 🎉
+**Happy Testing!**
 
 This test data gives you a complete food business simulation with realistic customers, products, and sales scenarios. Perfect for development, testing, and demonstrations!

@@ -1,12 +1,12 @@
 # Post-Migration Fixes Applied
 
-## ✅ Issues Fixed
+## Issues Fixed
 
 ### 1. **Swagger Documentation - Restored Dynamic JSDoc Generation**
 
 **Problem:** Swagger was loading static YAML instead of generating docs from JSDoc comments in routes.
 
-**Solution:** 
+**Solution:**
 - Restored `swagger-jsdoc` integration in `services/api/config/swagger.js`
 - Now dynamically scans `routes/*.js` and `controllers/*.js` for JSDoc comments
 - Static `docs/openapi.yaml` kept as developer reference only
@@ -20,26 +20,26 @@ Add JSDoc comments to your route files:
 /**
  * @swagger
  * /auth/login:
- *   post:
- *     summary: User login
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login successful
+ * post:
+ * summary: User login
+ * tags: [Authentication]
+ * requestBody:
+ * required: true
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * required:
+ * - email
+ * - password
+ * properties:
+ * email:
+ * type: string
+ * password:
+ * type: string
+ * responses:
+ * 200:
+ * description: Login successful
  */
 router.post('/login', validationRules.login, validate, login);
 ```
@@ -62,7 +62,7 @@ router.post('/login', validationRules.login, validate, login);
 ```
 services/api/config/dotenv.js
     ↓ (resolve '../../../')
-Root/.env.development  (or .env)
+Root/.env.development (or .env)
 ```
 
 ---
@@ -101,7 +101,7 @@ npm run format -w services/api
 
 ---
 
-## 📝 Remaining Tasks
+## Remaining Tasks
 
 ### Add JSDoc Comments to All Routes
 
@@ -112,91 +112,91 @@ Your routes currently have no JSDoc comments. You need to add them for Swagger t
 /**
  * @swagger
  * tags:
- *   name: Authentication
- *   description: User authentication and account management
+ * name: Authentication
+ * description: User authentication and account management
  */
 
 /**
  * @swagger
  * /auth/login:
- *   post:
- *     summary: User login
- *     description: Authenticate user and return JWT token
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 format: password
- *                 example: SecurePass123!
- *     responses:
- *       200:
- *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                 seller:
- *                   type: object
- *       400:
- *         description: Invalid credentials
- *       500:
- *         description: Server error
+ * post:
+ * summary: User login
+ * description: Authenticate user and return JWT token
+ * tags: [Authentication]
+ * requestBody:
+ * required: true
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * required:
+ * - email
+ * - password
+ * properties:
+ * email:
+ * type: string
+ * format: email
+ * example: user@example.com
+ * password:
+ * type: string
+ * format: password
+ * example: SecurePass123!
+ * responses:
+ * 200:
+ * description: Login successful
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * properties:
+ * token:
+ * type: string
+ * seller:
+ * type: object
+ * 400:
+ * description: Invalid credentials
+ * 500:
+ * description: Server error
  */
 router.post('/login', validationRules.login, validate, login);
 
 /**
  * @swagger
  * /auth/activate:
- *   post:
- *     summary: Activate pending seller account
- *     description: Complete account activation with verification details
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - dateOfBirth
- *               - lastName
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *               dateOfBirth:
- *                 type: string
- *                 format: date
- *               lastName:
- *                 type: string
- *               password:
- *                 type: string
- *                 minLength: 8
- *     responses:
- *       201:
- *         description: Account activated successfully
- *       400:
- *         description: Validation error
- *       404:
- *         description: Pending seller not found
+ * post:
+ * summary: Activate pending seller account
+ * description: Complete account activation with verification details
+ * tags: [Authentication]
+ * requestBody:
+ * required: true
+ * content:
+ * application/json:
+ * schema:
+ * type: object
+ * required:
+ * - email
+ * - dateOfBirth
+ * - lastName
+ * - password
+ * properties:
+ * email:
+ * type: string
+ * format: email
+ * dateOfBirth:
+ * type: string
+ * format: date
+ * lastName:
+ * type: string
+ * password:
+ * type: string
+ * minLength: 8
+ * responses:
+ * 201:
+ * description: Account activated successfully
+ * 400:
+ * description: Validation error
+ * 404:
+ * description: Pending seller not found
  */
 router.post('/activate', validationRules.activate, validate, activate);
 ```
@@ -213,7 +213,7 @@ router.post('/activate', validationRules.activate, validate, activate);
 
 ---
 
-## 🧪 Testing Changes
+## Testing Changes
 
 ### Test Swagger Documentation:
 ```bash
@@ -229,13 +229,13 @@ http://localhost:3000/bitetrack/api-docs
 ### Test Environment Loading:
 ```bash
 # Should see clean output:
-🔧 Environment loaded: .env.development
-📁 From: /home/fcortesbio/projects/BiteTrack/.env.development
+ Environment loaded: .env.development
+ From: /home/fcortesbio/projects/BiteTrack/.env.development
 ```
 
 ---
 
-## 🎯 Quick Fixes to Apply Now
+## Quick Fixes to Apply Now
 
 ```bash
 # 1. Install Prettier
@@ -255,8 +255,8 @@ EOF
 
 # 3. Add format scripts (edit services/api/package.json)
 # Add these to "scripts":
-#   "format": "prettier --write '**/*.{js,json,md}'",
-#   "format:check": "prettier --check '**/*.{js,json,md}'"
+# "format": "prettier --write '**/*.{js,json,md}'",
+# "format:check": "prettier --check '**/*.{js,json,md}'"
 
 # 4. Format all code
 npm run format -w services/api
@@ -270,7 +270,7 @@ npm run dev -w services/api
 
 ---
 
-## 📚 Reference: docs/openapi.yaml
+## Reference: docs/openapi.yaml
 
 The static `docs/openapi.yaml` is now a **developer reference only**. Use it as a template when writing JSDoc comments:
 
@@ -281,23 +281,23 @@ The static `docs/openapi.yaml` is now a **developer reference only**. Use it as 
 
 ---
 
-## ✅ Summary
+## Summary
 
 | Issue | Status | Files Changed |
 |-------|--------|---------------|
-| Swagger JSDoc | ✅ Fixed | `services/api/config/swagger.js` |
-| Dotenv paths | ✅ Fixed | `services/api/config/dotenv.js` |
+| Swagger JSDoc | Fixed | `services/api/config/swagger.js` |
+| Dotenv paths | Fixed | `services/api/config/dotenv.js` |
 | Prettier setup | ⏳ Needs install | N/A |
 | Route JSDoc | ⏳ Needs adding | All route files |
 
 ---
 
-## 🎉 After Completing These Fixes
+## After Completing These Fixes
 
 You'll have:
-- ✅ Dynamic Swagger docs generated from code
-- ✅ Clean monorepo-aware path resolution
-- ✅ Prettier formatting working
-- ✅ Full API documentation in Swagger UI
+- Dynamic Swagger docs generated from code
+- Clean monorepo-aware path resolution
+- Prettier formatting working
+- Full API documentation in Swagger UI
 
 **Next:** Start adding JSDoc comments to routes and enjoy automatic Swagger doc generation!

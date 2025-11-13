@@ -8,7 +8,7 @@ BiteTrack uses Nodemailer for email delivery with support for:
 
 ---
 
-## 🚀 Quick Setup
+## Quick Setup
 
 ### Development (Automatic)
 No configuration needed! The email service automatically:
@@ -29,7 +29,7 @@ CLIENT_URL=https://yourdomain.com
 
 ---
 
-## 📋 Configuration Options
+## Configuration Options
 
 ### Required Variables
 
@@ -50,12 +50,12 @@ CLIENT_URL=https://yourdomain.com
 
 ---
 
-## 🔧 Setup Instructions by Provider
+## Setup Instructions by Provider
 
 ### 1. Development (Ethereal Email)
 
-**Setup Time:** ~5 minutes  
-**Cost:** Free  
+**Setup Time:** ~5 minutes
+**Cost:** Free
 **Best For:** Local development & testing
 
 #### Quick Start
@@ -88,8 +88,8 @@ Preview URL: https://ethereal.email/message/WjYjEu...
 
 ### 2. SendGrid (Recommended for Production)
 
-**Setup Time:** ~10 minutes  
-**Cost:** Free tier available (100 emails/day)  
+**Setup Time:** ~10 minutes
+**Cost:** Free tier available (100 emails/day)
 **Best For:** Production deployments
 
 #### Step 1: Create SendGrid Account
@@ -133,8 +133,8 @@ curl --url 'smtp://smtp.sendgrid.net:587' \
 
 ### 3. AWS SES
 
-**Setup Time:** ~15 minutes  
-**Cost:** Pay-as-you-go  
+**Setup Time:** ~15 minutes
+**Cost:** Pay-as-you-go
 **Best For:** AWS-hosted deployments
 
 #### Step 1: Configure AWS SES
@@ -164,8 +164,8 @@ CLIENT_URL=https://yourdomain.com
 
 ### 4. Gmail (Not Recommended for Production)
 
-**Setup Time:** ~5 minutes  
-**Limitation:** Limited sending rate  
+**Setup Time:** ~5 minutes
+**Limitation:** Limited sending rate
 **Best For:** Testing only
 
 #### Step 1: Generate App Password
@@ -194,7 +194,7 @@ CLIENT_URL=https://yourdomain.com
 #### General Setup
 ```env
 SMTP_HOST=mail.yourserver.com
-SMTP_PORT=587          # or 465 for SSL
+SMTP_PORT=587 # or 465 for SSL
 EMAIL_USER=your-username
 EMAIL_PASSWORD=your-password
 EMAIL_FROM=noreply@yourdomain.com
@@ -208,17 +208,17 @@ telnet mail.yourserver.com 587
 
 ---
 
-## 🔐 Security Best Practices
+## Security Best Practices
 
 ### 1. Use Environment Variables
 **Never** hardcode credentials in code:
 ```javascript
-// ❌ BAD
+// BAD
 const transporter = nodemailer.createTransport({
   user: 'apikey:SG_XXXXX'
 });
 
-// ✅ GOOD
+// GOOD
 const transporter = nodemailer.createTransport({
   user: process.env.EMAIL_USER
 });
@@ -247,7 +247,7 @@ echo ".env.production" >> .gitignore
 
 ---
 
-## 🧪 Testing Email Configuration
+## Testing Email Configuration
 
 ### Manual Test
 ```bash
@@ -280,7 +280,7 @@ npm test -- tests/integration/auth-real.test.js
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Issue: "Email service not configured"
 
@@ -329,7 +329,7 @@ nano .env.production
 
 ---
 
-## 📊 Configuration by Environment
+## Configuration by Environment
 
 ### Development
 ```env
@@ -366,7 +366,7 @@ CLIENT_URL=https://yourdomain.com
 
 ---
 
-## 📧 Email Templates
+## Email Templates
 
 ### Password Reset Email
 
@@ -391,7 +391,7 @@ html: `
 
 ---
 
-## 🔄 Environment-Specific Behavior
+## Environment-Specific Behavior
 
 ### Development
 - Returns token in response: `{ token: "..." }`
@@ -407,7 +407,7 @@ html: `
 
 ---
 
-## ✅ Pre-Deployment Checklist
+## Pre-Deployment Checklist
 
 - [ ] Email credentials configured in `.env.production`
 - [ ] Sender email verified with email provider
@@ -422,7 +422,7 @@ html: `
 
 ---
 
-## 📚 Useful Links
+## Useful Links
 
 - [Nodemailer Documentation](https://nodemailer.com/)
 - [SendGrid SMTP Setup](https://sendgrid.com/docs/for-developers/sending-email/smtp/)
@@ -431,7 +431,7 @@ html: `
 
 ---
 
-## 🆘 Support
+## Support
 
 For email configuration issues:
 1. Check console for error messages

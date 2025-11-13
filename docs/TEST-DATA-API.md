@@ -1,24 +1,24 @@
-# 🧪 **Test Data Management API**
+# **Test Data Management API**
 
-> **⚠️ DEVELOPMENT/TESTING ONLY**: These endpoints are automatically disabled in production environments for security.
+> ** DEVELOPMENT/TESTING ONLY**: These endpoints are automatically disabled in production environments for security.
 
 The Test Data Management API provides powerful endpoints for populating, managing, and resetting test data in development and testing environments. All endpoints require authentication and admin privileges.
 
-## 🔒 **Security & Access Control**
+## **Security & Access Control**
 
 - **Environment Restriction**: Automatically disabled when `NODE_ENV=production`
 - **Authentication**: All endpoints require valid JWT token
-- **Role-based Access**: 
+- **Role-based Access**:
   - **Admin/SuperAdmin**: Can populate, clean, and check status
   - **SuperAdmin only**: Can perform database resets (most destructive)
 - **Confirmation Required**: Destructive operations require explicit confirmation flags
 
 ---
 
-## 📊 **Get Test Data Status**
+## **Get Test Data Status**
 
-**Endpoint:** `GET /bitetrack/test-data/status`  
-**Access:** Admin/SuperAdmin  
+**Endpoint:** `GET /bitetrack/test-data/status`
+**Access:** Admin/SuperAdmin
 **Description:** Get comprehensive statistics about current test data in the database.
 
 ### Request Headers:
@@ -65,10 +65,10 @@ Authorization: Bearer <jwt_token>
 
 ---
 
-## 🚀 **Populate Test Data**
+## **Populate Test Data**
 
-**Endpoint:** `POST /bitetrack/test-data/populate`  
-**Access:** Admin/SuperAdmin  
+**Endpoint:** `POST /bitetrack/test-data/populate`
+**Access:** Admin/SuperAdmin
 **Description:** Populate the database with realistic test data from JSON templates.
 
 ### Request Headers:
@@ -141,10 +141,10 @@ curl -X POST http://localhost:3000/bitetrack/test-data/populate \
 
 ---
 
-## 🗑️ **Clean Test Data**
+## **Clean Test Data**
 
-**Endpoint:** `DELETE /bitetrack/test-data/clean`  
-**Access:** Admin/SuperAdmin  
+**Endpoint:** `DELETE /bitetrack/test-data/clean`
+**Access:** Admin/SuperAdmin
 **Description:** Selectively remove test data from the database with preservation options.
 
 ### Request Headers:
@@ -201,10 +201,10 @@ curl -X DELETE http://localhost:3000/bitetrack/test-data/clean \
 
 ---
 
-## 🔄 **Reset to Test Scenario**
+## **Reset to Test Scenario**
 
-**Endpoint:** `POST /bitetrack/test-data/reset`  
-**Access:** SuperAdmin only  
+**Endpoint:** `POST /bitetrack/test-data/reset`
+**Access:** SuperAdmin only
 **Description:** Reset the entire database to a specific test scenario (most destructive operation).
 
 ### Request Headers:
@@ -264,7 +264,7 @@ curl -X POST http://localhost:3000/bitetrack/test-data/reset \
 
 ---
 
-## 🛠️ **Integration Examples**
+## **Integration Examples**
 
 ### Frontend Dashboard Integration
 ```javascript
@@ -282,7 +282,7 @@ const resetEnvironment = async (scenario = 'dev') => {
         confirmReset: true
       })
     });
-    
+
     const result = await response.json();
     console.log(`Environment reset: ${result.summary.counts.customers} customers, ${result.summary.counts.products} products created`);
   } catch (error) {
@@ -321,7 +321,7 @@ afterAll(async () => {
 #!/bin/bash
 # CI pipeline script example
 
-echo "🧪 Setting up test environment..."
+echo " Setting up test environment..."
 
 # Get auth token
 TOKEN=$(curl -X POST http://localhost:3000/bitetrack/auth/login \
@@ -336,7 +336,7 @@ curl -X POST http://localhost:3000/bitetrack/test-data/populate \
   -d '{"preset":"minimal","cleanBefore":true}' \
   --fail
 
-echo "✅ Test environment ready"
+echo " Test environment ready"
 
 # Run your tests here...
 
@@ -347,12 +347,12 @@ curl -X DELETE http://localhost:3000/bitetrack/test-data/clean \
   -d '{"confirmClean":true}' \
   --fail
 
-echo "🧹 Test environment cleaned"
+echo " Test environment cleaned"
 ```
 
 ---
 
-## ⚠️ **Error Responses**
+## **Error Responses**
 
 ### Production Environment (403 Forbidden):
 ```json
@@ -393,7 +393,7 @@ echo "🧹 Test environment cleaned"
 
 ---
 
-## 🎯 **Best Practices**
+## **Best Practices**
 
 ### Development Workflow:
 1. **Check Status First**: Always check current state with `GET /status`
@@ -414,13 +414,13 @@ echo "🧹 Test environment cleaned"
 
 ---
 
-## 🚀 **Benefits of API-Based Test Data Management**
+## **Benefits of API-Based Test Data Management**
 
-✅ **Remote Management** - Trigger from CI/CD, frontend dashboards, or external tools  
-✅ **Consistent Authentication** - Uses same JWT security model as rest of API  
-✅ **Granular Control** - Choose exactly what data to populate or preserve  
-✅ **Audit Trail** - All operations logged with user attribution  
-✅ **Safety Features** - Multiple confirmation requirements and environment checks  
-✅ **Integration Ready** - Perfect for automated testing and development workflows  
+ **Remote Management** - Trigger from CI/CD, frontend dashboards, or external tools
+ **Consistent Authentication** - Uses same JWT security model as rest of API
+ **Granular Control** - Choose exactly what data to populate or preserve
+ **Audit Trail** - All operations logged with user attribution
+ **Safety Features** - Multiple confirmation requirements and environment checks
+ **Integration Ready** - Perfect for automated testing and development workflows
 
-These endpoints transform test data management from manual script execution to a professional, integrated part of your development workflow! 🎉
+These endpoints transform test data management from manual script execution to a professional, integrated part of your development workflow!

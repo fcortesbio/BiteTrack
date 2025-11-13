@@ -1,10 +1,10 @@
 # CSV Sales Import Feature Specification
 
-## 📋 Overview
+## Overview
 
 This document outlines the implementation plan for extending BiteTrack's Sales model to support bulk import of sales data via CSV files. This feature enables integration with external data collection systems (e.g., Google Forms) while maintaining complete backwards compatibility with existing functionality.
 
-## 🎯 Business Requirements
+## Business Requirements
 
 ### **Primary Goal**
 Enable self-service sales data aggregation by importing historical sales records from CSV files, supporting businesses that collect sales data through external forms or manual processes.
@@ -15,18 +15,18 @@ Enable self-service sales data aggregation by importing historical sales records
 - **Audit Trail**: Maintain proof of sales with receipt links
 - **Batch Processing**: Handle large volumes of sales data efficiently
 
-## 🏗️ Technical Architecture
+## Technical Architecture
 
 ### **Core Principle: Backwards Compatibility**
 The existing Sales model is mission-critical with extensive dependencies across:
 - Transaction processing (`saleController.js`)
-- Business intelligence (`reportingController.js`) 
+- Business intelligence (`reportingController.js`)
 - Customer analytics (`customerController.js`)
 - Inventory management systems
 
 **All existing functionality must remain unaffected.**
 
-## 📊 Sales Model Extensions
+## Sales Model Extensions
 
 ### **New Optional Fields**
 The following fields will be added to `models/Sale.js`. All fields are optional to ensure backwards compatibility:
@@ -57,16 +57,16 @@ The following fields will be added to `models/Sale.js`. All fields are optional 
 // AFTER (with new optional fields)
 {
   // ... all existing fields unchanged ...
-  originalCreatedAt: Date,    // NEW: Historical timestamp
-  importedAt: Date,           // NEW: Import audit trail
-  externalSale: Boolean,      // NEW: Import flag
-  receiptUrl: String,         // NEW: Proof link
-  importBatch: String,        // NEW: Batch tracking
-  paymentMethod: String       // NEW: Payment method
+  originalCreatedAt: Date, // NEW: Historical timestamp
+  importedAt: Date, // NEW: Import audit trail
+  externalSale: Boolean, // NEW: Import flag
+  receiptUrl: String, // NEW: Proof link
+  importBatch: String, // NEW: Batch tracking
+  paymentMethod: String // NEW: Payment method
 }
 ```
 
-## 🚀 New Feature Implementation
+## New Feature Implementation
 
 ### **Endpoint Definition**
 ```
@@ -96,7 +96,7 @@ Bob Johnson,5559876543,Burger Combo,1,12.99,Transfer,10/4/2024 15:00:30,https://
 - `timestamp`: Sale timestamp (MM/DD/YYYY HH:mm:ss format)
 - `receiptUrl`: Link to proof of sale (optional)
 
-## 🔄 Import Processing Flow
+## Import Processing Flow
 
 ### **Phase 1: Interception and Parsing**
 1. **Authentication**: Extract `sellerId` from JWT token
@@ -113,7 +113,7 @@ For each CSV row, perform sequential validation:
 const customer = await Customer.findOne({
   $or: [
     { email: contact.toLowerCase() }, // If contact looks like email
-    { phoneNumber: contact }          // If contact is 10-digit phone
+    { phoneNumber: contact } // If contact is 10-digit phone
   ]
 });
 
@@ -169,27 +169,27 @@ Transform valid CSV rows into Sale documents:
 ```javascript
 const saleData = {
   customerId: customer._id,
-  sellerId: req.user._id,           // Importing user
+  sellerId: req.user._id, // Importing user
   products: [{
     productId: product._id,
     quantity: parseInt(quantity),
-    priceAtSale: product.price      // Current price at import time
+    priceAtSale: product.price // Current price at import time
   }],
   totalAmount: product.price * quantity,
   amountPaid: parseFloat(amountPaid),
   settled: amountPaid >= (product.price * quantity),
-  
+
   // New fields for CSV import
-  originalCreatedAt: parsedTimestamp,    // Historical timestamp
-  importedAt: new Date(),                // Import timestamp
-  externalSale: true,                    // External sale flag
-  receiptUrl: receiptUrl || null,        // Proof link
-  importBatch: batchId,                  // Batch identifier
-  paymentMethod: paymentMethod || null   // Payment method
+  originalCreatedAt: parsedTimestamp, // Historical timestamp
+  importedAt: new Date(), // Import timestamp
+  externalSale: true, // External sale flag
+  receiptUrl: receiptUrl || null, // Proof link
+  importBatch: batchId, // Batch identifier
+  paymentMethod: paymentMethod || null // Payment method
 };
 ```
 
-## ❌ Skip Reasons and Error Handling
+## Skip Reasons and Error Handling
 
 ### **Comprehensive Skip Matrix**
 | Skip Reason | Description | Action |
@@ -229,7 +229,7 @@ const saleData = {
 }
 ```
 
-## 📊 Reporting System Updates
+## Reporting System Updates
 
 ### **Critical Query Migration**
 All time-series reporting must use `originalCreatedAt` instead of `createdAt`:
@@ -243,8 +243,8 @@ All time-series reporting must use `originalCreatedAt` instead of `createdAt`:
 // BEFORE
 { $match: { createdAt: { $gte: startDate, $lte: endDate } }}
 
-// AFTER  
-{ $match: { 
+// AFTER
+{ $match: {
   $expr: {
     $and: [
       { $gte: [{ $ifNull: ['$originalCreatedAt', '$createdAt'] }, startDate] },
@@ -256,14 +256,14 @@ All time-series reporting must use `originalCreatedAt` instead of `createdAt`:
 
 This ensures compatibility with both existing sales (using `createdAt`) and imported sales (using `originalCreatedAt`).
 
-## ⚠️ Business Logic Decisions
+## Business Logic Decisions
 
 ### **Inventory Impact**
 **Decision**: External sales DO affect inventory (same as regular sales)
 - Inventory decrements normally during import
 - Ensures accurate stock levels regardless of sale origin
 
-### **Customer Transaction Updates**  
+### **Customer Transaction Updates**
 **Decision**: External sales update `customer.lastTransaction`
 - Maintains accurate customer analytics
 - Preserves customer engagement tracking
@@ -276,11 +276,11 @@ This ensures compatibility with both existing sales (using `createdAt`) and impo
 
 ### **Product Matching Strategy**
 **Decision**: Case-insensitive exact matching
-- "Club Sandwich" matches "club sandwich" 
+- "Club Sandwich" matches "club sandwich"
 - No fuzzy matching initially (can be added later)
 - Clear matching rules reduce ambiguity
 
-## 🎯 Expected Outcomes
+## Expected Outcomes
 
 ### **Primary Benefits**
 1. **Seamless Data Migration**: Import historical sales data maintaining chronological accuracy
@@ -289,11 +289,11 @@ This ensures compatibility with both existing sales (using `createdAt`) and impo
 4. **Backwards Compatibility**: Zero impact on existing functionality
 
 ### **Success Metrics**
-- ✅ All existing APIs continue to work unchanged
-- ✅ Time-series reporting accurately reflects historical dates
-- ✅ Large CSV files (1000+ rows) process efficiently
-- ✅ Duplicate imports result in zero additional records
-- ✅ Inventory levels remain accurate after import
+- All existing APIs continue to work unchanged
+- Time-series reporting accurately reflects historical dates
+- Large CSV files (1000+ rows) process efficiently
+- Duplicate imports result in zero additional records
+- Inventory levels remain accurate after import
 
 ### **Data Integrity Guarantees**
 - **Transactional Safety**: Each import is atomic (all valid sales or none)
@@ -301,7 +301,7 @@ This ensures compatibility with both existing sales (using `createdAt`) and impo
 - **Timeline Accuracy**: Historical dates preserved for accurate reporting
 - **Audit Trail**: Complete tracking of import operations and sources
 
-## 🔧 Implementation Phases
+## Implementation Phases
 
 ### **Phase 1: Model and Infrastructure**
 - Extend Sales model with new optional fields
@@ -323,7 +323,7 @@ This ensures compatibility with both existing sales (using `createdAt`) and impo
 - User guide for CSV format requirements
 - Production deployment and monitoring
 
-## 🚀 Technical Benefits
+## Technical Benefits
 
 ### **Performance Optimizations**
 - **Chunked Processing**: Handle large files without memory issues

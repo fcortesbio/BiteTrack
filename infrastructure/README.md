@@ -1,36 +1,36 @@
-# 🏗️ BiteTrack Infrastructure
+# BiteTrack Infrastructure
 
 Complete Docker Compose orchestration with Traefik reverse proxy for all BiteTrack services.
 
-## 🎯 Architecture Overview
+## Architecture Overview
 
 ```
                                  Internet
                                      ↓
                               Port 80 (HTTP)
                                      ↓
-                            ┌────────────────┐
-                            │    Traefik     │ ← Port 8080 (Dashboard)
-                            │  Reverse Proxy │
-                            └────────────────┘
-                                     │
-                    ┌────────────────┼────────────────┐
-                    ↓                ↓                ↓
-            ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
-            │   Frontend   │ │  BiteTrack   │ │     MCP      │
-            │   (React)    │ │     API      │ │  AI Server   │
-            │   Nginx:80   │ │  Express:3000│ │  Express:3001│
-            └──────────────┘ └──────────────┘ └──────────────┘
-                                     │                │
-                                     └────────┬───────┘
+
+                                Traefik ← Port 8080 (Dashboard)
+                              Reverse Proxy
+
+
+
+                    ↓ ↓ ↓
+
+               Frontend BiteTrack MCP
+               (React) API AI Server
+               Nginx:80 Express:3000 Express:3001
+
+
+
                                               ↓
-                                     ┌────────────────┐
-                                     │    MongoDB     │
-                                     │  Replica Set   │
-                                     └────────────────┘
+
+                                         MongoDB
+                                       Replica Set
+
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### One-Command Setup
 ```bash
@@ -61,7 +61,7 @@ docker compose up -d
 docker compose exec mongodb mongosh --eval "rs.initiate()"
 ```
 
-## 📍 Service Access
+## Service Access
 
 | Service | URL | Description |
 |---------|-----|-------------|
@@ -71,7 +71,7 @@ docker compose exec mongodb mongosh --eval "rs.initiate()"
 | **MCP** | http://localhost/mcp | AI chat server |
 | **Traefik** | http://localhost:8080 | Reverse proxy dashboard |
 
-## 🔧 Common Commands
+## Common Commands
 
 ### Service Management
 ```bash
@@ -129,7 +129,7 @@ docker compose exec mongodb mongosh --eval "rs.status()"
 docker compose exec mongodb mongosh --eval "show dbs"
 ```
 
-## 🌐 Routing Configuration
+## Routing Configuration
 
 Traefik automatically routes traffic based on path prefixes:
 
@@ -145,7 +145,7 @@ Traefik automatically routes traffic based on path prefixes:
 2. `/api/*`, `/bitetrack/*` → API
 3. `/*` → Frontend (lowest priority, catch-all)
 
-## 🔐 Security
+## Security
 
 ### Network Isolation
 - **`web` network**: Public-facing (Traefik, Frontend, API, MCP)
@@ -161,11 +161,11 @@ All sensitive values should be in `.env` (never commit this file):
 
 Generate secure values:
 ```bash
-openssl rand -base64 32  # For JWT_SECRET
-openssl rand -base64 24  # For passwords
+openssl rand -base64 32 # For JWT_SECRET
+openssl rand -base64 24 # For passwords
 ```
 
-## 📦 Service Configuration
+## Service Configuration
 
 ### Frontend (React + Nginx)
 - **Build**: Multi-stage (Node.js build → Nginx serve)
@@ -192,7 +192,7 @@ openssl rand -base64 24  # For passwords
 - **Volumes**: Persistent data in `mongodb_data`
 - **Network**: `backend` only (not exposed externally)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Services won't start
 ```bash
@@ -238,7 +238,7 @@ docker system prune -a
 docker compose build --no-cache
 ```
 
-## 📊 Monitoring
+## Monitoring
 
 ### Traefik Dashboard
 Access at http://localhost:8080 to view:
@@ -268,7 +268,7 @@ docker compose logs --tail=100
 docker compose logs --since 1h
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 
 ### Enable HTTPS
 1. Uncomment SSL sections in `traefik/traefik.yml`
@@ -301,7 +301,7 @@ docker compose exec mongodb mongodump --out /data/backup
 docker cp bitetrack-mongodb:/data/backup ./mongodb-backup
 ```
 
-## 📚 Related Documentation
+## Related Documentation
 
 - [API README](../services/api/README.md)
 - [Frontend README](../services/frontend/README.md)
@@ -309,7 +309,7 @@ docker cp bitetrack-mongodb:/data/backup ./mongodb-backup
 - [Traefik Docs](https://doc.traefik.io/traefik/)
 - [Docker Compose Docs](https://docs.docker.com/compose/)
 
-## 🤝 Contributing
+## Contributing
 
 When adding new services:
 1. Create service directory in `services/`

@@ -1,58 +1,58 @@
-# 🍔 **BiteTrack**
+# **BiteTrack**
 
-> **The Complete Food Service Management Platform**  
-> **Enterprise Backend ✅ | UI-Ready Architecture 🚀 | Real Business Value 💼**
+> **The Complete Food Service Management Platform**
+> **Enterprise Backend | UI-Ready Architecture | Real Business Value **
 
 BiteTrack is a **production-ready business intelligence platform** that transforms small food businesses from spreadsheet chaos to professional operations. Featuring a **comprehensive REST API backend** with advanced analytics, compliance tracking, and multi-role management—**ready for frontend development** to create the complete business solution.
 
 ---
 
-## 🏆 **Current Status: Enterprise Backend Complete - UI Development Ready**
+## **Current Status: Enterprise Backend Complete - UI Development Ready**
 
-> 🚀 **Strategic Position**: The backend platform is **90% UI-ready** with 38 professional endpoints, advanced analytics, compliance features, and multi-role security. **Frontend development is the next strategic phase.**
+> **Strategic Position**: The backend platform is **90% UI-ready** with 38 professional endpoints, advanced analytics, compliance features, and multi-role security. **Frontend development is the next strategic phase.**
 
-🗺️ **[View Complete UI Development Roadmap](ROADMAP.md)** | 📊 **[Explore All 38 API Endpoints](docs/API-documentation.md)**
+ **[View Complete UI Development Roadmap](ROADMAP.md)** | **[Explore All 38 API Endpoints](docs/API-documentation.md)**
 
 ---
 
-**📚 Quick Navigation:**  
-[🚀 Quick Start](#-quick-start-5-minutes) • [🎯 Why BiteTrack](#-why-bitetrack) • [🔑 First-Time Setup](#-first-time-setup-critical) • [📊 API Overview](#-api-overview) • [🏗️ Production Setup](#-production-setup) • [📄 Full Documentation](#-full-api-documentation-docsapi-documentationmd--postman-collection-docspostman-collectionjson)
+** Quick Navigation:**
+[ Quick Start](#-quick-start-5-minutes) • [ Why BiteTrack](#-why-bitetrack) • [ First-Time Setup](#-first-time-setup-critical) • [ API Overview](#-api-overview) • [ Production Setup](#-production-setup) • [ Full Documentation](#-full-api-documentation-docsapi-documentationmd--postman-collection-docspostman-collectionjson)
 
-## 🎯 **Why BiteTrack?**
+## **Why BiteTrack?**
 
 <table>
 <tr>
 <td width="50%">
 
-### 😟 **The Problem**
+### **The Problem**
 
 Small food businesses struggle with:
 
-- 📊 Messy spreadsheets that break and get lost
-- 🤔 No real-time inventory tracking
-- 📱 Manual sales recording prone to errors
-- 👥 Unstructured customer data
-- 🔒 No secure multi-user access control
+- Messy spreadsheets that break and get lost
+- No real-time inventory tracking
+- Manual sales recording prone to errors
+- Unstructured customer data
+- No secure multi-user access control
 
 </td>
 <td width="50%">
 
-### ✨ **The BiteTrack Solution**
+### **The BiteTrack Solution**
 
-- 📊 **Advanced Business Intelligence** - Time-series analytics, customer behavior insights
-- 🚀 **38 Professional API Endpoints** - Complete business operations coverage
-- 🔐 **Multi-Role Security** - User/Admin/SuperAdmin with JWT authentication
-- 💰 **Financial Management** - Sales tracking, settlement monitoring, payment analytics
-- 🗑️ **Regulatory Compliance** - Food waste tracking with audit trails
-- 📤 **Multi-Format Exports** - Professional CSV reports for accounting integration
-- 🏢 **Enterprise Architecture** - Production-ready with Docker orchestration
-- ✅ **UI-Ready Backend** - **90% prepared for frontend development**
+- **Advanced Business Intelligence** - Time-series analytics, customer behavior insights
+- **38 Professional API Endpoints** - Complete business operations coverage
+- **Multi-Role Security** - User/Admin/SuperAdmin with JWT authentication
+- **Financial Management** - Sales tracking, settlement monitoring, payment analytics
+- **Regulatory Compliance** - Food waste tracking with audit trails
+- **Multi-Format Exports** - Professional CSV reports for accounting integration
+- **Enterprise Architecture** - Production-ready with Docker orchestration
+- **UI-Ready Backend** - **90% prepared for frontend development**
 
 </td>
 </tr>
 </table>
 
-## 🚀 **Quick Start (5 Minutes)**
+## **Quick Start (5 Minutes)**
 
 **Get BiteTrack running in under 5 minutes:**
 
@@ -72,14 +72,14 @@ docker compose up -d
 curl http://localhost:3000/bitetrack/health
 ```
 
-**✨ That's it!** The API is now running at `http://localhost:3000`
+** That's it!** The API is now running at `http://localhost:3000`
 
-> **⚠️ Next:** Create a SuperAdmin user before using the API (see [First-Time Setup](#-first-time-setup-critical) below)
+> ** Next:** Create a SuperAdmin user before using the API (see [First-Time Setup](#-first-time-setup-critical) below)
 
-### 📋 **Advanced Setup Options**
+### **Advanced Setup Options**
 
 <details>
-<summary><strong>🤖 Automated Production Setup</strong></summary>
+<summary><strong> Automated Production Setup</strong></summary>
 
 ```bash
 # One-command production setup wizard
@@ -91,36 +91,36 @@ Interactive script that handles complete production deployment with guided confi
 </details>
 
 <details>
-<summary><strong>🔧 Manual Step-by-Step Setup</strong></summary>
+<summary><strong> Manual Step-by-Step Setup</strong></summary>
 
 For development or when you need full control:
 
 ```bash
 # Environment & Database
-./scripts/01-setup-keyfile.sh          # MongoDB keyfile
+./scripts/01-setup-keyfile.sh # MongoDB keyfile
 ./scripts/02-quick-persistence-test.sh # Health check
 
-# User Management & Data  
-./scripts/03-create-superadmin.sh       # Admin user (REQUIRED)
-./scripts/04-populate-test-data.js      # Sample data
+# User Management & Data
+./scripts/03-create-superadmin.sh # Admin user (REQUIRED)
+./scripts/04-populate-test-data.js # Sample data
 
 # Testing & Validation
-./scripts/05-test-data-persistence.sh   # Data persistence test
-./scripts/06-test-sales-filtering.js    # API validation
+./scripts/05-test-data-persistence.sh # Data persistence test
+./scripts/06-test-sales-filtering.js # API validation
 ```
 
 </details>
 
-## ⚙️ **Environment Configuration**
+## **Environment Configuration**
 
 BiteTrack uses different environment files for different deployment scenarios:
 
 | File | Purpose | Tracked in Git |
 |------|---------|----------------|
-| `.env.development.example` | 📝 Development template | ✅ Yes (safe defaults) |
-| `.env.development` | 👨‍💻 Local development config | ❌ No (contains secrets) |
-| `.env.production.template` | 🏗️ Production deployment guide | ✅ Yes (template only) |
-| `.env.production` | 🚀 Production config | ❌ No (contains secrets) |
+| `.env.development.example` | Development template | Yes (safe defaults) |
+| `.env.development` | Local development config | No (contains secrets) |
+| `.env.production.template` | Production deployment guide | Yes (template only) |
+| `.env.production` | Production config | No (contains secrets) |
 
 ### **Environment Setup**
 
@@ -136,41 +136,41 @@ cp .env.production.template .env.production
 
 ### **NPM Scripts**
 
-#### **🚀 Development & Production**
+#### ** Development & Production**
 ```bash
-npm run dev              # Development mode with auto-reload (.env.development)
-npm run dev:watch        # Same as dev (nodemon with file watching)
-npm run dev:manual       # Development mode without auto-reload
-npm run start            # Production mode (uses .env or environment variables)
+npm run dev # Development mode with auto-reload (.env.development)
+npm run dev:watch # Same as dev (nodemon with file watching)
+npm run dev:manual # Development mode without auto-reload
+npm run start # Production mode (uses .env or environment variables)
 npm run start:production # Explicit production mode with NODE_ENV=production
 ```
 
-#### **🧪 Testing & Quality Assurance**
+#### ** Testing & Quality Assurance**
 ```bash
-npm test                 # Run all tests (Jest with MongoDB Memory Server)
-npm run test:watch       # Run tests in watch mode (for active development)
-npm run test:coverage    # Generate test coverage reports
-npm run test:verbose     # Run tests with detailed output
+npm test # Run all tests (Jest with MongoDB Memory Server)
+npm run test:watch # Run tests in watch mode (for active development)
+npm run test:coverage # Generate test coverage reports
+npm run test:verbose # Run tests with detailed output
 ```
 
-#### **🔍 Code Quality & Linting**
+#### ** Code Quality & Linting**
 ```bash
-npm run lint             # Run ESLint to check code quality
-npm run lint:fix         # Run ESLint and automatically fix issues
-npm run lint:check       # Run ESLint with zero warnings policy (CI-ready)
+npm run lint # Run ESLint to check code quality
+npm run lint:fix # Run ESLint and automatically fix issues
+npm run lint:check # Run ESLint with zero warnings policy (CI-ready)
 ```
 
-#### **📝 Documentation & API Tools**
+#### ** Documentation & API Tools**
 ```bash
 # Current API documentation access
-curl http://localhost:3000/bitetrack/           # API overview endpoint
+curl http://localhost:3000/bitetrack/ # API overview endpoint
 # Future scripts (suggestions for UI development phase):
-# npm run docs:generate    # Generate API docs from OpenAPI spec
-# npm run docs:serve       # Serve interactive Swagger UI locally
+# npm run docs:generate # Generate API docs from OpenAPI spec
+# npm run docs:serve # Serve interactive Swagger UI locally
 ```
 
 <details>
-<summary><strong>💡 Recommended Script Additions for UI Development</strong></summary>
+<summary><strong> Recommended Script Additions for UI Development</strong></summary>
 
 **Suggested additions to package.json for enhanced development workflow:**
 
@@ -202,9 +202,9 @@ curl http://localhost:3000/bitetrack/           # API overview endpoint
 
 </details>
 
-> 🔒 **Security Note:** Environment files with actual credentials (`.env.development`, `.env.production`) are automatically excluded from Git. Only templates and examples are tracked.
+> **Security Note:** Environment files with actual credentials (`.env.development`, `.env.production`) are automatically excluded from Git. Only templates and examples are tracked.
 
-## 🛠️ **Development Workflow**
+## **Development Workflow**
 
 ### **Container Deployment (Recommended)**
 
@@ -231,18 +231,18 @@ docker compose up mongodb -d
 
 # Run BiteTrack locally for development
 npm install
-npm run dev          # Uses .env.development
-npm run dev:watch    # Same as above but with nodemon
+npm run dev # Uses .env.development
+npm run dev:watch # Same as above but with nodemon
 
 # The containerized MongoDB is accessible at localhost:27017
 # Perfect for development - get MongoDB benefits without local install!
 ```
 
-## 🔑 **First-Time Setup** (CRITICAL)
+## **First-Time Setup** (CRITICAL)
 
-**⚠️ All API routes require authentication - create a SuperAdmin account first!**
+** All API routes require authentication - create a SuperAdmin account first!**
 
-### 🚀 **Streamlined Setup (Recommended)**
+### **Streamlined Setup (Recommended)**
 
 ```bash
 # One-step superadmin creation (interactive prompts)
@@ -254,10 +254,10 @@ ADMIN_EMAIL="admin@yourcompany.com" ADMIN_DOB="1990-01-01" \
 ADMIN_PASSWORD="SecurePass123!" \
 ./scripts/03-create-superadmin.sh --non-interactive
 
-# 🎉 Done! User created and ready to login
+# Done! User created and ready to login
 ```
 
-### 🧪 **Test Your Setup**
+### **Test Your Setup**
 
 ```bash
 # Login to get authentication token
@@ -271,7 +271,7 @@ curl -X GET http://localhost:3000/bitetrack/sellers \
 ```
 
 <details>
-<summary><strong>📜 Legacy Setup Method (Manual)</strong></summary>
+<summary><strong> Legacy Setup Method (Manual)</strong></summary>
 
 **If you prefer the original two-step process:**
 
@@ -286,65 +286,65 @@ mongosh mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 
 </details>
 
-> 💡 **Pro tip:** The API includes a public route to check if an email exists: `GET /auth/seller-status?email=test@example.com` - perfect for client-side login flows!
+> **Pro tip:** The API includes a public route to check if an email exists: `GET /auth/seller-status?email=test@example.com` - perfect for client-side login flows!
 
-## 🧪 **Testing Infrastructure**
+## **Testing Infrastructure**
 
 **Production-ready testing suite with Jest + Supertest + MongoDB Memory Server**
 
-### ⚡ **Quick Testing**
+### **Quick Testing**
 
 ```bash
 # Run all tests (20/20 passing)
 npm test
 
 # Development testing workflows
-npm run test:watch      # Watch mode for active development
-npm run test:coverage   # Coverage analysis (26% → 95% roadmap)
-npm run test:verbose    # Detailed test output
+npm run test:watch # Watch mode for active development
+npm run test:coverage # Coverage analysis (26% → 95% roadmap)
+npm run test:verbose # Detailed test output
 
 # Run specific test suites
-npm test -- auth-real   # Authentication tests (16/16 ✅)
-npm test -- products    # Product tests (placeholder - ready for implementation)
-npm test -- sales       # Sales tests (placeholder - ready for implementation)
+npm test -- auth-real # Authentication tests (16/16 )
+npm test -- products # Product tests (placeholder - ready for implementation)
+npm test -- sales # Sales tests (placeholder - ready for implementation)
 ```
 
-### 📊 **Current Test Status**
+### **Current Test Status**
 
-- **✅ Authentication Routes**: 16/16 tests passing (100% complete)
+- ** Authentication Routes**: 16/16 tests passing (100% complete)
   - Login, activation, password reset, seller status
   - JWT token validation, password hashing, role management
   - Security edge cases and error handling
-- **⚠️ API Endpoints**: 0% coverage (authentication foundation complete)
+- ** API Endpoints**: 0% coverage (authentication foundation complete)
   - Products, Sales, Customers, Inventory, Reporting (ready for implementation)
   - Comprehensive test roadmap with 8-phase expansion plan
 
-### 🎯 **Testing Roadmap**
+### **Testing Roadmap**
 
-**Phase 1 (Weeks 1-2):** Product + Sales Testing → 60% coverage  
-**Phase 2 (Weeks 3-4):** Customer + Seller Management → 80% coverage  
-**Phase 3 (Weeks 5-6):** Inventory + Reporting → 90% coverage  
+**Phase 1 (Weeks 1-2):** Product + Sales Testing → 60% coverage
+**Phase 2 (Weeks 3-4):** Customer + Seller Management → 80% coverage
+**Phase 3 (Weeks 5-6):** Inventory + Reporting → 90% coverage
 **Phase 4 (Weeks 7-8):** Security + Performance → 95% coverage
 
-### 📚 **Testing Documentation**
+### **Testing Documentation**
 
-- **📋 Complete Status & Roadmap**: [`docs/TESTING-STATUS.md`](docs/TESTING-STATUS.md)
-- **🔧 Test Infrastructure Guide**: [`tests/README.md`](tests/README.md)
-- **💻 Test Implementation Examples**: [`tests/integration/auth-real.test.js`](tests/integration/auth-real.test.js)
+- ** Complete Status & Roadmap**: [`docs/TESTING-STATUS.md`](docs/TESTING-STATUS.md)
+- ** Test Infrastructure Guide**: [`tests/README.md`](tests/README.md)
+- ** Test Implementation Examples**: [`tests/integration/auth-real.test.js`](tests/integration/auth-real.test.js)
 
-**🚀 Ready for systematic API testing expansion with production-grade infrastructure!**
+** Ready for systematic API testing expansion with production-grade infrastructure!**
 
-## 💼 **Perfect For**
+## **Perfect For**
 
-- 🥪 **Sandwich shops** - Track inventory, customers, and daily sales
-- ☕ **Coffee shops** - Manage products and customer loyalty
-- 🍕 **Small restaurants** - Multi-user staff access with role controls
-- 🚚 **Food trucks** - Mobile-friendly API for on-the-go management
-- 📦 **Any food business** ready to scale beyond spreadsheets
+- **Sandwich shops** - Track inventory, customers, and daily sales
+- **Coffee shops** - Manage products and customer loyalty
+- **Small restaurants** - Multi-user staff access with role controls
+- **Food trucks** - Mobile-friendly API for on-the-go management
+- **Any food business** ready to scale beyond spreadsheets
 
-## ⚡ **Core Features**
+## **Core Features**
 
-### 🛡️ **Security & Access Control**
+### **Security & Access Control**
 
 - **JWT Authentication** - Industry-standard token-based auth
 - **Role-based permissions** - User, Admin, and SuperAdmin roles
@@ -352,7 +352,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **Password recovery system** - Admin-controlled reset process
 - **Rate limiting & input validation** - Protection against abuse
 
-### 💰 **Sales & Inventory Management**
+### **Sales & Inventory Management**
 
 - **Atomic transactions** - Sales and inventory update together or not at all
 - **Real-time stock tracking** - Never oversell products
@@ -363,7 +363,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **CSV import capabilities** - Bulk import for sales and customer data
 - **Customer transaction history** - Detailed purchase tracking per customer
 
-### 📊 **Business Intelligence & Reporting**
+### **Business Intelligence & Reporting**
 
 - **Comprehensive sales analytics** - Revenue, trends, top products, customer insights
 - **Time-series data analysis** - Hourly, daily, weekly, monthly, yearly aggregations
@@ -371,7 +371,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **Payment settlement tracking** - Monitor outstanding balances and cash flow
 - **Customer behavior analysis** - Purchase patterns and loyalty metrics
 
-### 🗑️ **Food Waste Management & Compliance**
+### **Food Waste Management & Compliance**
 
 - **Inventory drop tracking** - Record expired, damaged, or end-of-day waste
 - **Cost analysis** - Calculate monetary impact of food waste
@@ -380,14 +380,14 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **Waste analytics** - Identify patterns and optimize inventory management
 - **Audit trails** - Complete tracking of who, what, when, why for all drops
 
-### 👥 **Multi-User Business Operations**
+### **Multi-User Business Operations**
 
 - **Staff management** - Multiple sellers with different permission levels
 - **Customer database** - Track customer information and purchase history
 - **Product catalog** - Manage inventory, pricing, and descriptions
 - **Audit trails** - Know who did what and when
 
-### 🏢 **Enterprise-Ready Architecture**
+### **Enterprise-Ready Architecture**
 
 - **Docker containerization** - Consistent deployment anywhere
 - **MongoDB integration** - Scalable document database with direct admin access
@@ -396,28 +396,28 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 - **Comprehensive logging** - Monitor API usage and performance
 - **Health check endpoints** - Monitor system status
 
-## 📋 **API Overview**
+## **API Overview**
 
 **Base URL:** `http://localhost:3000/bitetrack`
 
 | Feature | Endpoints | Key Actions |
 |---------|-----------|-------------|
-| **🔐 Auth** | `/auth/*` | Login, activate accounts, password recovery |
-| **🔎 Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
-| **👤 Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
-| **🏪 Customers** | `/customers/*` | Customer database, CSV import, contact info, transaction history |
-| **📦 Products** | `/products/*` | Inventory management, pricing, and catalog |
-| **💳 Sales** | `/sales/*` | Process orders, CSV import, advanced filtering, payment tracking |
-| **📊 Reporting** | `/reporting/*` | **NEW:** Sales analytics, CSV exports, business intelligence |
-| **🗑️ Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
-| **🧪 Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
+| ** Auth** | `/auth/*` | Login, activate accounts, password recovery |
+| ** Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
+| ** Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
+| ** Customers** | `/customers/*` | Customer database, CSV import, contact info, transaction history |
+| ** Products** | `/products/*` | Inventory management, pricing, and catalog |
+| ** Sales** | `/sales/*` | Process orders, CSV import, advanced filtering, payment tracking |
+| ** Reporting** | `/reporting/*` | **NEW:** Sales analytics, CSV exports, business intelligence |
+| ** Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
+| ** Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
 
-> 📚 **Full API documentation:** [`docs/API-documentation.md`](docs/API-documentation.md) | **Postman Collection:** [`docs/postman-collection.json`](docs/postman-collection.json)
+> **Full API documentation:** [`docs/API-documentation.md`](docs/API-documentation.md) | **Postman Collection:** [`docs/postman-collection.json`](docs/postman-collection.json)
 
-## 📊 **Data Models & Business Logic**
+## **Data Models & Business Logic**
 
 <details>
-<summary><strong>👤 User Management (Sellers)</strong></summary>
+<summary><strong> User Management (Sellers)</strong></summary>
 
 **Three-tier access system:**
 
@@ -434,7 +434,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 </details>
 
 <details>
-<summary><strong>💰 Sales & Transaction Logic</strong></summary>
+<summary><strong> Sales & Transaction Logic</strong></summary>
 
 **Atomic transaction processing:**
 
@@ -447,7 +447,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 </details>
 
 <details>
-<summary><strong>📦 Inventory & Customer Management</strong></summary>
+<summary><strong> Inventory & Customer Management</strong></summary>
 
 **Product catalog:**
 
@@ -462,7 +462,7 @@ npm test -- sales       # Sales tests (placeholder - ready for implementation)
 
 </details>
 
-## 🔧 **Production Setup**
+## **Production Setup**
 
 ### Prerequisites
 
@@ -479,7 +479,7 @@ cp .env.production.template .env.production
 # Edit .env.production with your secure values
 ```
 
-**⚠️ For production**: Always use secure passwords and secrets in `.env.production`!
+** For production**: Always use secure passwords and secrets in `.env.production`!
 
 ### Complete Stack Deployment
 
@@ -516,7 +516,7 @@ docker compose logs -f
 server {
     listen 80;
     server_name your-api-domain.com;
-    
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
@@ -575,16 +575,16 @@ docker compose ps
 curl http://localhost:3000/bitetrack/health
 
 # MongoDB connection test
-curl localhost:27017  # Should return MongoDB HTTP message
+curl localhost:27017 # Should return MongoDB HTTP message
 
 # View real-time logs
 docker compose logs -f bitetrack-api
 docker compose logs -f mongodb
 ```
 
-### 🚀 **Production Deployment Strategies**
+### **Production Deployment Strategies**
 
-**✅ Database data is always safe!** BiteTrack uses persistent Docker volumes (`mongodb_data`) that survive container updates, ensuring zero data loss during deployments.
+** Database data is always safe!** BiteTrack uses persistent Docker volumes (`mongodb_data`) that survive container updates, ensuring zero data loss during deployments.
 
 #### **Strategy 1: Rolling Update (Recommended - Zero Downtime)**
 
@@ -599,7 +599,7 @@ curl http://your-domain/bitetrack/health
 docker compose logs -f bitetrack-api
 ```
 
-**✅ Benefits:**
+** Benefits:**
 
 - Zero downtime (database never stops)
 - Fastest deployment method
@@ -610,16 +610,16 @@ docker compose logs -f bitetrack-api
 
 ```bash
 # Full stack rebuild - data persists via volumes
-docker compose down                    # Stop containers (volumes preserved)
-git pull origin main                   # Get latest code
-docker compose up --build -d          # Rebuild and start everything
+docker compose down # Stop containers (volumes preserved)
+git pull origin main # Get latest code
+docker compose up --build -d # Rebuild and start everything
 
 # Verify deployment
 docker compose logs -f
 curl http://your-domain/bitetrack/health
 ```
 
-**✅ Benefits:**
+** Benefits:**
 
 - Complete environment refresh
 - Rebuilds both API and database containers
@@ -646,14 +646,14 @@ curl http://localhost:3001/bitetrack/health
 docker compose -f docker-compose.yml down bitetrack-api
 ```
 
-**✅ Benefits:**
+** Benefits:**
 
 - Absolute zero downtime
 - Instant rollback capability
 - Full testing before traffic switch
 - Enterprise-grade deployment pattern
 
-#### **🔒 Production Safety Checklist**
+#### ** Production Safety Checklist**
 
 **Before deploying:**
 
@@ -673,7 +673,7 @@ docker compose -f docker-compose.yml --env-file .env.staging up -d
 ```bash
 # 4. Run comprehensive health checks
 curl http://your-domain/bitetrack/health
-curl http://your-domain/bitetrack/  # API overview
+curl http://your-domain/bitetrack/ # API overview
 
 # 5. Monitor logs for errors
 docker compose logs -f bitetrack-api --tail=100
@@ -684,22 +684,22 @@ curl -X POST http://your-domain/bitetrack/auth/login \
   -d '{"email":"test@example.com","password":"password"}'
 ```
 
-#### **📊 Database Persistence Guarantee**
+#### ** Database Persistence Guarantee**
 
 **Why data is always safe:**
 
-- 🔒 **Named Docker Volumes**: `mongodb_data:/data/db` persists on host
-- 🏗️ **Container Independence**: API rebuilds don't affect database container
-- 💾 **MongoDB Durability**: All writes are persisted to disk immediately
-- 🔄 **Restart Policies**: `restart: unless-stopped` ensures automatic recovery
-- ✅ **Volume Survival**: Data survives `docker compose down`, only destroyed by `docker compose down -v`
+- **Named Docker Volumes**: `mongodb_data:/data/db` persists on host
+- **Container Independence**: API rebuilds don't affect database container
+- **MongoDB Durability**: All writes are persisted to disk immediately
+- **Restart Policies**: `restart: unless-stopped` ensures automatic recovery
+- **Volume Survival**: Data survives `docker compose down`, only destroyed by `docker compose down -v`
 
 **Data persistence verified through:**
 
-- Container restarts ✅
-- Image updates ✅
-- Host reboots ✅
-- Docker service restarts ✅
+- Container restarts
+- Image updates
+- Host reboots
+- Docker service restarts
 
 ### Scaling & Updates
 
@@ -716,24 +716,24 @@ docker compose up -d --scale bitetrack-api=3
 docker compose exec mongodb mongodump --out /data/backup
 ```
 
-## 🧪 **Development & Integration**
+## **Development & Integration**
 
 ### Project Structure
 
 ```
 BiteTrack/
-├── 🧠 models/              # Mongoose schemas
-├── 🎮 controllers/       # Business logic
-├── 🛜️ routes/            # API endpoints
-├── 🔒 middleware/        # Auth, validation, error handling
-├── 📚 docs/              # API documentation & Postman collection
-├── 🧪 scripts/           # Testing and utility scripts
-├── 🔑 create-superadmin.js # First-time setup script (IMPORTANT!)
-├── 🐳 Dockerfile         # Container definition
-├── 📦 docker-compose.yml # Complete stack orchestration
-├── ⚙️ .env.development    # Development environment configuration
-├── 📋 .env.production.template # Production deployment template
-└── 🔐 keyfile            # MongoDB replica set authentication
+  models/ # Mongoose schemas
+  controllers/ # Business logic
+  routes/ # API endpoints
+  middleware/ # Auth, validation, error handling
+  docs/ # API documentation & Postman collection
+  scripts/ # Testing and utility scripts
+  create-superadmin.js # First-time setup script (IMPORTANT!)
+  Dockerfile # Container definition
+  docker-compose.yml # Complete stack orchestration
+  .env.development # Development environment configuration
+  .env.production.template # Production deployment template
+  keyfile # MongoDB replica set authentication
 ```
 
 ### Development Mode
@@ -741,7 +741,7 @@ BiteTrack/
 ```bash
 # Local development with auto-reload
 npm install
-npm run dev  # Uses nodemon for hot reload
+npm run dev # Uses nodemon for hot reload
 ```
 
 ### Testing the API
@@ -772,33 +772,33 @@ curl http://localhost:3000/bitetrack/health
 
 **What the persistence tests verify:**
 
-- MongoDB container restart → Data survives ✅
-- API container restart → Data survives ✅  
-- Full stack restart → Data survives ✅
-- Volume integrity → MongoDB volume preserved ✅
+- MongoDB container restart → Data survives
+- API container restart → Data survives
+- Full stack restart → Data survives
+- Volume integrity → MongoDB volume preserved
 
 **Security Features:**
 
-- 🔒 **No hardcoded credentials** - Tests read MongoDB credentials from environment variables
-- 📁 **Automatic environment loading** - Loads from `.env.development` file  
-- 🛡️ **Credential override** - Can override with `MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD`
-- 🧹 **Automatic cleanup** - Test data is always cleaned up after tests
+- **No hardcoded credentials** - Tests read MongoDB credentials from environment variables
+- **Automatic environment loading** - Loads from `.env.development` file
+- **Credential override** - Can override with `MONGO_ROOT_USERNAME`/`MONGO_ROOT_PASSWORD`
+- **Automatic cleanup** - Test data is always cleaned up after tests
 
-### 🛠️ Database Management & Auditing
+### Database Management & Auditing
 
 **Enterprise-Ready Dual Management Approach**
 
 BiteTrack provides **both REST API and direct MongoDB access**, giving system administrators and database professionals complete flexibility for enterprise operations. This dual approach means you're never locked into just the API—you have full database administrative capabilities.
 
-**🎯 Why This Matters:**
+** Why This Matters:**
 
-- 🏢 **Enterprise Operations** - Direct database access for complex queries, reporting, and compliance
-- 🔧 **System Administration** - Full MongoDB toolchain support (shell, Compass, monitoring tools)
-- 📊 **Advanced Analytics** - Complex aggregations beyond API scope
-- 🔒 **Audit & Compliance** - Direct data access for regulatory requirements
-- ⚡ **Performance Optimization** - Index management and query tuning
-- 🔄 **Data Migration** - Easy import/export with standard MongoDB tools
-- 🛡️ **No Vendor Lock-in** - Standard MongoDB, works with existing enterprise infrastructure
+- **Enterprise Operations** - Direct database access for complex queries, reporting, and compliance
+- **System Administration** - Full MongoDB toolchain support (shell, Compass, monitoring tools)
+- **Advanced Analytics** - Complex aggregations beyond API scope
+- **Audit & Compliance** - Direct data access for regulatory requirements
+- **Performance Optimization** - Index management and query tuning
+- **Data Migration** - Easy import/export with standard MongoDB tools
+- **No Vendor Lock-in** - Standard MongoDB, works with existing enterprise infrastructure
 
 #### **MongoDB Shell (mongosh) Access:**
 
@@ -832,11 +832,11 @@ mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 
 **Compass provides:**
 
-- 📊 **Visual data exploration** - Browse collections with rich GUI
-- 📈 **Query performance insights** - Index usage and query optimization
-- 🔍 **Advanced querying** - Visual query builder and aggregation pipeline editor
-- 📋 **Schema analysis** - Automatic schema validation and field type analysis
-- 📊 **Real-time monitoring** - Connection stats, query performance metrics
+- **Visual data exploration** - Browse collections with rich GUI
+- **Query performance insights** - Index usage and query optimization
+- **Advanced querying** - Visual query builder and aggregation pipeline editor
+- **Schema analysis** - Automatic schema validation and field type analysis
+- **Real-time monitoring** - Connection stats, query performance metrics
 
 #### **Administrative Operations:**
 
@@ -844,14 +844,14 @@ mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 // MongoDB shell examples for system administrators
 
 // 1. Audit trail - Find recent actions by specific user
-db.sales.find({ 
+db.sales.find({
   "createdAt": { $gte: new Date("2024-01-01") },
-  "sellerId": ObjectId("USER_ID_HERE") 
+  "sellerId": ObjectId("USER_ID_HERE")
 }).sort({ "createdAt": -1 })
 
 // 2. Data integrity checks - Find orphaned references
-db.sales.find({ 
-  "customerId": { $nin: db.customers.distinct("_id") } 
+db.sales.find({
+  "customerId": { $nin: db.customers.distinct("_id") }
 })
 
 // 3. Business intelligence - Sales performance by seller
@@ -866,11 +866,11 @@ db.sales.aggregate([
 ])
 
 // 4. Data cleanup - Remove test data (be careful!)
-db.sales.deleteMany({ "totalAmount": { $lt: 1 } })  // Remove penny transactions
+db.sales.deleteMany({ "totalAmount": { $lt: 1 } }) // Remove penny transactions
 
 // 5. Index management
-db.sales.createIndex({ "createdAt": -1, "sellerId": 1 })  // Optimize queries
-db.sales.getIndexes()  // View all indexes
+db.sales.createIndex({ "createdAt": -1, "sellerId": 1 }) // Optimize queries
+db.sales.getIndexes() // View all indexes
 ```
 
 #### **Backup & Restore Operations:**
@@ -895,34 +895,34 @@ docker compose exec mongodb mongoexport \
 
 #### **Enterprise Integration Benefits:**
 
-✅ **Dual Management Approach** - Both API and direct database access  
-✅ **Standard MongoDB Tools** - No vendor lock-in, use familiar tools  
-✅ **Advanced Analytics** - Complex aggregations beyond API capabilities  
-✅ **Audit & Compliance** - Direct access to all data for compliance reporting  
-✅ **Performance Tuning** - Index optimization and query analysis  
-✅ **Data Migration** - Easy import/export for system migrations  
-✅ **Backup Integration** - Integrate with enterprise backup solutions  
-✅ **Monitoring Integration** - Connect MongoDB monitoring tools (Ops Manager, etc.)  
+ **Dual Management Approach** - Both API and direct database access
+ **Standard MongoDB Tools** - No vendor lock-in, use familiar tools
+ **Advanced Analytics** - Complex aggregations beyond API capabilities
+ **Audit & Compliance** - Direct access to all data for compliance reporting
+ **Performance Tuning** - Index optimization and query analysis
+ **Data Migration** - Easy import/export for system migrations
+ **Backup Integration** - Integrate with enterprise backup solutions
+ **Monitoring Integration** - Connect MongoDB monitoring tools (Ops Manager, etc.)
 
-> **💡 Pro Tip**: System administrators can use both the BiteTrack API for application-level operations and direct MongoDB access for database-level administration, providing complete flexibility for enterprise environments.
+> ** Pro Tip**: System administrators can use both the BiteTrack API for application-level operations and direct MongoDB access for database-level administration, providing complete flexibility for enterprise environments.
 
-## 🚀 **Strategic Roadmap: UI-First Development**
+## **Strategic Roadmap: UI-First Development**
 
-> 🏆 **ACHIEVEMENT**: Enterprise backend **100% complete** with 38 professional endpoints
-> 🔄 **STRATEGIC PIVOT**: Now focusing on **frontend development** to create complete business solution
+> **ACHIEVEMENT**: Enterprise backend **100% complete** with 38 professional endpoints
+> **STRATEGIC PIVOT**: Now focusing on **frontend development** to create complete business solution
 
-🗺️ **[Complete UI Development Roadmap](ROADMAP.md)** - Detailed frontend implementation plan
+ **[Complete UI Development Roadmap](ROADMAP.md)** - Detailed frontend implementation plan
 
-### ✅ **Backend Foundation (v2.0+ Complete)**
+### **Backend Foundation (v2.0+ Complete)**
 
-- ✅ **Enterprise API Platform** - 38 endpoints across 9 business categories
-- ✅ **Advanced Analytics & Reporting** - Time-series data, CSV exports, business intelligence  
-- ✅ **Multi-Role Security** - JWT authentication with User/Admin/SuperAdmin roles
-- ✅ **Compliance & Waste Management** - Food safety tracking with audit trails
-- ✅ **Production Infrastructure** - Docker, health monitoring, enterprise deployment
-- ✅ **Comprehensive Testing** - Jest + Supertest integration testing suite
+- **Enterprise API Platform** - 38 endpoints across 9 business categories
+- **Advanced Analytics & Reporting** - Time-series data, CSV exports, business intelligence
+- **Multi-Role Security** - JWT authentication with User/Admin/SuperAdmin roles
+- **Compliance & Waste Management** - Food safety tracking with audit trails
+- **Production Infrastructure** - Docker, health monitoring, enterprise deployment
+- **Comprehensive Testing** - Jest + Supertest integration testing suite
 
-### 🔴 **Priority 1: Frontend Development (Active Focus - Next 4 weeks)**
+### **Priority 1: Frontend Development (Active Focus - Next 4 weeks)**
 
 - [ ] **Next.js + TypeScript Setup** - Modern React architecture with TailwindCSS
 - [ ] **Core Business UI** - Seller dashboard, sales entry, customer management
@@ -930,21 +930,21 @@ docker compose exec mongodb mongoexport \
 - [ ] **Business Intelligence Dashboard** - Charts and analytics leveraging advanced reporting APIs
 - [ ] **Admin & Compliance Interface** - Multi-role UI for enterprise features
 
-### 🟡 **Priority 2: Enhanced User Experience (Weeks 5-6)**
+### **Priority 2: Enhanced User Experience (Weeks 5-6)**
 
 - [ ] **Progressive Web App** - Offline capability for food service environments
 - [ ] **Mobile-First Design** - Touch-optimized for tablet POS systems
 - [ ] **Real-time Features** - WebSocket integration for live updates
 - [ ] **Enhanced API Endpoints** - UI-optimized endpoints for better user experience
 
-### 🔵 **Future Innovation (Phase 2 - 2+ months)**
+### **Future Innovation (Phase 2 - 2+ months)**
 
 - [ ] **Advanced Data Visualizations** - Interactive charts and business insights
 - [ ] **Mobile App** - Native iOS/Android point-of-sale interface
 - [ ] **AI & ML Integration** - Predictive analytics and intelligent recommendations
 - [ ] **Multi-location Support** - Franchise and chain restaurant management
 
-## 🤝 **Contributing**
+## **Contributing**
 
 BiteTrack is open source and welcomes contributions!
 
@@ -961,12 +961,12 @@ BiteTrack is open source and welcomes contributions!
 
 ---
 
-## 📜 **License**
+## **License**
 
 **MIT License** - Free for commercial and personal use.
 
 ---
 
-**🌟 Star this repo** if BiteTrack helps your food business grow!
+** Star this repo** if BiteTrack helps your food business grow!
 
 **Questions?** Reach out via [GitHub Issues](https://github.com/fcortesbio/BiteTrack/issues) or check the [documentation](docs/API-documentation.md).

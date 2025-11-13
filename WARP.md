@@ -6,9 +6,9 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 BiteTrack is a **production-ready Enterprise Business Intelligence Platform** for food businesses built with Node.js, Express, and MongoDB. It has evolved from a simple API into a comprehensive business management platform with advanced analytics, regulatory compliance, and professional development infrastructure.
 
-**🚀 Current Status**: **v2.0+ Enterprise Platform** (38 endpoints across 9 business categories)
+** Current Status**: **v2.0+ Enterprise Platform** (38 endpoints across 9 business categories)
 
-**🎯 Core Platform Capabilities:**
+** Core Platform Capabilities:**
 - **Business Intelligence & Analytics**: Advanced sales reporting with time-series data
 - **Food Waste Management**: Regulatory compliance with cost analysis and audit trails
 - **Enterprise Authentication**: JWT-based with 3-tier role-based permissions
@@ -56,7 +56,7 @@ docker run -d -p 3000:3000 --env-file .env --name bitetrack-api bitetrack:latest
 curl http://localhost:3000/bitetrack/health
 ```
 
-### 📚 Interactive API Documentation (NEW)
+### Interactive API Documentation (NEW)
 ```bash
 # Access professional Swagger UI documentation portal
 open http://localhost:3000/api-docs
@@ -91,7 +91,7 @@ curl -X GET "http://localhost:3000/bitetrack/reporting/sales/export?format=detai
   -H "Authorization: Bearer TOKEN"
 ```
 
-### 🗑️ Food Waste Management (NEW)
+### Food Waste Management (NEW)
 ```bash
 # Drop inventory for compliance (admin/superadmin only)
 curl -X POST http://localhost:3000/bitetrack/inventory-drops \
@@ -108,7 +108,7 @@ curl -X GET http://localhost:3000/bitetrack/inventory-drops/undoable \
   -H "Authorization: Bearer TOKEN"
 ```
 
-### 🧪 Professional Testing Infrastructure
+### Professional Testing Infrastructure
 ```bash
 # Get comprehensive test data status
 curl -X GET http://localhost:3000/bitetrack/test-data/status \
@@ -127,36 +127,36 @@ npm run test:coverage
 
 ## Architecture Overview
 
-### 🏢 Enterprise Platform Architecture (v2.0+)
+### Enterprise Platform Architecture (v2.0+)
 ```
 BiteTrack/
-├── models/              # Mongoose schemas with business logic
-│   ├── Seller.js        # User management with role-based access
-│   ├── PendingSeller.js # Two-phase account activation
-│   ├── Customer.js      # Customer database (no login access)
-│   ├── Product.js       # Inventory with real-time stock tracking
-│   ├── Sale.js          # Transaction records with payment status
-│   ├── InventoryDrop.js # Food waste compliance and tracking
-│   └── PasswordResetToken.js # Secure password recovery
-├── controllers/         # Business logic implementation
-│   ├── authController.js      # Authentication & authorization
-│   ├── sellerController.js    # Staff and user management
-│   ├── customerController.js  # Customer relationship management
-│   ├── productController.js   # Inventory and catalog management
-│   ├── saleController.js      # Transaction processing
-│   ├── reportingController.js # 🆕 Business intelligence & analytics
-│   ├── inventoryDropController.js # 🆕 Food waste management
-│   └── testDataController.js  # 🆕 Professional testing infrastructure
-├── routes/             # API endpoint definitions (9 categories, 38 endpoints)
-├── middleware/         # Authentication, validation, error handling
-├── utils/              # JWT generation, validation helpers
-├── config/             # 🆕 Professional configuration management
-│   └── swagger.js      # 🆕 Interactive API documentation portal
-├── tests/              # 🆕 Integration test suite with Jest + Supertest
-├── docs/               # Comprehensive documentation
-│   ├── openapi.yaml    # Professional OpenAPI 3.1 specification
-│   └── API-documentation.md # Complete endpoint reference
-└── create-superadmin.js # Bootstrap script for first user
+ models/ # Mongoose schemas with business logic
+    Seller.js # User management with role-based access
+    PendingSeller.js # Two-phase account activation
+    Customer.js # Customer database (no login access)
+    Product.js # Inventory with real-time stock tracking
+    Sale.js # Transaction records with payment status
+    InventoryDrop.js # Food waste compliance and tracking
+    PasswordResetToken.js # Secure password recovery
+ controllers/ # Business logic implementation
+    authController.js # Authentication & authorization
+    sellerController.js # Staff and user management
+    customerController.js # Customer relationship management
+    productController.js # Inventory and catalog management
+    saleController.js # Transaction processing
+    reportingController.js # Business intelligence & analytics
+    inventoryDropController.js # Food waste management
+    testDataController.js # Professional testing infrastructure
+ routes/ # API endpoint definitions (9 categories, 38 endpoints)
+ middleware/ # Authentication, validation, error handling
+ utils/ # JWT generation, validation helpers
+ config/ # Professional configuration management
+    swagger.js # Interactive API documentation portal
+ tests/ # Integration test suite with Jest + Supertest
+ docs/ # Comprehensive documentation
+    openapi.yaml # Professional OpenAPI 3.1 specification
+    API-documentation.md # Complete endpoint reference
+ create-superadmin.js # Bootstrap script for first user
 ```
 
 ### Authentication & Authorization Architecture
@@ -208,7 +208,7 @@ BiteTrack/
   - Settlement status filtering
 - **Optimized MongoDB aggregation pipelines** for performance
 
-### 🗑️ Food Waste Management Architecture (NEW)
+### Food Waste Management Architecture (NEW)
 
 **Complete regulatory compliance system:**
 - **Inventory drop tracking** with detailed audit trails and cost analysis
@@ -224,7 +224,7 @@ BiteTrack/
 - `GET /inventory-drops/undoable` - Error recovery management within undo window
 - `POST /inventory-drops/{id}/undo` - Reverse accidental drops with audit trail
 
-### 📚 Interactive Documentation Architecture (NEW)
+### Interactive Documentation Architecture (NEW)
 
 **Professional Swagger UI integration:**
 - **Dynamic OpenAPI loading** from existing YAML specification with error handling
@@ -238,7 +238,7 @@ BiteTrack/
 - `GET /api-docs.json` - Raw OpenAPI specification for integration
 - `GET /` - API overview with quick start guide and platform capabilities
 
-### 🧪 Professional Testing Infrastructure (NEW)
+### Professional Testing Infrastructure (NEW)
 
 **Enterprise-grade testing capabilities:**
 - **Jest + Supertest integration** with MongoDB Memory Server for realistic scenarios
@@ -256,29 +256,29 @@ BiteTrack/
 ### Database Relationships
 - `Seller.createdBy` → `Seller._id` (supports "Self" for bootstrap superadmin)
 - `Sale.customerId` → `Customer._id`
-- `Sale.sellerId` → `Seller._id` 
+- `Sale.sellerId` → `Seller._id`
 - `Sale.products[].productId` → `Product._id`
 - `PasswordResetToken.sellerId` → `Seller._id`
 
-## 📊 Enterprise API Structure (38 Endpoints)
+## Enterprise API Structure (38 Endpoints)
 
 **Base URL:** `http://localhost:3000/bitetrack`
 
-### 🔐 **Authentication & Authorization** (`/auth/*`)
+### **Authentication & Authorization** (`/auth/*`)
 - `POST /auth/login` - Multi-role authentication system
 - `POST /auth/activate` - Secure account activation with multi-factor verification
 - `GET /auth/seller-status?email=x` - **PUBLIC** - Account status checking for client apps
 - `POST /auth/recover` - Password recovery token generation (superadmin only)
 - `POST /auth/reset` - Secure password reset with token validation
 
-### 👤 **User & Staff Management** (`/sellers/*`) - Admin+ Required
+### **User & Staff Management** (`/sellers/*`) - Admin+ Required
 - `GET /sellers` - Staff directory and role management
 - `POST /sellers/pending` - Professional onboarding workflow
 - `PATCH /sellers/{id}` - Self-service profile updates
 - `PATCH /sellers/{id}/role` - Role promotion/demotion (superadmin only)
 - `DELETE /sellers/{id}` - Account deactivation (superadmin only)
 
-### 🏪 **Customer Relationship Management** (`/customers/*`)
+### **Customer Relationship Management** (`/customers/*`)
 - `GET /customers` - Customer database with transaction history
 - `POST /customers` - Customer registration and profile creation
 - `POST /customers/import` - Bulk customer import via CSV upload
@@ -286,24 +286,24 @@ BiteTrack/
 - `PATCH /customers/{id}` - Customer information updates
 - `DELETE /customers/{id}` - Customer record management
 
-### 📦 **Inventory & Product Management** (`/products/*`)
+### **Inventory & Product Management** (`/products/*`)
 - `GET /products` - Real-time inventory status and catalog
 - `POST /products` - Product creation with pricing and descriptions
 - `PATCH /products/{id}` - Inventory updates and pricing management
 - `DELETE /products/{id}` - Product catalog maintenance
 
-### 💳 **Sales & Transaction Processing** (`/sales/*`)
+### **Sales & Transaction Processing** (`/sales/*`)
 - `GET /sales` - Advanced sales analytics with filtering, pagination, and sorting
 - `POST /sales` - Atomic transaction processing with inventory management
 - `POST /sales/import` - Bulk sales import via CSV upload
 - `GET /sales/{id}` - Detailed transaction information
 - `PATCH /sales/{id}/settle` - Payment settlement and tracking
 
-### 📊 **Business Intelligence & Reporting** (`/reporting/*`) - NEW
+### **Business Intelligence & Reporting** (`/reporting/*`) - NEW
 - `GET /reporting/sales/analytics` - Comprehensive analytics with time-series data
 - `GET /reporting/sales/export` - Professional CSV exports (detailed/summary/products)
 
-### 🗑️ **Food Waste Management & Compliance** (`/inventory-drops/*`) - NEW - Admin+ Only
+### **Food Waste Management & Compliance** (`/inventory-drops/*`) - NEW - Admin+ Only
 - `POST /inventory-drops` - Waste recording with regulatory compliance
 - `GET /inventory-drops` - Waste history with filtering and pagination
 - `GET /inventory-drops/{id}` - Detailed drop information and audit trails
@@ -311,13 +311,13 @@ BiteTrack/
 - `GET /inventory-drops/undoable` - Operational error management dashboard
 - `GET /inventory-drops/analytics` - Cost analysis and waste pattern identification
 
-### 🧪 **Professional Testing Infrastructure** (`/test-data/*`) - Admin+ Only
+### **Professional Testing Infrastructure** (`/test-data/*`) - Admin+ Only
 - `GET /test-data/status` - Development environment monitoring and statistics
 - `POST /test-data/populate` - Realistic scenario generation with configurable presets
 - `DELETE /test-data/clean` - Selective data cleanup with preservation options
 - `POST /test-data/reset` - Complete environment reset (superadmin only)
 
-### ❤️ **System Health & Monitoring** (`/health`)
+### **System Health & Monitoring** (`/health`)
 - `GET /bitetrack/health` - **PUBLIC** - System status and uptime monitoring
 
 ## Environment Configuration
@@ -327,7 +327,7 @@ BiteTrack/
 MONGO_URI=mongodb://admin:password@host:27017/bitetrack
 JWT_SECRET=your-super-secure-jwt-secret
 PORT=3000
-NODE_ENV=production  # Optional
+NODE_ENV=production # Optional
 ```
 
 ## Critical Setup Requirements
@@ -365,31 +365,31 @@ Sales creation automatically:
 - Password fields excluded from JSON responses (`select: false`)
 - Input validation with express-validator
 
-## 🧪 Enterprise Testing & Documentation Resources
+## Enterprise Testing & Documentation Resources
 
-### 📚 **Interactive Documentation Portal**
+### **Interactive Documentation Portal**
 - **Swagger UI Interface:** `http://localhost:3000/api-docs` - Professional interactive documentation
 - **OpenAPI Specification:** `http://localhost:3000/api-docs.json` - Complete API specification
 - **Getting Started Guide:** `http://localhost:3000/` - API overview and quick start
 
-### 📄 **Comprehensive Documentation**
+### **Comprehensive Documentation**
 - **Complete API Reference:** `docs/API-documentation.md` - All 38 endpoints documented
 - **OpenAPI 3.1 Specification:** `docs/openapi.yaml` - Professional API specification
 - **Postman Collection:** `docs/postman-collection.json` - Ready-to-use API testing
 - **Strategic Roadmap:** `ROADMAP.md` - Development planning and priorities
 
-### 🧪 **Professional Testing Infrastructure**
+### **Professional Testing Infrastructure**
 - **Integration Tests:** `tests/` directory with Jest + Supertest + MongoDB Memory Server
 - **Test Coverage:** `npm run test:coverage` - Comprehensive test coverage reports
 - **Realistic Test Data:** `test-data/` directory with business scenario samples
 - **Automated Test Management:** `/test-data/*` API endpoints for scenario control
 
-### 📊 **Monitoring & Health Checks**
+### **Monitoring & Health Checks**
 - **System Health:** `GET /bitetrack/health` - **PUBLIC** - No authentication required
 - **Development Monitoring:** `GET /test-data/status` - Database and environment statistics
 - **Performance Testing:** Integration test suite with realistic business scenarios
 
-### 🏢 **Enterprise Development Resources**
+### **Enterprise Development Resources**
 - **Docker Orchestration:** `docker-compose.yml` - Complete stack deployment
 - **Environment Management:** Multiple environment configurations (dev/staging/production)
 - **Professional Logging:** Morgan middleware with request/response tracking

@@ -1,8 +1,8 @@
-# BiteTrack Scripts Suite 🚀
+# BiteTrack Scripts Suite
 
 This directory contains a comprehensive suite of utility and testing scripts for BiteTrack, **designed for both interactive use and automation**. Scripts are organized in logical workflow order for easy project setup, maintenance, and CI/CD integration.
 
-## 🎯 Quick Start Guide
+## Quick Start Guide
 
 ### For New Environments
 
@@ -39,29 +39,29 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 
 ---
 
-## 🎆 Master Setup Script
+## Master Setup Script
 
 ### `00-init-production-setup.sh`
 
-**Purpose:** Complete production deployment orchestration with automation support  
+**Purpose:** Complete production deployment orchestration with automation support
 **Usage:**
 
 - Interactive: `./scripts/00-init-production-setup.sh`
 - Automated: `./scripts/00-init-production-setup.sh --non-interactive`
 
-**Duration:** ~5-10 minutes (interactive) | ~2-3 minutes (automated)  
+**Duration:** ~5-10 minutes (interactive) | ~2-3 minutes (automated)
 **What it does:** Orchestrates all numbered scripts in sequence for complete setup
 
 **Complete Setup Process:**
 
-- 🧹 Docker cleanup (optional) - Fresh environment
-- ⚙️ Environment configuration - Interactive prompts or env vars
-- 🔐 MongoDB keyfile generation - Secure replica set auth
-- 🐳 Container startup - Production-ready Docker stack
-- ✅ Health verification - System status validation
-- 👤 SuperAdmin creation - Administrative user setup
-- 📊 Test data population - Sample data (optional)
-- 🧪 Comprehensive testing - Full system validation
+- Docker cleanup (optional) - Fresh environment
+- Environment configuration - Interactive prompts or env vars
+- MongoDB keyfile generation - Secure replica set auth
+- Container startup - Production-ready Docker stack
+- Health verification - System status validation
+- SuperAdmin creation - Administrative user setup
+- Test data population - Sample data (optional)
+- Comprehensive testing - Full system validation
 
 **Automation Features:**
 
@@ -74,13 +74,13 @@ node scripts/07-test-reporting-features.js --auth-token=$API_TOKEN
 **Non-Interactive Environment Variables:**
 
 ```bash
-ADMIN_EMAIL="admin@company.com"       # Required: Admin email
-ADMIN_PASSWORD="SecurePass123!"       # Required: Admin password
-ADMIN_FIRST_NAME="Admin"              # Required: Admin first name
-ADMIN_LAST_NAME="User"                # Required: Admin last name
-ADMIN_DOB="1990-01-01"               # Required: Admin date of birth
-SKIP_TEST_DATA="true"                # Optional: Skip test data population
-SKIP_CLEANUP="true"                  # Optional: Skip Docker cleanup
+ADMIN_EMAIL="admin@company.com" # Required: Admin email
+ADMIN_PASSWORD="SecurePass123!" # Required: Admin password
+ADMIN_FIRST_NAME="Admin" # Required: Admin first name
+ADMIN_LAST_NAME="User" # Required: Admin last name
+ADMIN_DOB="1990-01-01" # Required: Admin date of birth
+SKIP_TEST_DATA="true" # Optional: Skip test data population
+SKIP_CLEANUP="true" # Optional: Skip Docker cleanup
 ```
 
 **Use cases:**
@@ -93,21 +93,21 @@ SKIP_CLEANUP="true"                  # Optional: Skip Docker cleanup
 
 ---
 
-## 📋 Individual Script Workflow Order
+## Individual Script Workflow Order
 
 The scripts are numbered to follow a logical development and deployment workflow, with each supporting both interactive and non-interactive modes:
 
-### **Phase 1: Environment Setup** 🔧
+### **Phase 1: Environment Setup**
 
 ### `01-setup-keyfile.sh`
 
-**Purpose:** MongoDB keyfile setup for replica set authentication  
+**Purpose:** MongoDB keyfile setup for replica set authentication
 **Usage:**
 
 - Standard: `./scripts/01-setup-keyfile.sh`
 - CI/CD: `./scripts/01-setup-keyfile.sh --force`
 
-**Duration:** ~2 seconds  
+**Duration:** ~2 seconds
 **What it does:** Creates or copies MongoDB keyfile with proper permissions
 
 **Non-Interactive Options:**
@@ -131,13 +131,13 @@ The scripts are numbered to follow a logical development and deployment workflow
 
 ### `02-quick-persistence-test.sh`
 
-**Purpose:** Quick system health and data persistence verification  
+**Purpose:** Quick system health and data persistence verification
 **Usage:**
 
 - Standard: `./scripts/02-quick-persistence-test.sh`
 - Verbose: `./scripts/02-quick-persistence-test.sh --verbose`
 
-**Duration:** ~5 seconds  
+**Duration:** ~5 seconds
 **What it tests:** Basic MongoDB connectivity and data operations
 
 **Non-Interactive Options:**
@@ -160,28 +160,28 @@ The scripts are numbered to follow a logical development and deployment workflow
 - Pre-deployment validation
 - Quick troubleshooting
 
-### **Phase 2: System Initialization** 🚀
+### **Phase 2: System Initialization**
 
 ### `03-create-superadmin.sh`
 
-**Purpose:** Create initial SuperAdmin user account  
+**Purpose:** Create initial SuperAdmin user account
 **Usage:**
 
 - Interactive: `./scripts/03-create-superadmin.sh`
 - Automated: `./scripts/03-create-superadmin.sh --non-interactive`
 - Help: `./scripts/03-create-superadmin.sh --help`
 
-**Duration:** ~10-20 seconds  
+**Duration:** ~10-20 seconds
 **What it does:** Creates and validates superadmin user in one step
 
 **Non-Interactive Environment Variables:**
 
 ```bash
-ADMIN_FIRST_NAME="John"              # First name (required)
-ADMIN_LAST_NAME="Doe"                # Last name (required)
-ADMIN_EMAIL="admin@company.com"      # Email address (required, must be unique)
-ADMIN_DOB="1990-01-01"               # Date of birth in YYYY-MM-DD format (required)
-ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements (required)
+ADMIN_FIRST_NAME="John" # First name (required)
+ADMIN_LAST_NAME="Doe" # Last name (required)
+ADMIN_EMAIL="admin@company.com" # Email address (required, must be unique)
+ADMIN_DOB="1990-01-01" # Date of birth in YYYY-MM-DD format (required)
+ADMIN_PASSWORD="SecurePass123!" # Password meeting complexity requirements (required)
 ```
 
 **Features:**
@@ -203,9 +203,9 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 
 ### `04-populate-test-data.js`
 
-**Purpose:** Populate database with realistic test data  
-**Usage:** `node scripts/04-populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`  
-**Duration:** ~10-30 seconds (depending on preset)  
+**Purpose:** Populate database with realistic test data
+**Usage:** `node scripts/04-populate-test-data.js [--preset=<preset>] [--clean] [--verbose]`
+**Duration:** ~10-30 seconds (depending on preset)
 **What it does:** Creates customers, products, sales with proper relationships
 
 **Non-Interactive Options:**
@@ -237,18 +237,18 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Performance testing scenarios
 - Demo environment preparation
 
-### **Phase 3: Testing & Validation** 🧪
+### **Phase 3: Testing & Validation**
 
 ### `05-test-data-persistence.sh`
 
-**Purpose:** Comprehensive data persistence testing across failure scenarios  
+**Purpose:** Comprehensive data persistence testing across failure scenarios
 **Usage:**
 
 - Standard: `./scripts/05-test-data-persistence.sh`
 - Verbose: `./scripts/05-test-data-persistence.sh --verbose`
 - Clean mode: `./scripts/05-test-data-persistence.sh --clean`
 
-**Duration:** ~2-3 minutes  
+**Duration:** ~2-3 minutes
 **What it tests:** Enterprise-grade persistence validation
 
 **Non-Interactive Options:**
@@ -260,10 +260,10 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 
 **Comprehensive Test Suite:**
 
-- MongoDB container restarts → Data survives ✅
-- API container restarts → Data survives ✅
-- Full stack restarts → Data survives ✅
-- Volume integrity verification → Data preserved ✅
+- MongoDB container restarts → Data survives
+- API container restarts → Data survives
+- Full stack restarts → Data survives
+- Volume integrity verification → Data preserved
 
 **Features:**
 
@@ -282,14 +282,14 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 
 ### `06-test-sales-filtering.js`
 
-**Purpose:** Advanced API feature testing (sales filtering, pagination, sorting)  
+**Purpose:** Advanced API feature testing (sales filtering, pagination, sorting)
 **Usage:**
 
 - Standard: `node scripts/06-test-sales-filtering.js`
 - With token: `node scripts/06-test-sales-filtering.js --auth-token=<token>`
 - Verbose: `node scripts/06-test-sales-filtering.js --verbose`
 
-**Duration:** ~15-30 seconds  
+**Duration:** ~15-30 seconds
 **What it tests:** Complex API functionality and performance
 
 **Non-Interactive Options:**
@@ -319,7 +319,7 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 
 ### `07-test-reporting-features.js`
 
-**Purpose:** Tests reporting and CSV export capabilities  
+**Purpose:** Tests reporting and CSV export capabilities
 **Usage:**
 
 - Standard: `node scripts/07-test-reporting-features.js`
@@ -328,7 +328,7 @@ ADMIN_PASSWORD="SecurePass123!"      # Password meeting complexity requirements 
 - Verbose: `node scripts/07-test-reporting-features.js --verbose`
 - Help: `node scripts/07-test-reporting-features.js --help`
 
-**Duration:** ~15-30 seconds  
+**Duration:** ~15-30 seconds
 **What it tests:** Analytics endpoints and CSV export functionality
 
 **Non-Interactive Options:**
@@ -411,11 +411,11 @@ export MONGO_ROOT_PASSWORD=mypass
 For `03-create-superadmin.sh --non-interactive`, set these environment variables:
 
 ```bash
-ADMIN_FIRST_NAME="John"              # First name (required)
-ADMIN_LAST_NAME="Doe"               # Last name (required)
-ADMIN_EMAIL="admin@company.com"     # Email address (required, must be unique)
-ADMIN_DOB="1990-01-01"             # Date of birth in YYYY-MM-DD format (required)
-ADMIN_PASSWORD="SecurePass123!"     # Password meeting complexity requirements (required)
+ADMIN_FIRST_NAME="John" # First name (required)
+ADMIN_LAST_NAME="Doe" # Last name (required)
+ADMIN_EMAIL="admin@company.com" # Email address (required, must be unique)
+ADMIN_DOB="1990-01-01" # Date of birth in YYYY-MM-DD format (required)
+ADMIN_PASSWORD="SecurePass123!" # Password meeting complexity requirements (required)
 ```
 
 ## CI/CD Integration
@@ -430,7 +430,7 @@ All scripts are designed for CI/CD integration with proper exit codes:
 
 ```bash
 #!/bin/bash
-set -e  # Exit on any error
+set -e # Exit on any error
 
 # 1. Setup environment
 ./scripts/01-setup-keyfile.sh --force
@@ -444,7 +444,7 @@ export ADMIN_PASSWORD="CIPassword123!"
 export ADMIN_FIRST_NAME="CI"
 export ADMIN_LAST_NAME="Admin"
 export ADMIN_DOB="2000-01-01"
-./scripts/03-create-superadmin.sh --non-interactive || true  # Don't fail if user exists
+./scripts/03-create-superadmin.sh --non-interactive || true # Don't fail if user exists
 
 # 4. Populate test data
 node scripts/04-populate-test-data.js --preset=minimal --clean --json > test_data.json

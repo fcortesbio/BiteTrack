@@ -1,54 +1,54 @@
-# 🚀 BiteTrack Migration Roadmap
+# BiteTrack Migration Roadmap
 
-**Strategic Objective:** Modernize BiteTrack with ES Modules and AI-powered conversational interface  
-**Timeline:** 3-4 weeks before UX development  
+**Strategic Objective:** Modernize BiteTrack with ES Modules and AI-powered conversational interface
+**Timeline:** 3-4 weeks before UX development
 **Status:** Planning Phase
 
 ---
 
-## 🎯 **Strategic Vision**
+## **Strategic Vision**
 
 ### **Why These Migrations Matter**
 
 **ES Modules Migration Benefits:**
-- ✅ Modern JavaScript standard (future-proof)
-- ✅ Better tree-shaking and bundle optimization
-- ✅ Native browser compatibility for future frontend
-- ✅ Improved static analysis and tooling
-- ✅ Cleaner import/export syntax
-- ✅ Better TypeScript integration path
+- Modern JavaScript standard (future-proof)
+- Better tree-shaking and bundle optimization
+- Native browser compatibility for future frontend
+- Improved static analysis and tooling
+- Cleaner import/export syntax
+- Better TypeScript integration path
 
 **MCP + Gemini AI Integration Benefits:**
-- ✅ Conversational API interface for users
-- ✅ Natural language business operations
-- ✅ Enhanced user experience (non-technical users)
-- ✅ Competitive differentiation
-- ✅ Foundation for advanced AI features
-- ✅ Reduced learning curve for new users
+- Conversational API interface for users
+- Natural language business operations
+- Enhanced user experience (non-technical users)
+- Competitive differentiation
+- Foundation for advanced AI features
+- Reduced learning curve for new users
 
 ---
 
-## 📋 **Migration Timeline Overview**
+## **Migration Timeline Overview**
 
 ```
 Week 1-2: CommonJS → ES Modules Migration
-├── Phase 1: Setup & Configuration (Days 1-2)
-├── Phase 2: Core Modules Migration (Days 3-5)
-├── Phase 3: Testing & Validation (Days 6-8)
-└── Phase 4: Documentation Update (Days 9-10)
+ Phase 1: Setup & Configuration (Days 1-2)
+ Phase 2: Core Modules Migration (Days 3-5)
+ Phase 3: Testing & Validation (Days 6-8)
+ Phase 4: Documentation Update (Days 9-10)
 
 Week 3-4: MCP + Gemini AI Integration
-├── Phase 1: MCP Architecture Design (Days 1-3)
-├── Phase 2: Gemini API Integration (Days 4-6)
-├── Phase 3: Endpoint Mapping (Days 7-10)
-├── Phase 4: Testing & Refinement (Days 11-14)
+ Phase 1: MCP Architecture Design (Days 1-3)
+ Phase 2: Gemini API Integration (Days 4-6)
+ Phase 3: Endpoint Mapping (Days 7-10)
+ Phase 4: Testing & Refinement (Days 11-14)
 
 Then: UX Development
 ```
 
 ---
 
-## 🔄 **MILESTONE 1: CommonJS → ES Modules Migration**
+## **MILESTONE 1: CommonJS → ES Modules Migration**
 
 ### **Phase 1: Setup & Configuration** (2 days)
 
@@ -114,11 +114,11 @@ npm update mongoose express dotenv
 ```
 
 **Key Dependencies Status:**
-- ✅ Express.js: ESM compatible (v5+, or v4 with imports)
-- ✅ Mongoose: ESM compatible (v7+)
-- ✅ dotenv: ESM compatible (use import with config)
-- ✅ Jest: ESM support (configuration needed)
-- ✅ bcryptjs, jsonwebtoken, helmet: All ESM compatible
+- Express.js: ESM compatible (v5+, or v4 with imports)
+- Mongoose: ESM compatible (v7+)
+- dotenv: ESM compatible (use import with config)
+- Jest: ESM support (configuration needed)
+- bcryptjs, jsonwebtoken, helmet: All ESM compatible
 
 ---
 
@@ -192,7 +192,7 @@ const resolvedPath = require.resolve('module-name');
 **Main Server File (index.js):**
 ```javascript
 // index.js
-import 'dotenv/config';  // ESM way to load dotenv
+import 'dotenv/config'; // ESM way to load dotenv
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -231,18 +231,18 @@ import Seller from '../../models/Seller.js';
 npm test -- auth-real.test.js
 npm test -- customers.test.js
 # ... until all pass
-npm test  # Full suite
+npm test # Full suite
 ```
 
 #### **Day 8: Integration Testing**
 
 **Critical Tests:**
-1. ✅ All 204 tests still passing
-2. ✅ MongoDB connection works
-3. ✅ JWT authentication functional
-4. ✅ Docker container builds successfully
-5. ✅ Health endpoint responds
-6. ✅ Swagger UI loads correctly
+1. All 204 tests still passing
+2. MongoDB connection works
+3. JWT authentication functional
+4. Docker container builds successfully
+5. Health endpoint responds
+6. Swagger UI loads correctly
 
 ---
 
@@ -256,7 +256,7 @@ npm test  # Full suite
 
 ---
 
-## 🤖 **MILESTONE 2: MCP + Gemini AI Integration**
+## **MILESTONE 2: MCP + Gemini AI Integration**
 
 ### **Understanding MCP (Model Context Protocol)**
 
@@ -289,25 +289,25 @@ Business Operations (Sales, Inventory, Customers)
 ```bash
 npm install @modelcontextprotocol/sdk
 npm install @google/generative-ai
-npm install zod  # For schema validation
+npm install zod # For schema validation
 ```
 
 **Create MCP Server Structure:**
 ```
 BiteTrack/
-├── mcp/
-│   ├── server.js           # MCP server entry point
-│   ├── tools/              # Tool definitions
-│   │   ├── sales-tools.js
-│   │   ├── inventory-tools.js
-│   │   ├── customer-tools.js
-│   │   └── analytics-tools.js
-│   ├── schemas/            # Zod validation schemas
-│   │   └── tool-schemas.js
-│   ├── handlers/           # Business logic handlers
-│   │   └── api-client.js
-│   └── config/
-│       └── mcp-config.js
+ mcp/
+    server.js # MCP server entry point
+    tools/ # Tool definitions
+       sales-tools.js
+       inventory-tools.js
+       customer-tools.js
+       analytics-tools.js
+    schemas/ # Zod validation schemas
+       tool-schemas.js
+    handlers/ # Business logic handlers
+       api-client.js
+    config/
+        mcp-config.js
 ```
 
 #### **Day 2: Tool Definitions**
@@ -379,7 +379,7 @@ server.setRequestHandler('tools/list', async () => ({
 
 server.setRequestHandler('tools/call', async (request) => {
   const { name, arguments: args } = request.params;
-  
+
   try {
     const result = await handleToolCall(name, args);
     return {
@@ -418,7 +418,7 @@ await server.connect(transport);
 ```bash
 # .env.development
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.0-flash-exp  # Latest model
+GEMINI_MODEL=gemini-2.0-flash-exp # Latest model
 ```
 
 **Gemini Client Setup:**
@@ -429,7 +429,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const createChatSession = () => {
-  const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({
     model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
   });
 
@@ -464,14 +464,14 @@ router.post('/', async (req, res) => {
   try {
     const { message, conversationId } = req.body;
     const userId = req.user.id;
-    
+
     const response = await handleChatMessage({
       message,
       conversationId,
       userId,
       userRole: req.user.role,
     });
-    
+
     res.json({
       response: response.text,
       conversationId: response.conversationId,
@@ -526,7 +526,7 @@ class BiteTrackAPIClient {
 
 export const handleToolCall = async (toolName, args, authToken) => {
   const client = new BiteTrackAPIClient(null, authToken);
-  
+
   switch (toolName) {
     case 'create_sale':
       return await client.createSale(args);
@@ -619,17 +619,17 @@ export const authorizeToolUse = (toolName, userRole) => {
     'manage_inventory_drops',
     'delete_sale',
   ];
-  
+
   const superAdminOnlyTools = [
     'change_user_role',
     'reset_password',
   ];
-  
+
   if (superAdminOnlyTools.includes(toolName) && userRole !== 'superadmin') {
     throw new Error('SuperAdmin access required');
   }
-  
-  if (adminOnlyTools.includes(toolName) && 
+
+  if (adminOnlyTools.includes(toolName) &&
       !['admin', 'superadmin'].includes(userRole)) {
     throw new Error('Admin access required');
   }
@@ -656,9 +656,9 @@ const aiChatLimiter = rateLimit({
 
 ---
 
-## 📊 **Implementation Checklist**
+## **Implementation Checklist**
 
-### **Milestone 1: ES Modules** ✅
+### **Milestone 1: ES Modules**
 
 - [ ] Update package.json with `"type": "module"`
 - [ ] Update Jest configuration for ESM
@@ -677,7 +677,7 @@ const aiChatLimiter = rateLimit({
 - [ ] Update all documentation
 - [ ] Git commit: "feat: migrate to ES modules"
 
-### **Milestone 2: MCP + Gemini AI** 🤖
+### **Milestone 2: MCP + Gemini AI**
 
 - [ ] Install MCP SDK and Gemini AI packages
 - [ ] Create MCP server structure
@@ -701,28 +701,28 @@ const aiChatLimiter = rateLimit({
 
 ---
 
-## 🎯 **Success Criteria**
+## **Success Criteria**
 
 ### **ES Modules Migration Complete When:**
-- ✅ All 204 tests passing with ES modules
-- ✅ No `require()` statements remain
-- ✅ All imports use `.js` extensions
-- ✅ Docker builds successfully
-- ✅ Development and production modes work
-- ✅ Documentation updated
+- All 204 tests passing with ES modules
+- No `require()` statements remain
+- All imports use `.js` extensions
+- Docker builds successfully
+- Development and production modes work
+- Documentation updated
 
 ### **MCP Integration Complete When:**
-- ✅ Users can chat naturally with the API
-- ✅ All core business operations accessible via chat
-- ✅ Role-based security enforced
-- ✅ Conversation history maintained
-- ✅ Error handling graceful and user-friendly
-- ✅ 20+ chat scenarios tested
-- ✅ API documentation includes AI endpoints
+- Users can chat naturally with the API
+- All core business operations accessible via chat
+- Role-based security enforced
+- Conversation history maintained
+- Error handling graceful and user-friendly
+- 20+ chat scenarios tested
+- API documentation includes AI endpoints
 
 ---
 
-## 🚨 **Risk Assessment & Mitigation**
+## **Risk Assessment & Mitigation**
 
 ### **ES Modules Migration Risks**
 
@@ -744,7 +744,7 @@ const aiChatLimiter = rateLimit({
 
 ---
 
-## 📚 **Learning Resources**
+## **Learning Resources**
 
 ### **ES Modules**
 - Node.js ES Modules Docs: https://nodejs.org/api/esm.html
@@ -763,7 +763,7 @@ const aiChatLimiter = rateLimit({
 
 ---
 
-## 🎉 **Post-Migration Benefits**
+## **Post-Migration Benefits**
 
 **After Both Migrations:**
 - Modern, future-proof JavaScript codebase
@@ -783,7 +783,7 @@ const aiChatLimiter = rateLimit({
 
 ---
 
-**Estimated Total Time:** 3-4 weeks  
-**Recommended Start:** After code quality cleanup  
-**Prerequisites:** All tests passing, clean codebase  
+**Estimated Total Time:** 3-4 weeks
+**Recommended Start:** After code quality cleanup
+**Prerequisites:** All tests passing, clean codebase
 **Next Phase:** UX Development with AI-enhanced interface

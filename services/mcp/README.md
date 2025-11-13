@@ -1,8 +1,8 @@
-# 🤖 BiteTrack MCP Server
+# BiteTrack MCP Server
 
 AI-powered conversational interface for BiteTrack operations using Model Context Protocol (MCP) and Google Gemini.
 
-## 🎯 Purpose
+## Purpose
 
 Provide natural language access to all BiteTrack API operations, enabling:
 - Conversational sales processing ("Create a sale for John with 2 coffees")
@@ -10,7 +10,7 @@ Provide natural language access to all BiteTrack API operations, enabling:
 - Business analytics ("Show me this week's top products")
 - Customer management via chat interface
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Development
 ```bash
@@ -34,7 +34,7 @@ docker compose up -d
 
 Access via Traefik: `http://localhost/mcp/` or `https://yourdomain.com/mcp/`
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Health Check
 ```bash
@@ -74,9 +74,9 @@ Content-Type: application/json
 }
 ```
 
-## 🏗️ Implementation Roadmap
+## Implementation Roadmap
 
-### Phase 1: Boilerplate (✅ Complete)
+### Phase 1: Boilerplate ( Complete)
 - [x] Basic Express server
 - [x] Health check endpoint
 - [x] Docker containerization
@@ -100,7 +100,7 @@ Content-Type: application/json
 - [ ] Predictive analytics
 - [ ] Recommendations engine
 
-## 🔧 Environment Variables
+## Environment Variables
 
 ```bash
 MCP_PORT=3001
@@ -110,7 +110,7 @@ GEMINI_API_KEY=your_gemini_key
 JWT_SECRET=same_as_api
 ```
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Health check
@@ -125,13 +125,13 @@ curl -X POST http://localhost:3001/chat \
   -d '{"message":"Hello"}'
 ```
 
-## 📚 Resources
+## Resources
 
 - [Model Context Protocol Docs](https://modelcontextprotocol.io/)
 - [Google Gemini API](https://ai.google.dev/gemini-api/docs)
 - [BiteTrack API Documentation](../api/README.md)
 
-## 🔗 Related Services
+## Related Services
 
 - **API**: `services/api/` - BiteTrack REST API
 - **Frontend**: `services/frontend/` - Web interface

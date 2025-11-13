@@ -1,20 +1,20 @@
-# 🚀 Getting Started with BiteTrack
+# Getting Started with BiteTrack
 
-## ✨ What's New
+## What's New
 
 Your BiteTrack project now has a **complete multi-service architecture** with:
 
-- ✅ **Frontend** - React + Vite boilerplate (ready for development)
-- ✅ **API** - Your existing Express REST API (refactored for independence)
-- ✅ **MCP** - AI server boilerplate (ready for Gemini integration)
-- ✅ **MongoDB** - Database with replica set
-- ✅ **Traefik** - Reverse proxy routing all services
+- **Frontend** - React + Vite boilerplate (ready for development)
+- **API** - Your existing Express REST API (refactored for independence)
+- **MCP** - AI server boilerplate (ready for Gemini integration)
+- **MongoDB** - Database with replica set
+- **Traefik** - Reverse proxy routing all services
 
 Everything is orchestrated with Docker Compose and accessible through **one domain** (localhost or your production domain).
 
 ---
 
-## 🎯 Quick Start (3 Steps)
+## Quick Start (3 Steps)
 
 ### 1. **One-Command Setup**
 ```bash
@@ -23,12 +23,12 @@ cd infrastructure
 ```
 
 This automated script will:
-- ✅ Check Docker prerequisites
-- ✅ Generate secure secrets (JWT, MongoDB password)
-- ✅ Build all service images
-- ✅ Initialize MongoDB replica set
-- ✅ Start all 5 services
-- ✅ Run health checks
+- Check Docker prerequisites
+- Generate secure secrets (JWT, MongoDB password)
+- Build all service images
+- Initialize MongoDB replica set
+- Start all 5 services
+- Run health checks
 
 **Total time: ~5-10 minutes** (depending on your machine)
 
@@ -58,48 +58,48 @@ curl http://localhost/bitetrack/health
 curl http://localhost/mcp/health
 ```
 
-Traefik automatically routes requests to the right service! 🎉
+Traefik automatically routes requests to the right service!
 
 ---
 
-## 📁 Project Structure (After Setup)
+## Project Structure (After Setup)
 
 ```
 BiteTrack/
-├── services/
-│   ├── api/                       # ✅ Your existing API
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── Dockerfile             # Standalone, no workspace deps
-│   │   └── package.json
-│   │
-│   ├── frontend/                  # 🆕 React boilerplate
-│   │   ├── src/
-│   │   │   ├── App.jsx           # Landing page with status checks
-│   │   │   └── ...
-│   │   ├── Dockerfile             # Multi-stage (build + nginx)
-│   │   └── package.json
-│   │
-│   └── mcp/                       # 🆕 AI server boilerplate
-│       ├── index.js               # Express server with health endpoint
-│       ├── Dockerfile
-│       └── package.json
-│
-├── infrastructure/
-│   ├── docker-compose.yml         # 🆕 Unified orchestration (all services)
-│   ├── traefik/
-│   │   └── traefik.yml            # 🆕 Reverse proxy config
-│   └── scripts/
-│       └── init.sh                # 🆕 Automated setup script
-│
-├── .env                           # 🆕 Global configuration (created by init.sh)
-└── .env.example                   # 🆕 Template with documentation
+ services/
+    api/ # Your existing API
+       controllers/
+       models/
+       routes/
+       Dockerfile # Standalone, no workspace deps
+       package.json
+
+    frontend/ # React boilerplate
+       src/
+          App.jsx # Landing page with status checks
+          ...
+       Dockerfile # Multi-stage (build + nginx)
+       package.json
+
+    mcp/ # AI server boilerplate
+        index.js # Express server with health endpoint
+        Dockerfile
+        package.json
+
+ infrastructure/
+    docker-compose.yml # Unified orchestration (all services)
+    traefik/
+       traefik.yml # Reverse proxy config
+    scripts/
+        init.sh # Automated setup script
+
+ .env # Global configuration (created by init.sh)
+ .env.example # Template with documentation
 ```
 
 ---
 
-## 🌐 How Traefik Routing Works
+## How Traefik Routing Works
 
 Traefik acts as a **smart reverse proxy** that automatically routes traffic:
 
@@ -107,22 +107,22 @@ Traefik acts as a **smart reverse proxy** that automatically routes traffic:
 User Request → Traefik (Port 80) → Right Service
 
 Examples:
-  http://localhost/           → Frontend (React)
-  http://localhost/api/...    → API (Express)
+  http://localhost/ → Frontend (React)
+  http://localhost/api/... → API (Express)
   http://localhost/bitetrack/ → API (Express)
-  http://localhost/mcp/...    → MCP (AI server)
+  http://localhost/mcp/... → MCP (AI server)
 ```
 
 **Why this is awesome:**
-- ✅ One domain for everything
-- ✅ No port management (3000, 3001, etc.)
-- ✅ Easy SSL/HTTPS setup (just uncomment config)
-- ✅ Automatic service discovery
-- ✅ Built-in load balancing
+- One domain for everything
+- No port management (3000, 3001, etc.)
+- Easy SSL/HTTPS setup (just uncomment config)
+- Automatic service discovery
+- Built-in load balancing
 
 ---
 
-## 🔧 Development Workflow
+## Development Workflow
 
 ### **Option A: Docker Development** (Recommended for testing full stack)
 ```bash
@@ -132,9 +132,9 @@ cd infrastructure
 docker compose up -d
 
 # View logs
-docker compose logs -f bitetrack-api     # API logs
+docker compose logs -f bitetrack-api # API logs
 docker compose logs -f bitetrack-frontend # Frontend logs
-docker compose logs -f bitetrack-mcp      # MCP logs
+docker compose logs -f bitetrack-mcp # MCP logs
 
 # Rebuild after code changes
 docker compose build bitetrack-api
@@ -150,21 +150,21 @@ docker compose down
 ```bash
 cd services/api
 npm install
-npm run dev  # Port 3000
+npm run dev # Port 3000
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
 cd services/frontend
 npm install
-npm run dev  # Port 5173
+npm run dev # Port 5173
 ```
 
 **Terminal 3 - MCP:**
 ```bash
 cd services/mcp
 npm install
-npm run dev  # Port 3001
+npm run dev # Port 3001
 ```
 
 Then access directly:
@@ -174,7 +174,7 @@ Then access directly:
 
 ---
 
-## 📝 Common Commands
+## Common Commands
 
 ### Service Management
 ```bash
@@ -219,7 +219,7 @@ docker compose exec mongodb mongosh --eval "rs.status()"
 
 ---
 
-## 🎨 Next Steps
+## Next Steps
 
 ### **For Frontend Development:**
 1. Open `services/frontend/src/App.jsx`
@@ -241,7 +241,7 @@ docker compose exec mongodb mongosh --eval "rs.status()"
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### **Services won't start**
 ```bash
@@ -281,7 +281,7 @@ docker compose exec mongodb mongosh --eval "rs.initiate()"
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 - **Infrastructure**: `infrastructure/README.md` - Complete Docker guide
 - **Frontend**: `services/frontend/README.md` - React development guide
@@ -291,15 +291,15 @@ docker compose exec mongodb mongosh --eval "rs.initiate()"
 
 ---
 
-## 🎉 You're All Set!
+## You're All Set!
 
 Your BiteTrack infrastructure is **production-ready** with:
-- ✅ Service independence (each has own Dockerfile)
-- ✅ Network isolation (MongoDB not exposed externally)
-- ✅ Automatic routing (Traefik)
-- ✅ Health checks (all services)
-- ✅ Secure secrets (generated automatically)
-- ✅ Development + Production configs
+- Service independence (each has own Dockerfile)
+- Network isolation (MongoDB not exposed externally)
+- Automatic routing (Traefik)
+- Health checks (all services)
+- Secure secrets (generated automatically)
+- Development + Production configs
 
 **Start developing:**
 ```bash
@@ -307,11 +307,11 @@ cd infrastructure
 ./scripts/init.sh
 # Wait 5-10 minutes
 # Open http://localhost
-# 🚀 You're running!
+# You're running!
 ```
 
 Questions? Check the READMEs in each service directory or the infrastructure folder.
 
 ---
 
-**Happy coding! 🍔✨**
+**Happy coding! **

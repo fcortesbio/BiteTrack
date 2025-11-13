@@ -1,0 +1,11 @@
+./scripts/init-noninteractive.sh \
+  --mongo-user 'btadmin' \
+  --mongo-password 'SucurePass123' \
+  --mongo-db 'bitetrack' \
+  --port 3000 \
+  --frontend-urls 'https://app.mycompany.com,https://admin.mycompany.com' \
+  --admin-email 'super.admin@bitetrack.com' \
+  --admin-password 'AdminPass123!' \
+  --admin-first-name 'Super' \
+  --admin-last-name 'Admin' \
+  --admin-dob '1999-10-25' \
