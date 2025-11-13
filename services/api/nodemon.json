@@ -30,6 +30,6 @@
   "events": {
     "start": "echo 'Starting BiteTrack development server...'",
     "restart": "echo 'Restarting due to file changes...'",
-    "crash": "echo '💥 Server crashed - fix the error and save a file to restart'"
+    "crash": "echo 'Server crashed - fix the error and save a file to restart'"
   }
 }

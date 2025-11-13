@@ -106,14 +106,12 @@ class SessionManager {
   getStats() {
     return {
       activeSessions: this.sessions.size,
-      sessions: Array.from(this.sessions.entries()).map(
-        ([id, session]) => ({
-          id,
-          hasToken: !!session.token,
-          ageMinutes: Math.floor((Date.now() - session.createdAt) / 60000),
-          executionCount: session.executionCount,
-        }),
-      ),
+      sessions: Array.from(this.sessions.entries()).map(([id, session]) => ({
+        id,
+        hasToken: !!session.token,
+        ageMinutes: Math.floor((Date.now() - session.createdAt) / 60000),
+        executionCount: session.executionCount,
+      })),
     };
   }
 }

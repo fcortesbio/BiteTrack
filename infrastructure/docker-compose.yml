@@ -51,6 +51,8 @@ services:
     image: mongo:8.0-noble
     container_name: bitetrack-mongodb
     restart: unless-stopped
+    ports:
+      - "27017:27017" # Expose for local development
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}

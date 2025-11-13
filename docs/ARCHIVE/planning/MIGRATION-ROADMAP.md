@@ -182,7 +182,7 @@ export const generateToken = (payload) => {
 const module = await import("./dynamic-module.js");
 ```
 
-2. ****dirname and **filename Replacement:**
+2. \***\*dirname and **filename Replacement:\*\*
 
 ```javascript
 import { fileURLToPath } from "url";

@@ -61,12 +61,14 @@ app.get("/sse", (req, res) => {
   res.setHeader("Connection", "keep-alive");
 
   // Send initial connection event
-  res.write(`data: ${JSON.stringify({
-    type: "connected",
-    sessionId,
-    message: "MCP server connected",
-    capabilities: ["code_execution", "tool_discovery"],
-  })}\n\n`);
+  res.write(
+    `data: ${JSON.stringify({
+      type: "connected",
+      sessionId,
+      message: "MCP server connected",
+      capabilities: ["code_execution", "tool_discovery"],
+    })}\n\n`,
+  );
 
   // Keep connection alive
   const keepAlive = setInterval(() => {

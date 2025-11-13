@@ -1,0 +1,43 @@
+Swagger UI Documentation Portal initialized (production)
+Docs generated from JSDoc comments in routes
+Interactive docs available at: http://localhost:3000/bitetrack/api-docs
+JSON specification at: http://localhost:3000/bitetrack/api-docs.json
+
+BiteTrack API server running on port 3000
+Environment: production
+Global error handlers installed
+
+Server ready - Happy coding!
+
+MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND mongodb
+    at _handleConnectionErrors (/home/fcortesbio/projects/BiteTrack/node_modules/mongoose/lib/connection.js:1165:11)
+    at NativeConnection.openUri (/home/fcortesbio/projects/BiteTrack/node_modules/mongoose/lib/connection.js:1096:11) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Single',
+    servers: Map(1) { 'mongodb:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  cause: TopologyDescription {
+    type: 'Single',
+    servers: Map(1) { 'mongodb:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  }
+}
