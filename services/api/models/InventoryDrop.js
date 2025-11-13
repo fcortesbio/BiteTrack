@@ -129,6 +129,11 @@ const inventoryDropSchema = new mongoose.Schema(
       trim: true,
       index: true,
     },
+    isTestData: {
+      type: Boolean,
+      default: () => process.env.NODE_ENV === "development",
+      index: true, // Index for efficient filtering and cleanup
+    },
   },
   {
     timestamps: true,

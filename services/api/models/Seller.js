@@ -60,7 +60,8 @@ const sellerSchema = new mongoose.Schema(
     },
     testingUser: {
       type: Boolean,
-      default: false,
+      // Automatically mark users created in development as test users
+      default: () => process.env.NODE_ENV === "development",
       index: true, // Index for efficient filtering
     },
   },
