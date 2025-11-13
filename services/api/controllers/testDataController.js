@@ -4,6 +4,7 @@ import Product from "../models/Product.js";
 import Sale from "../models/Sale.js";
 import PendingSeller from "../models/PendingSeller.js";
 import Seller from "../models/Seller.js";
+import InventoryDrop from "../models/InventoryDrop.js";
 
 /**
  * Test Data Management Controller
@@ -161,8 +162,9 @@ const populateTestData = async (req, res) => {
  *
  * @description
  * Safely deletes test data with confirmation requirement
- * Can preserve specific data types: sales, customers, products, pendingSellers
- * Only deletes sellers marked with testingUser flag
+ * Only removes records marked with isTestData: true (or testingUser: true for sellers)
+ * Can preserve specific data types: sales, customers, products, pendingSellers, inventoryDrops
+ * Automatically set in development mode; production data remains safe
  */
 const cleanTestData = async (req, res) => {
   try {
@@ -197,25 +199,36 @@ const cleanTestData = async (req, res) => {
         products: 0,
         pendingSellers: 0,
         testingSellers: 0,
+        inventoryDrops: 0,
       },
       preserved: preserveData,
     };
 
     // Delete sales first (due to foreign key relationships)
+    // Only delete records marked as test data
     if (!preserveData.includes("sales")) {
-      const salesResult = await Sale.deleteMany({});
+      const salesResult = await Sale.deleteMany({ isTestData: true });
       deletionSummary.deletedCounts.sales = salesResult.deletedCount;
     }
 
-    // Delete customers
+    // Delete inventory drops marked as test data
+    if (!preserveData.includes("inventoryDrops")) {
+      const inventoryDropsResult = await InventoryDrop.deleteMany({
+        isTestData: true,
+      });
+      deletionSummary.deletedCounts.inventoryDrops =
+        inventoryDropsResult.deletedCount;
+    }
+
+    // Delete customers marked as test data
     if (!preserveData.includes("customers")) {
-      const customersResult = await Customer.deleteMany({});
+      const customersResult = await Customer.deleteMany({ isTestData: true });
       deletionSummary.deletedCounts.customers = customersResult.deletedCount;
     }
 
-    // Delete products
+    // Delete products marked as test data
     if (!preserveData.includes("products")) {
-      const productsResult = await Product.deleteMany({});
+      const productsResult = await Product.deleteMany({ isTestData: true });
       deletionSummary.deletedCounts.products = productsResult.deletedCount;
     }
 
@@ -268,8 +281,9 @@ const cleanTestData = async (req, res) => {
  *
  * @description
  * Returns:
- * - Document counts for all collections
- * - Testing user counts
+ * - Total document counts for all collections
+ * - Test data counts (isTestData: true) for selective cleanup visibility
+ * - Testing user counts (Sellers and PendingSellers)
  * - Sales statistics (total value, averages, settlement status)
  * - Recent sales with customer and seller info
  */
@@ -287,8 +301,13 @@ const getTestDataStatus = async (req, res) => {
     // Get counts from all collections
     const [
       customerCount,
+      testCustomerCount,
       productCount,
+      testProductCount,
       saleCount,
+      testSaleCount,
+      inventoryDropCount,
+      testInventoryDropCount,
       pendingSellerCount,
       testingPendingSellerCount,
       testingSellerCount,
@@ -296,8 +315,13 @@ const getTestDataStatus = async (req, res) => {
       recentSales,
     ] = await Promise.all([
       Customer.countDocuments(),
+      Customer.countDocuments({ isTestData: true }),
       Product.countDocuments(),
+      Product.countDocuments({ isTestData: true }),
       Sale.countDocuments(),
+      Sale.countDocuments({ isTestData: true }),
+      InventoryDrop.countDocuments(),
+      InventoryDrop.countDocuments({ isTestData: true }),
       PendingSeller.countDocuments(),
       PendingSeller.countDocuments({ testingUser: true }),
       Seller.countDocuments({ testingUser: true }),
@@ -339,10 +363,15 @@ const getTestDataStatus = async (req, res) => {
         customers: customerCount,
         products: productCount,
         sales: saleCount,
+        inventoryDrops: inventoryDropCount,
         pendingSellers: pendingSellerCount,
         sellers: totalSellerCount,
       },
-      testingUserCounts: {
+      testDataCounts: {
+        customers: testCustomerCount,
+        products: testProductCount,
+        sales: testSaleCount,
+        inventoryDrops: testInventoryDropCount,
         pendingSellers: testingPendingSellerCount,
         sellers: testingSellerCount,
       },

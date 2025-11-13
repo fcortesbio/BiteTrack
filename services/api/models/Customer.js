@@ -57,6 +57,11 @@ const customerSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    isTestData: {
+      type: Boolean,
+      default: () => process.env.NODE_ENV === "development",
+      index: true, // Index for efficient filtering and cleanup
+    },
   },
   {
     timestamps: true,

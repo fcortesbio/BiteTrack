@@ -32,11 +32,16 @@
     "test:coverage": "npm run test:coverage --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
     "clean": "rm -rf node_modules services/*/node_modules packages/*/node_modules",
     "postinstall": "echo '✅ All workspaces installed successfully'"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "prettier": "^3.6.2"
   }
 }

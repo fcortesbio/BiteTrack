@@ -23,6 +23,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    isTestData: {
+      type: Boolean,
+      default: () => process.env.NODE_ENV === "development",
+      index: true, // Index for efficient filtering and cleanup
+    },
   },
   {
     timestamps: true,
