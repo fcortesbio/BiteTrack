@@ -89,6 +89,7 @@ BiteTrack/
 To use `@bitetrack/shared-types` in any service:
 
 **1. Add to service's `package.json`:**
+
 ```json
 {
   "dependencies": {
@@ -100,8 +101,9 @@ To use `@bitetrack/shared-types` in any service:
 **2. Run `npm install` from root**
 
 **3. Import in your code:**
+
 ```javascript
-import { USER_ROLES, PAYMENT_STATUS } from '@bitetrack/shared-types';
+import { USER_ROLES, PAYMENT_STATUS } from "@bitetrack/shared-types";
 ```
 
 NPM Workspaces automatically links local packages - no manual linking needed!
@@ -109,17 +111,20 @@ NPM Workspaces automatically links local packages - no manual linking needed!
 ## Adding New Services
 
 ### Step 1: Create directory
+
 ```bash
 mkdir -p services/new-service
 cd services/new-service
 ```
 
 ### Step 2: Initialize package.json
+
 ```bash
 npm init -y
 ```
 
 Edit `package.json`:
+
 ```json
 {
   "name": "@bitetrack/new-service",
@@ -134,6 +139,7 @@ Edit `package.json`:
 ```
 
 ### Step 3: Install from root
+
 ```bash
 cd /home/fcortesbio/projects/BiteTrack
 npm install
@@ -142,6 +148,7 @@ npm install
 The new service is now part of the workspace!
 
 ### Step 4: Add dependencies
+
 ```bash
 npm install express -w services/new-service
 npm install @bitetrack/shared-types -w services/new-service
@@ -176,6 +183,7 @@ WORKDIR /app/services/my-service
 ### Problem: "Cannot find module '@bitetrack/shared-types'"
 
 **Solution:**
+
 ```bash
 # From root
 npm install
@@ -192,6 +200,7 @@ npm install
 ### Problem: npm install fails
 
 **Solution:**
+
 ```bash
 # Clean everything
 npm run clean
@@ -216,6 +225,7 @@ npm install
 5. **Use `--if-present`** in root scripts - services without script won't error
 
 Example root script:
+
 ```json
 {
   "scripts": {

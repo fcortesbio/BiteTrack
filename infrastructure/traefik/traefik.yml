@@ -1,7 +1,7 @@
 # Traefik Static Configuration
 api:
   dashboard: true
-  insecure: true  # Dashboard on :8080 (disable in production with SSL)
+  insecure: true # Dashboard on :8080 (disable in production with SSL)
 
 entryPoints:
   web:
@@ -12,8 +12,8 @@ entryPoints:
 providers:
   docker:
     endpoint: "unix:///var/run/docker.sock"
-    exposedByDefault: false  # Only expose services with traefik.enable=true
-    network: web  # Default network for backend services
+    exposedByDefault: false # Only expose services with traefik.enable=true
+    network: web # Default network for backend services
 
 # certificatesResolvers:  # Uncomment for Let's Encrypt SSL
 #   letsencrypt:
@@ -24,7 +24,7 @@ providers:
 #         entryPoint: web
 
 log:
-  level: INFO  # DEBUG, INFO, WARN, ERROR
+  level: INFO # DEBUG, INFO, WARN, ERROR
 
 accessLog:
   filePath: "/var/log/traefik/access.log"

@@ -5,6 +5,7 @@ This project uses ESLint to maintain consistent code quality and style across th
 ## What is Linting?
 
 Linting automatically checks your JavaScript code for:
+
 - **Syntax errors** and potential bugs
 - **Style consistency** (quotes, spacing, indentation)
 - **Best practices** and code quality issues
@@ -21,6 +22,7 @@ npm install
 ## Available Commands
 
 ### Check for Issues
+
 ```bash
 # Check all files for linting issues
 npm run lint
@@ -30,6 +32,7 @@ npm run lint:check
 ```
 
 ### Auto-fix Issues
+
 ```bash
 # Automatically fix all fixable issues
 npm run lint:fix
@@ -43,6 +46,7 @@ npx eslint path/to/file.js --fix
 Our ESLint configuration enforces these standards:
 
 ### Style Rules
+
 - **Single quotes** for strings: `'hello'` instead of `"hello"`
 - **2-space indentation** consistently
 - **Trailing commas** in multi-line objects and arrays
@@ -50,12 +54,14 @@ Our ESLint configuration enforces these standards:
 - **Semicolons** at the end of statements
 
 ### Quality Rules
+
 - **No unused variables** (prefix with `_` if intentionally unused)
 - **Consistent equality** operators: use `===` instead of `==`
 - **Proper error handling**: avoid empty catch blocks
 - **No duplicate object keys**
 
 ### Node.js Best Practices
+
 - **Prefer `const`** over `let` when variables don't change
 - **Handle callback errors** properly
 - **Avoid sync operations** where possible (warnings for `fs.readFileSync`, etc.)
@@ -63,13 +69,17 @@ Our ESLint configuration enforces these standards:
 ## IDE Integration
 
 ### VS Code
+
 Install the ESLint extension:
+
 1. Go to Extensions (Ctrl+Shift+X)
 2. Search for "ESLint"
 3. Install the official ESLint extension by Dirk Baeumer
 
 ### Configure Auto-fix on Save
+
 Add this to your VS Code settings.json:
+
 ```json
 {
   "editor.codeActionsOnSave": {
@@ -89,37 +99,41 @@ Add this to your VS Code settings.json:
 ## Common Issues and Solutions
 
 ### "Strings must use singlequote"
- `const message = "Hello world";`
- `const message = 'Hello world';`
+
+`const message = "Hello world";`
+`const message = 'Hello world';`
 
 ### "Missing trailing comma"
 
 ```javascript
 const config = {
-  host: 'localhost',
-  port: 3001
+  host: "localhost",
+  port: 3001,
 };
 ```
 
 ```javascript
 const config = {
-  host: 'localhost',
+  host: "localhost",
   port: 3001,
 };
 ```
 
 ### "Unexpected space before function parentheses"
- `const handler = async (req, res) => {}`
- `const handler = async(req, res) => {}`
+
+`const handler = async (req, res) => {}`
+`const handler = async(req, res) => {}`
 
 ### "No unused variables"
- `const unused = getData();`
- `const _unused = getData();` (if intentionally unused)
- Just remove the unused variable
+
+`const unused = getData();`
+`const _unused = getData();` (if intentionally unused)
+Just remove the unused variable
 
 ## Console Warnings
 
 Console statements generate **warnings** (not errors) because they're useful for:
+
 - Development logging
 - Error handling
 - Debugging scripts
@@ -133,7 +147,7 @@ For exceptional cases, you can disable rules:
 ```javascript
 // Disable for next line
 // eslint-disable-next-line no-console
-console.log('This is allowed');
+console.log("This is allowed");
 
 // Disable for entire file (top of file)
 /* eslint-disable no-console */

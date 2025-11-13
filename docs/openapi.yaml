@@ -8,7 +8,7 @@ info:
     and production-ready error handling. Features JWT-based authentication with role-based 
     access control, inventory management, sales processing, business intelligence capabilities,
     and regulatory compliance tools.
-    
+
     **Complete API Coverage:** 40 professional endpoints across 9 business categories
     including Authentication, User Management, Customer Relations, Product Management, 
     Sales Processing, Business Intelligence, Food Waste Management, Test Data Management,
@@ -98,7 +98,7 @@ components:
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
         # CSV Import specific fields
-        originalCreatedAt: 
+        originalCreatedAt:
           type: string
           format: date-time
           nullable: true
@@ -179,7 +179,15 @@ components:
         limit: { type: integer, minimum: 1, maximum: 100 }
         hasNextPage: { type: boolean }
         hasPrevPage: { type: boolean }
-      required: [currentPage, totalPages, totalTransactions, limit, hasNextPage, hasPrevPage]
+      required:
+        [
+          currentPage,
+          totalPages,
+          totalTransactions,
+          limit,
+          hasNextPage,
+          hasPrevPage,
+        ]
 
     CustomerTransactionsResponse:
       type: object
@@ -200,7 +208,8 @@ components:
         limit: { type: integer, minimum: 1, maximum: 100 }
         hasNextPage: { type: boolean }
         hasPrevPage: { type: boolean }
-      required: [currentPage, totalPages, totalSales, limit, hasNextPage, hasPrevPage]
+      required:
+        [currentPage, totalPages, totalSales, limit, hasNextPage, hasPrevPage]
 
     SalesFilters:
       type: object
@@ -255,7 +264,7 @@ components:
         statusCode: { type: integer }
         timestamp: { type: string, format: date-time }
       required: [error, message, statusCode, timestamp]
-        
+
     # CSV Import specific schemas
     CSVImportSummary:
       type: object
@@ -265,25 +274,25 @@ components:
         skipped: { type: integer, minimum: 0 }
         importBatchId: { type: string }
       required: [totalRows, imported, skipped, importBatchId]
-        
+
     CSVImportError:
       type: object
       properties:
         field: { type: string }
         message: { type: string }
       required: [field, message]
-        
+
     CSVSkippedRow:
       type: object
       properties:
         row: { type: integer, minimum: 1 }
         data: { type: object }
         skip_reason: { type: string }
-        errors: 
+        errors:
           type: array
           items: { $ref: "#/components/schemas/CSVImportError" }
       required: [row, data, skip_reason, errors]
-        
+
     CSVImportResponse:
       type: object
       properties:
@@ -304,7 +313,16 @@ components:
           properties:
             importedSales: { type: boolean }
             skippedRows: { type: boolean }
-      required: [success, message, summary, importedSales, skippedRows, warnings, truncated]
+      required:
+        [
+          success,
+          message,
+          summary,
+          importedSales,
+          skippedRows,
+          warnings,
+          truncated,
+        ]
 
     InventoryDrop:
       type: object
@@ -325,7 +343,16 @@ components:
         totalValueLost: { type: number, minimum: 0 }
         reason:
           type: string
-          enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+          enum:
+            [
+              expired,
+              end_of_day,
+              quality_issue,
+              damaged,
+              contaminated,
+              overproduction,
+              other,
+            ]
         notes: { type: string, maxLength: 500, nullable: true }
         droppedBy:
           type: object
@@ -351,30 +378,85 @@ components:
         expirationDate: { type: string, format: date-time, nullable: true }
         batchId: { type: string, nullable: true }
         # Virtual fields
-        dropPercentage: { type: string, description: "Percentage of inventory dropped" }
-        undoAvailable: { type: boolean, description: "Whether drop can still be undone" }
-        undoTimeRemaining: { type: integer, description: "Minutes remaining for undo" }
-        isPartialDrop: { type: boolean, description: "True if not all inventory was dropped" }
-        daysSinceProduction: { type: integer, nullable: true, description: "Days since production date" }
+        dropPercentage:
+          { type: string, description: "Percentage of inventory dropped" }
+        undoAvailable:
+          { type: boolean, description: "Whether drop can still be undone" }
+        undoTimeRemaining:
+          { type: integer, description: "Minutes remaining for undo" }
+        isPartialDrop:
+          {
+            type: boolean,
+            description: "True if not all inventory was dropped",
+          }
+        daysSinceProduction:
+          {
+            type: integer,
+            nullable: true,
+            description: "Days since production date",
+          }
         createdAt: { type: string, format: date-time }
         updatedAt: { type: string, format: date-time }
       required:
-        [id, productId, productName, quantityDropped, originalQuantity, remainingQuantity, pricePerUnit, totalValueLost, reason, droppedBy, droppedAt]
+        [
+          id,
+          productId,
+          productName,
+          quantityDropped,
+          originalQuantity,
+          remainingQuantity,
+          pricePerUnit,
+          totalValueLost,
+          reason,
+          droppedBy,
+          droppedAt,
+        ]
 
     InventoryDropRequest:
       type: object
       properties:
-        productId: { type: string, description: "MongoDB ObjectId of the product" }
-        quantityToDrop: { type: integer, minimum: 1, description: "Number of units to drop" }
+        productId:
+          { type: string, description: "MongoDB ObjectId of the product" }
+        quantityToDrop:
+          { type: integer, minimum: 1, description: "Number of units to drop" }
         reason:
           type: string
-          enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+          enum:
+            [
+              expired,
+              end_of_day,
+              quality_issue,
+              damaged,
+              contaminated,
+              overproduction,
+              other,
+            ]
           default: end_of_day
           description: "Reason for dropping inventory"
-        notes: { type: string, maxLength: 500, description: "Additional context (optional)" }
-        productionDate: { type: string, format: date-time, description: "When product was made (optional)" }
-        expirationDate: { type: string, format: date-time, description: "Product expiration date (optional)" }
-        batchId: { type: string, maxLength: 100, description: "Batch/lot identifier (optional)" }
+        notes:
+          {
+            type: string,
+            maxLength: 500,
+            description: "Additional context (optional)",
+          }
+        productionDate:
+          {
+            type: string,
+            format: date-time,
+            description: "When product was made (optional)",
+          }
+        expirationDate:
+          {
+            type: string,
+            format: date-time,
+            description: "Product expiration date (optional)",
+          }
+        batchId:
+          {
+            type: string,
+            maxLength: 100,
+            description: "Batch/lot identifier (optional)",
+          }
       required: [productId, quantityToDrop]
 
     InventoryDropResponse:
@@ -401,7 +483,12 @@ components:
     UndoDropRequest:
       type: object
       properties:
-        undoReason: { type: string, maxLength: 300, description: "Reason for undoing the drop (optional)" }
+        undoReason:
+          {
+            type: string,
+            maxLength: 300,
+            description: "Reason for undoing the drop (optional)",
+          }
 
     UndoDropResponse:
       type: object
@@ -717,9 +804,22 @@ paths:
                     type: array
                     items:
                       type: object
-                      required: [_id, firstName, lastName, email, dateOfBirth, createdAt, createdBy]
+                      required:
+                        [
+                          _id,
+                          firstName,
+                          lastName,
+                          email,
+                          dateOfBirth,
+                          createdAt,
+                          createdBy,
+                        ]
                       properties:
-                        _id: { type: string, description: "Unique identifier for the pending seller" }
+                        _id:
+                          {
+                            type: string,
+                            description: "Unique identifier for the pending seller",
+                          }
                         firstName: { type: string }
                         lastName: { type: string }
                         email: { type: string, format: email }
@@ -1022,7 +1122,8 @@ paths:
           description: Customer transaction history
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/CustomerTransactionsResponse" }
+              schema:
+                { $ref: "#/components/schemas/CustomerTransactionsResponse" }
         "400":
           description: Invalid pagination parameters
           content:
@@ -1042,10 +1143,10 @@ paths:
       description: |
         Bulk import customers from a CSV file with comprehensive validation and error handling.
         Supports detailed reporting of successful imports and failures with conflict detection.
-        
+
         **CSV Format Required:**
         - firstName,lastName,phoneNumber,email
-        
+
         **Features:**
         - Duplicate phone number detection
         - Email uniqueness validation
@@ -1102,7 +1203,15 @@ paths:
                     properties:
                       successfulImports: { type: boolean }
                       failures: { type: boolean }
-                required: [success, message, summary, successfulImports, failures, truncated]
+                required:
+                  [
+                    success,
+                    message,
+                    summary,
+                    successfulImports,
+                    failures,
+                    truncated,
+                  ]
         "400":
           description: No file provided or invalid file format
           content:
@@ -1241,7 +1350,8 @@ paths:
           example: "2024-01-31T23:59:59.999Z"
         - name: dateField
           in: query
-          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          schema:
+            { type: string, enum: [createdAt, updatedAt], default: createdAt }
           description: Date field to filter by
         - name: page
           in: query
@@ -1309,10 +1419,10 @@ paths:
       description: |
         Import sales data from CSV file with comprehensive validation and error handling.
         Supports customer/product resolution, duplicate detection, and batch tracking.
-        
+
         **CSV Format Required:**
         - Date,Contact Name,Contact Phone,Contact Email,Product,Quantity,Unit Price,Total Amount,Amount Paid
-        
+
         **Features:**
         - Automatic phone number normalization (supports various formats)
         - Customer resolution by phone or email
@@ -1437,11 +1547,13 @@ paths:
           example: "2024-01-31T23:59:59.999Z"
         - name: dateField
           in: query
-          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          schema:
+            { type: string, enum: [createdAt, updatedAt], default: createdAt }
           description: Date field to filter by
         - name: groupBy
           in: query
-          schema: { type: string, enum: [hour, day, week, month, year], default: day }
+          schema:
+            { type: string, enum: [hour, day, week, month, year], default: day }
           description: Time grouping for time-series data
       responses:
         "200":
@@ -1454,8 +1566,10 @@ paths:
                   period:
                     type: object
                     properties:
-                      startDate: { type: string, format: date-time, nullable: true }
-                      endDate: { type: string, format: date-time, nullable: true }
+                      startDate:
+                        { type: string, format: date-time, nullable: true }
+                      endDate:
+                        { type: string, format: date-time, nullable: true }
                       dateField: { type: string }
                       groupBy: { type: string }
                   summary:
@@ -1532,11 +1646,17 @@ paths:
           description: End date for filtering (ISO 8601 format)
         - name: dateField
           in: query
-          schema: { type: string, enum: [createdAt, updatedAt], default: createdAt }
+          schema:
+            { type: string, enum: [createdAt, updatedAt], default: createdAt }
           description: Date field to filter by
         - name: format
           in: query
-          schema: { type: string, enum: [detailed, summary, products], default: detailed }
+          schema:
+            {
+              type: string,
+              enum: [detailed, summary, products],
+              default: detailed,
+            }
           description: |
             Export format:
             - detailed: Individual product line items with full transaction details
@@ -1829,7 +1949,7 @@ paths:
       description: |
         Drop inventory for expired, damaged, or end-of-day waste. Creates permanent audit record 
         and updates product inventory atomically. Only accessible by admin and superadmin users.
-        
+
         **Features:**
         - Atomic transaction processing (inventory + audit record)
         - 8-hour undo window for operational error recovery
@@ -1884,9 +2004,18 @@ paths:
           description: Filter by specific product ID
         - name: reason
           in: query
-          schema: 
+          schema:
             type: string
-            enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+            enum:
+              [
+                expired,
+                end_of_day,
+                quality_issue,
+                damaged,
+                contaminated,
+                overproduction,
+                other,
+              ]
           description: Filter by drop reason
         - name: droppedBy
           in: query
@@ -1909,7 +2038,8 @@ paths:
           description: List of inventory drops with pagination
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/InventoryDropsListResponse" }
+              schema:
+                { $ref: "#/components/schemas/InventoryDropsListResponse" }
         "400":
           description: Invalid parameters
           content:
@@ -1969,9 +2099,18 @@ paths:
           description: Filter by specific product
         - name: reason
           in: query
-          schema: 
+          schema:
             type: string
-            enum: [expired, end_of_day, quality_issue, damaged, contaminated, overproduction, other]
+            enum:
+              [
+                expired,
+                end_of_day,
+                quality_issue,
+                damaged,
+                contaminated,
+                overproduction,
+                other,
+              ]
           description: Filter by drop reason
         - name: droppedBy
           in: query
@@ -2018,7 +2157,8 @@ paths:
                 properties:
                   drop: { $ref: "#/components/schemas/InventoryDrop" }
                   canUndo: { type: boolean }
-                  timeRemainingForUndo: { type: integer, description: "Minutes remaining for undo" }
+                  timeRemainingForUndo:
+                    { type: integer, description: "Minutes remaining for undo" }
                 required: [drop, canUndo, timeRemainingForUndo]
         "404":
           description: Inventory drop not found
@@ -2039,7 +2179,7 @@ paths:
       description: |
         Undo an inventory drop within the 8-hour recovery window. Restores inventory 
         to the product and marks the drop as undone for audit purposes.
-        
+
         **Business Rules:**
         - Must be within 8 hours of original drop
         - Drop must not already be undone
@@ -2105,15 +2245,21 @@ paths:
                   documentation:
                     type: object
                     properties:
-                      interactive: { type: string, description: "Swagger UI URL" }
-                      json: { type: string, description: "OpenAPI JSON spec URL" }
-                      static: { type: string, description: "Static documentation URL" }
+                      interactive:
+                        { type: string, description: "Swagger UI URL" }
+                      json:
+                        { type: string, description: "OpenAPI JSON spec URL" }
+                      static:
+                        {
+                          type: string,
+                          description: "Static documentation URL",
+                        }
                   capabilities:
                     type: object
                     properties:
                       endpoints: { type: string }
                       categories: { type: string }
-                      features: 
+                      features:
                         type: array
                         items: { type: string }
                   quickStart:
@@ -2123,9 +2269,19 @@ paths:
                       step2: { type: string }
                       step3: { type: string }
                       step4: { type: string }
-                  health: { type: string, description: "Health check endpoint URL" }
-                required: [message, version, server, documentation, capabilities, quickStart, health]
-  
+                  health:
+                    { type: string, description: "Health check endpoint URL" }
+                required:
+                  [
+                    message,
+                    version,
+                    server,
+                    documentation,
+                    capabilities,
+                    quickStart,
+                    health,
+                  ]
+
   /health:
     get:
       summary: API health check
@@ -2143,5 +2299,6 @@ paths:
                 properties:
                   status: { type: string, example: "OK" }
                   timestamp: { type: string, format: date-time }
-                  uptime: { type: number, description: "Server uptime in seconds" }
+                  uptime:
+                    { type: number, description: "Server uptime in seconds" }
                 required: [status, timestamp, uptime]

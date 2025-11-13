@@ -59,6 +59,7 @@ The Docker Compose setup successfully builds and runs all services. However, the
    - Accessing `http://localhost/` returns `404 Not Found` from Traefik
 
 **Root Cause**: Traefik Docker provider is not creating a router for the frontend service despite:
+
 - Container having correct labels (`traefik.enable=true`, etc.)
 - Container being on the correct network (`bitetrack_web`)
 - Traefik having access to Docker socket
@@ -81,11 +82,11 @@ bitetrack_backend (172.21.0.0/16 - internal):
 
 ## Traefik Routers Discovered
 
-| Router | Rule | Priority | Status |
-|--------|------|----------|--------|
-| `api@docker` | `PathPrefix(\`/api\`) \|\| PathPrefix(\`/bitetrack\`)` | 46 | Enabled |
-| `mcp@docker` | `PathPrefix(\`/mcp\`)` | 18 | Enabled |
-| `frontend@docker` | **MISSING** | N/A | |
+| Router            | Rule                                                   | Priority | Status  |
+| ----------------- | ------------------------------------------------------ | -------- | ------- |
+| `api@docker`      | `PathPrefix(\`/api\`) \|\| PathPrefix(\`/bitetrack\`)` | 46       | Enabled |
+| `mcp@docker`      | `PathPrefix(\`/mcp\`)`                                 | 18       | Enabled |
+| `frontend@docker` | **MISSING**                                            | N/A      |         |
 
 ## Services Discovered
 
@@ -143,6 +144,7 @@ bitetrack-traefik Running (unhealthy initially, then healthy)
 ### Immediate Workaround
 
 Use the API and MCP services directly - they are fully functional:
+
 - API: `http://localhost/bitetrack/*`
 - MCP: `http://localhost/mcp/*`
 - Traefik Dashboard: `http://localhost:8080/`
@@ -150,6 +152,7 @@ Use the API and MCP services directly - they are fully functional:
 ### Frontend Access Options
 
 1. **Direct IP Access** (temporary):
+
    ```bash
    FRONTEND_IP=$(docker inspect bitetrack-frontend | jq -r '.[0].NetworkSettings.Networks.bitetrack_web.IPAddress')
    curl http://$FRONTEND_IP/
@@ -166,6 +169,7 @@ Use the API and MCP services directly - they are fully functional:
 ### Investigation Needed
 
 The frontend router discovery issue requires further investigation:
+
 - Check Traefik version compatibility with router priority settings
 - Verify if there's a conflict with internal Traefik dashboard router
 - Consider using explicit `Host()` rule instead of just `PathPrefix(\`/\`)`

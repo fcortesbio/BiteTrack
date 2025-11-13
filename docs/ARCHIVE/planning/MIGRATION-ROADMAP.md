@@ -11,6 +11,7 @@
 ### **Why These Migrations Matter**
 
 **ES Modules Migration Benefits:**
+
 - Modern JavaScript standard (future-proof)
 - Better tree-shaking and bundle optimization
 - Native browser compatibility for future frontend
@@ -19,6 +20,7 @@
 - Better TypeScript integration path
 
 **MCP + Gemini AI Integration Benefits:**
+
 - Conversational API interface for users
 - Natural language business operations
 - Enhanced user experience (non-technical users)
@@ -55,6 +57,7 @@ Then: UX Development
 #### **Day 1: Package Configuration**
 
 **1. Update package.json**
+
 ```json
 {
   "type": "module",
@@ -72,6 +75,7 @@ Then: UX Development
 ```
 
 **2. Update Jest Configuration**
+
 ```json
 {
   "jest": {
@@ -87,13 +91,14 @@ Then: UX Development
 ```
 
 **3. Update ESLint Configuration**
+
 ```javascript
 // eslint.config.js
 export default [
   {
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module',
+      sourceType: "module",
       globals: {
         ...globals.node,
         ...globals.es2021,
@@ -106,6 +111,7 @@ export default [
 #### **Day 2: Tooling & Dependencies**
 
 **Check Compatibility:**
+
 ```bash
 # Verify all dependencies support ES modules
 npm ls
@@ -114,6 +120,7 @@ npm update mongoose express dotenv
 ```
 
 **Key Dependencies Status:**
+
 - Express.js: ESM compatible (v5+, or v4 with imports)
 - Mongoose: ESM compatible (v7+)
 - dotenv: ESM compatible (use import with config)
@@ -129,6 +136,7 @@ npm update mongoose express dotenv
 **Day 3: Utilities & Models**
 
 **Order of Migration:**
+
 1. `utils/` → Pure functions, easiest to migrate
 2. `models/` → Mongoose schemas, straightforward
 3. `middleware/` → Express middleware
@@ -140,24 +148,26 @@ npm update mongoose express dotenv
 **Example Conversion Pattern:**
 
 **Before (CommonJS):**
+
 ```javascript
 // utils/jwt.js
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
 module.exports = { generateToken };
 ```
 
 **After (ES Modules):**
+
 ```javascript
 // utils/jwt.js
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 export const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 ```
 
@@ -166,43 +176,47 @@ export const generateToken = (payload) => {
 **Special Cases to Handle:**
 
 1. **Dynamic Imports (if needed):**
+
 ```javascript
 // For conditional imports
-const module = await import('./dynamic-module.js');
+const module = await import("./dynamic-module.js");
 ```
 
-2. **__dirname and __filename Replacement:**
+2. ****dirname and **filename Replacement:**
+
 ```javascript
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 ```
 
 3. **require.resolve Alternative:**
+
 ```javascript
-import { createRequire } from 'module';
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const resolvedPath = require.resolve('module-name');
+const resolvedPath = require.resolve("module-name");
 ```
 
 **Day 5: Routes & Entry Point**
 
 **Main Server File (index.js):**
+
 ```javascript
 // index.js
-import 'dotenv/config'; // ESM way to load dotenv
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
-import morgan from 'morgan';
+import "dotenv/config"; // ESM way to load dotenv
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import morgan from "morgan";
 
 // Import routes
-import authRoutes from './routes/auth.js';
-import sellerRoutes from './routes/sellers.js';
+import authRoutes from "./routes/auth.js";
+import sellerRoutes from "./routes/sellers.js";
 // ... other imports
 
 const app = express();
@@ -216,16 +230,18 @@ const app = express();
 #### **Day 6-7: Test Suite Migration**
 
 **Update Test Files:**
+
 ```javascript
 // tests/integration/auth-real.test.js
-import request from 'supertest';
-import mongoose from 'mongoose';
-import { jest } from '@jest/globals';
-import app from '../../testApp.js';
-import Seller from '../../models/Seller.js';
+import request from "supertest";
+import mongoose from "mongoose";
+import { jest } from "@jest/globals";
+import app from "../../testApp.js";
+import Seller from "../../models/Seller.js";
 ```
 
 **Run Tests Incrementally:**
+
 ```bash
 # Test each module as you migrate
 npm test -- auth-real.test.js
@@ -237,6 +253,7 @@ npm test # Full suite
 #### **Day 8: Integration Testing**
 
 **Critical Tests:**
+
 1. All 204 tests still passing
 2. MongoDB connection works
 3. JWT authentication functional
@@ -249,6 +266,7 @@ npm test # Full suite
 ### **Phase 4: Documentation Update** (2 days)
 
 **Update Documentation:**
+
 - README.md: Update import examples
 - WARP.md: Update code patterns
 - API-documentation.md: Update code snippets
@@ -261,12 +279,14 @@ npm test # Full suite
 ### **Understanding MCP (Model Context Protocol)**
 
 **What is MCP?**
+
 - Protocol for connecting AI models to external data sources
 - Allows AI assistants to interact with your API
 - Enables conversational interfaces for business operations
 - Standardized way to expose tools/functions to AI
 
 **Architecture Overview:**
+
 ```
 User (Natural Language)
     ↓
@@ -286,6 +306,7 @@ Business Operations (Sales, Inventory, Customers)
 #### **Day 1: MCP Server Setup**
 
 **Install MCP Dependencies:**
+
 ```bash
 npm install @modelcontextprotocol/sdk
 npm install @google/generative-ai
@@ -293,6 +314,7 @@ npm install zod # For schema validation
 ```
 
 **Create MCP Server Structure:**
+
 ```
 BiteTrack/
  mcp/
@@ -313,35 +335,38 @@ BiteTrack/
 #### **Day 2: Tool Definitions**
 
 **Example Tool Definition (Sales):**
+
 ```javascript
 // mcp/tools/sales-tools.js
-import { z } from 'zod';
+import { z } from "zod";
 
 export const salesTools = [
   {
-    name: 'create_sale',
-    description: 'Create a new sale transaction with products and customer',
+    name: "create_sale",
+    description: "Create a new sale transaction with products and customer",
     inputSchema: z.object({
-      customerId: z.string().describe('Customer ID'),
-      products: z.array(z.object({
-        productId: z.string(),
-        quantity: z.number().positive(),
-      })),
+      customerId: z.string().describe("Customer ID"),
+      products: z.array(
+        z.object({
+          productId: z.string(),
+          quantity: z.number().positive(),
+        }),
+      ),
       amountPaid: z.number().nonnegative(),
     }),
   },
   {
-    name: 'get_sales_analytics',
-    description: 'Get sales analytics and business intelligence',
+    name: "get_sales_analytics",
+    description: "Get sales analytics and business intelligence",
     inputSchema: z.object({
       startDate: z.string().optional(),
       endDate: z.string().optional(),
-      groupBy: z.enum(['hour', 'day', 'week', 'month', 'year']).optional(),
+      groupBy: z.enum(["hour", "day", "week", "month", "year"]).optional(),
     }),
   },
   {
-    name: 'settle_payment',
-    description: 'Mark a sale as settled/paid',
+    name: "settle_payment",
+    description: "Mark a sale as settled/paid",
     inputSchema: z.object({
       saleId: z.string(),
     }),
@@ -352,32 +377,36 @@ export const salesTools = [
 #### **Day 3: MCP Server Implementation**
 
 **Core MCP Server:**
+
 ```javascript
 // mcp/server.js
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { salesTools } from './tools/sales-tools.js';
-import { inventoryTools } from './tools/inventory-tools.js';
-import { customerTools } from './tools/customer-tools.js';
-import { handleToolCall } from './handlers/api-client.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { salesTools } from "./tools/sales-tools.js";
+import { inventoryTools } from "./tools/inventory-tools.js";
+import { customerTools } from "./tools/customer-tools.js";
+import { handleToolCall } from "./handlers/api-client.js";
 
-const server = new Server({
-  name: 'bitetrack-mcp',
-  version: '1.0.0',
-}, {
-  capabilities: {
-    tools: {},
+const server = new Server(
+  {
+    name: "bitetrack-mcp",
+    version: "1.0.0",
   },
-});
+  {
+    capabilities: {
+      tools: {},
+    },
+  },
+);
 
 // Register all tools
 const allTools = [...salesTools, ...inventoryTools, ...customerTools];
 
-server.setRequestHandler('tools/list', async () => ({
+server.setRequestHandler("tools/list", async () => ({
   tools: allTools,
 }));
 
-server.setRequestHandler('tools/call', async (request) => {
+server.setRequestHandler("tools/call", async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
@@ -385,7 +414,7 @@ server.setRequestHandler('tools/call', async (request) => {
     return {
       content: [
         {
-          type: 'text',
+          type: "text",
           text: JSON.stringify(result, null, 2),
         },
       ],
@@ -394,7 +423,7 @@ server.setRequestHandler('tools/call', async (request) => {
     return {
       content: [
         {
-          type: 'text',
+          type: "text",
           text: `Error: ${error.message}`,
         },
       ],
@@ -415,6 +444,7 @@ await server.connect(transport);
 #### **Day 4: Gemini Setup**
 
 **Environment Configuration:**
+
 ```bash
 # .env.development
 GEMINI_API_KEY=your_gemini_api_key_here
@@ -422,15 +452,16 @@ GEMINI_MODEL=gemini-2.0-flash-exp # Latest model
 ```
 
 **Gemini Client Setup:**
+
 ```javascript
 // mcp/config/gemini-client.js
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const createChatSession = () => {
   const model = genAI.getGenerativeModel({
-    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
+    model: process.env.GEMINI_MODEL || "gemini-2.0-flash-exp",
   });
 
   return model.startChat({
@@ -448,11 +479,12 @@ export const createChatSession = () => {
 #### **Day 5: Conversational Interface**
 
 **Create Chat Endpoint:**
+
 ```javascript
 // routes/ai-chat.js
-import express from 'express';
-import { authenticate } from '../middleware/auth.js';
-import { handleChatMessage } from '../mcp/handlers/chat-handler.js';
+import express from "express";
+import { authenticate } from "../middleware/auth.js";
+import { handleChatMessage } from "../mcp/handlers/chat-handler.js";
 
 const router = express.Router();
 
@@ -460,7 +492,7 @@ const router = express.Router();
 router.use(authenticate);
 
 // POST /ai-chat
-router.post('/', async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { message, conversationId } = req.body;
     const userId = req.user.id;
@@ -479,7 +511,7 @@ router.post('/', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      error: 'Chat Error',
+      error: "Chat Error",
       message: error.message,
     });
   }
@@ -491,33 +523,36 @@ export default router;
 #### **Day 6: Tool Execution Handler**
 
 **API Client for Tool Execution:**
+
 ```javascript
 // mcp/handlers/api-client.js
-import axios from 'axios';
+import axios from "axios";
 
 class BiteTrackAPIClient {
   constructor(baseURL, authToken) {
     this.client = axios.create({
-      baseURL: baseURL || 'http://localhost:3000/bitetrack',
+      baseURL: baseURL || "http://localhost:3000/bitetrack",
       headers: {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authToken}`,
+        "Content-Type": "application/json",
       },
     });
   }
 
   async createSale(data) {
-    const response = await this.client.post('/sales', data);
+    const response = await this.client.post("/sales", data);
     return response.data;
   }
 
   async getSalesAnalytics(params) {
-    const response = await this.client.get('/reporting/sales/analytics', { params });
+    const response = await this.client.get("/reporting/sales/analytics", {
+      params,
+    });
     return response.data;
   }
 
   async listProducts(params) {
-    const response = await this.client.get('/products', { params });
+    const response = await this.client.get("/products", { params });
     return response.data;
   }
 
@@ -528,11 +563,11 @@ export const handleToolCall = async (toolName, args, authToken) => {
   const client = new BiteTrackAPIClient(null, authToken);
 
   switch (toolName) {
-    case 'create_sale':
+    case "create_sale":
       return await client.createSale(args);
-    case 'get_sales_analytics':
+    case "get_sales_analytics":
       return await client.getSalesAnalytics(args);
-    case 'list_products':
+    case "list_products":
       return await client.listProducts(args);
     // ... other cases
     default:
@@ -611,45 +646,47 @@ Response: "Total waste this month: $234.50 (15 items dropped)..."
 **Security Considerations:**
 
 1. **Role-Based Tool Access:**
+
 ```javascript
 // mcp/middleware/tool-authorization.js
 export const authorizeToolUse = (toolName, userRole) => {
   const adminOnlyTools = [
-    'create_user',
-    'manage_inventory_drops',
-    'delete_sale',
+    "create_user",
+    "manage_inventory_drops",
+    "delete_sale",
   ];
 
-  const superAdminOnlyTools = [
-    'change_user_role',
-    'reset_password',
-  ];
+  const superAdminOnlyTools = ["change_user_role", "reset_password"];
 
-  if (superAdminOnlyTools.includes(toolName) && userRole !== 'superadmin') {
-    throw new Error('SuperAdmin access required');
+  if (superAdminOnlyTools.includes(toolName) && userRole !== "superadmin") {
+    throw new Error("SuperAdmin access required");
   }
 
-  if (adminOnlyTools.includes(toolName) &&
-      !['admin', 'superadmin'].includes(userRole)) {
-    throw new Error('Admin access required');
+  if (
+    adminOnlyTools.includes(toolName) &&
+    !["admin", "superadmin"].includes(userRole)
+  ) {
+    throw new Error("Admin access required");
   }
 };
 ```
 
 2. **Input Validation:**
+
 - Use Zod schemas for all tool inputs
 - Validate dates, IDs, amounts
 - Sanitize user inputs
 
 3. **Rate Limiting:**
+
 ```javascript
 // Special rate limit for AI endpoints
 const aiChatLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 30, // 30 AI requests per 15 minutes
   message: {
-    error: 'Too Many AI Requests',
-    message: 'Please wait before making more AI queries',
+    error: "Too Many AI Requests",
+    message: "Please wait before making more AI queries",
   },
 });
 ```
@@ -671,7 +708,7 @@ const aiChatLimiter = rateLimit({
 - [ ] Migrate config/ directory
 - [ ] Migrate index.js entry point
 - [ ] Migrate test files
-- [ ] Update __dirname/__filename usage
+- [ ] Update **dirname/**filename usage
 - [ ] Run full test suite (204 tests should pass)
 - [ ] Update Docker configuration if needed
 - [ ] Update all documentation
@@ -704,6 +741,7 @@ const aiChatLimiter = rateLimit({
 ## **Success Criteria**
 
 ### **ES Modules Migration Complete When:**
+
 - All 204 tests passing with ES modules
 - No `require()` statements remain
 - All imports use `.js` extensions
@@ -712,6 +750,7 @@ const aiChatLimiter = rateLimit({
 - Documentation updated
 
 ### **MCP Integration Complete When:**
+
 - Users can chat naturally with the API
 - All core business operations accessible via chat
 - Role-based security enforced
@@ -726,37 +765,40 @@ const aiChatLimiter = rateLimit({
 
 ### **ES Modules Migration Risks**
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Breaking tests | High | Migrate incrementally, test often |
-| Docker build issues | Medium | Update Dockerfile, test builds |
+| Risk                        | Impact | Mitigation                                         |
+| --------------------------- | ------ | -------------------------------------------------- |
+| Breaking tests              | High   | Migrate incrementally, test often                  |
+| Docker build issues         | Medium | Update Dockerfile, test builds                     |
 | Third-party incompatibility | Medium | Check dependencies, use require() bridge if needed |
-| __dirname/__filename breaks | Low | Use import.meta.url alternative |
+| **dirname/**filename breaks | Low    | Use import.meta.url alternative                    |
 
 ### **MCP Integration Risks**
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Gemini API costs | Medium | Implement strict rate limiting |
-| Security vulnerabilities | High | Role-based access, input validation |
-| Tool execution errors | Medium | Robust error handling, fallbacks |
-| Context confusion | Medium | Clear tool descriptions, examples |
+| Risk                     | Impact | Mitigation                          |
+| ------------------------ | ------ | ----------------------------------- |
+| Gemini API costs         | Medium | Implement strict rate limiting      |
+| Security vulnerabilities | High   | Role-based access, input validation |
+| Tool execution errors    | Medium | Robust error handling, fallbacks    |
+| Context confusion        | Medium | Clear tool descriptions, examples   |
 
 ---
 
 ## **Learning Resources**
 
 ### **ES Modules**
+
 - Node.js ES Modules Docs: https://nodejs.org/api/esm.html
 - Jest ESM Support: https://jestjs.io/docs/ecmascript-modules
 - Express with ES Modules: https://expressjs.com/en/advanced/best-practice-performance.html
 
 ### **MCP (Model Context Protocol)**
+
 - MCP Specification: https://modelcontextprotocol.io
 - MCP SDK: https://github.com/modelcontextprotocol/typescript-sdk
 - Examples: https://github.com/modelcontextprotocol/servers
 
 ### **Gemini AI**
+
 - Gemini API Docs: https://ai.google.dev/docs
 - Function Calling: https://ai.google.dev/docs/function_calling
 - Best Practices: https://ai.google.dev/docs/best_practices
@@ -766,6 +808,7 @@ const aiChatLimiter = rateLimit({
 ## **Post-Migration Benefits**
 
 **After Both Migrations:**
+
 - Modern, future-proof JavaScript codebase
 - AI-powered conversational business operations
 - Reduced learning curve for non-technical users
@@ -775,6 +818,7 @@ const aiChatLimiter = rateLimit({
 - Ready for modern UX development
 
 **Then Ready For:**
+
 - Next.js frontend with native ESM support
 - Real-time AI chat interface
 - Voice-activated business operations

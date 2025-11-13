@@ -33,11 +33,13 @@ Complete Docker Compose orchestration with Traefik reverse proxy for all BiteTra
 ## Quick Start
 
 ### One-Command Setup
+
 ```bash
 ./scripts/init.sh
 ```
 
 This automated script will:
+
 1. Check prerequisites (Docker, Docker Compose)
 2. Create `.env` with secure secrets
 3. Build all service images
@@ -46,6 +48,7 @@ This automated script will:
 6. Run health checks
 
 ### Manual Setup
+
 ```bash
 # 1. Create environment file
 cp ../.env.example ../.env
@@ -63,17 +66,18 @@ docker compose exec mongodb mongosh --eval "rs.initiate()"
 
 ## Service Access
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend** | http://localhost | React web interface |
-| **API** | http://localhost/bitetrack | REST API endpoints |
-| **API Docs** | http://localhost/bitetrack/api-docs | Interactive Swagger UI |
-| **MCP** | http://localhost/mcp | AI chat server |
-| **Traefik** | http://localhost:8080 | Reverse proxy dashboard |
+| Service      | URL                                 | Description             |
+| ------------ | ----------------------------------- | ----------------------- |
+| **Frontend** | http://localhost                    | React web interface     |
+| **API**      | http://localhost/bitetrack          | REST API endpoints      |
+| **API Docs** | http://localhost/bitetrack/api-docs | Interactive Swagger UI  |
+| **MCP**      | http://localhost/mcp                | AI chat server          |
+| **Traefik**  | http://localhost:8080               | Reverse proxy dashboard |
 
 ## Common Commands
 
 ### Service Management
+
 ```bash
 # Start all services
 docker compose up -d
@@ -94,6 +98,7 @@ docker compose logs -f bitetrack-mcp
 ```
 
 ### Build & Deploy
+
 ```bash
 # Rebuild specific service
 docker compose build bitetrack-api
@@ -107,6 +112,7 @@ docker compose build --no-cache
 ```
 
 ### Health Checks
+
 ```bash
 # Check all service status
 docker compose ps
@@ -118,6 +124,7 @@ curl http://localhost/mcp/health
 ```
 
 ### MongoDB Management
+
 ```bash
 # Connect to MongoDB shell
 docker compose exec mongodb mongosh -u admin -p
@@ -133,14 +140,15 @@ docker compose exec mongodb mongosh --eval "show dbs"
 
 Traefik automatically routes traffic based on path prefixes:
 
-| Path | Target Service | Middleware |
-|------|---------------|------------|
-| `/` | Frontend | None |
-| `/api/*` | API | None |
-| `/bitetrack/*` | API | None |
-| `/mcp/*` | MCP | Strip `/mcp` prefix |
+| Path           | Target Service | Middleware          |
+| -------------- | -------------- | ------------------- |
+| `/`            | Frontend       | None                |
+| `/api/*`       | API            | None                |
+| `/bitetrack/*` | API            | None                |
+| `/mcp/*`       | MCP            | Strip `/mcp` prefix |
 
 ### Priority Rules
+
 1. `/mcp/*` → MCP (highest priority)
 2. `/api/*`, `/bitetrack/*` → API
 3. `/*` → Frontend (lowest priority, catch-all)
@@ -148,18 +156,22 @@ Traefik automatically routes traffic based on path prefixes:
 ## Security
 
 ### Network Isolation
+
 - **`web` network**: Public-facing (Traefik, Frontend, API, MCP)
 - **`backend` network**: Internal only (MongoDB, API, MCP)
   - MongoDB is NOT exposed to the `web` network
   - Only API and MCP can access MongoDB
 
 ### Environment Variables
+
 All sensitive values should be in `.env` (never commit this file):
+
 - `MONGO_ROOT_PASSWORD` - MongoDB admin password
 - `JWT_SECRET` - API authentication secret
 - `GEMINI_API_KEY` - MCP AI service key
 
 Generate secure values:
+
 ```bash
 openssl rand -base64 32 # For JWT_SECRET
 openssl rand -base64 24 # For passwords
@@ -168,6 +180,7 @@ openssl rand -base64 24 # For passwords
 ## Service Configuration
 
 ### Frontend (React + Nginx)
+
 - **Build**: Multi-stage (Node.js build → Nginx serve)
 - **Port**: Internal 80, External via Traefik
 - **Health**: `GET /health`
@@ -175,18 +188,21 @@ openssl rand -base64 24 # For passwords
 - **SPA routing**: All paths → `index.html`
 
 ### API (Node.js + Express)
+
 - **Build**: Single-stage production
 - **Port**: Internal 3000
 - **Health**: `GET /bitetrack/health`
 - **Database**: MongoDB via `backend` network
 
 ### MCP (Node.js + Express)
+
 - **Build**: Single-stage production
 - **Port**: Internal 3001
 - **Health**: `GET /health`
 - **API Access**: Via `backend` network
 
 ### MongoDB
+
 - **Image**: `mongo:8.0-noble`
 - **Replica Set**: `rs0` (required for transactions)
 - **Volumes**: Persistent data in `mongodb_data`
@@ -195,6 +211,7 @@ openssl rand -base64 24 # For passwords
 ## Troubleshooting
 
 ### Services won't start
+
 ```bash
 # Check Docker is running
 docker ps
@@ -207,6 +224,7 @@ ls -la ../.env
 ```
 
 ### Can't access services
+
 ```bash
 # Verify Traefik is running
 docker compose ps traefik
@@ -219,6 +237,7 @@ open http://localhost:8080
 ```
 
 ### MongoDB connection issues
+
 ```bash
 # Check MongoDB is healthy
 docker compose ps mongodb
@@ -231,6 +250,7 @@ docker compose exec bitetrack-api wget -O- mongodb:27017
 ```
 
 ### Build failures
+
 ```bash
 # Clean and rebuild
 docker compose down -v
@@ -241,13 +261,16 @@ docker compose build --no-cache
 ## Monitoring
 
 ### Traefik Dashboard
+
 Access at http://localhost:8080 to view:
+
 - Active routers and services
 - HTTP request metrics
 - Health check status
 - Error logs
 
 ### Docker Stats
+
 ```bash
 # Real-time resource usage
 docker stats
@@ -257,6 +280,7 @@ docker stats bitetrack-api
 ```
 
 ### Logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -271,15 +295,18 @@ docker compose logs --since 1h
 ## Production Deployment
 
 ### Enable HTTPS
+
 1. Uncomment SSL sections in `traefik/traefik.yml`
 2. Set `ACME_EMAIL` in `.env`
 3. Update `DOMAIN` in `.env`
 4. Restart Traefik:
+
 ```bash
 docker compose up -d traefik
 ```
 
 ### Performance Tuning
+
 ```bash
 # Scale API horizontally
 docker compose up -d --scale bitetrack-api=3
@@ -293,6 +320,7 @@ deploy:
 ```
 
 ### Backup
+
 ```bash
 # MongoDB backup
 docker compose exec mongodb mongodump --out /data/backup
@@ -312,6 +340,7 @@ docker cp bitetrack-mongodb:/data/backup ./mongodb-backup
 ## Contributing
 
 When adding new services:
+
 1. Create service directory in `services/`
 2. Add standalone Dockerfile
 3. Add service to `docker-compose.yml`

@@ -10,11 +10,13 @@ Both Traefik and Frontend containers were showing as unhealthy despite running c
 ## Root Causes Identified
 
 ### 1. **Traefik Health Check** (Line 43)
+
 **Issue:** The health check command `traefik healthcheck --ping` was failing with `404 Not Found`.
 
 **Root Cause:** The `--ping` endpoint was not enabled in Traefik's configuration.
 
 **Error Output:**
+
 ```
 Bad healthcheck status: 404 Not Found
 ```
@@ -27,11 +29,13 @@ command:
 ```
 
 ### 2. **Frontend Health Check** (Line 148)
+
 **Issue:** The health check was failing with `Connection refused` despite nginx running properly.
 
 **Root Cause:** The health check used `http://localhost/health`, which resolved to IPv6 `[::1]:80`, but nginx was only listening on IPv4 `0.0.0.0:80`.
 
 **Error Output:**
+
 ```
 Connecting to localhost ([::1]:80)
 wget: can't connect to remote host: Connection refused
@@ -41,7 +45,15 @@ wget: can't connect to remote host: Connection refused
 
 ```yaml
 healthcheck:
-  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"]
+  test:
+    [
+      "CMD",
+      "wget",
+      "--no-verbose",
+      "--tries=1",
+      "--spider",
+      "http://127.0.0.1/health",
+    ]
 ```
 
 ## Changes Made
@@ -49,6 +61,7 @@ healthcheck:
 ### docker-compose.yml
 
 **Before:**
+
 ```yaml
 # Traefik
 command:
@@ -62,10 +75,19 @@ command:
 
 # Frontend
 healthcheck:
-  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+  test:
+    [
+      "CMD",
+      "wget",
+      "--no-verbose",
+      "--tries=1",
+      "--spider",
+      "http://localhost/health",
+    ]
 ```
 
 **After:**
+
 ```yaml
 # Traefik
 command:
@@ -80,7 +102,14 @@ command:
 
 # Frontend
 healthcheck:
-  test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/health"] # ← CHANGED
+  test: [
+      "CMD",
+      "wget",
+      "--no-verbose",
+      "--tries=1",
+      "--spider",
+      "http://127.0.0.1/health",
+    ] # ← CHANGED
 ```
 
 ## Verification
@@ -100,6 +129,7 @@ bitetrack-traefik Up 21 seconds (healthy)
 ### Health Check Logs
 
 **Traefik:**
+
 ```json
 {
   "ExitCode": 0,
@@ -108,6 +138,7 @@ bitetrack-traefik Up 21 seconds (healthy)
 ```
 
 **Frontend:**
+
 ```json
 {
   "ExitCode": 0,
@@ -120,6 +151,7 @@ bitetrack-traefik Up 21 seconds (healthy)
 ### Why localhost vs 127.0.0.1 Matters
 
 In Alpine Linux containers (which both nginx and Traefik use):
+
 - `localhost` can resolve to both IPv4 (127.0.0.1) and IPv6 (::1)
 - `wget` prefers IPv6 when available
 - If the service only binds to IPv4 (0.0.0.0:80), IPv6 connections fail
@@ -129,6 +161,7 @@ In Alpine Linux containers (which both nginx and Traefik use):
 ### Traefik Ping Endpoint
 
 The `--ping` flag enables a dedicated health check endpoint at:
+
 - `http://localhost:8080/ping` (when using traefik entrypoint)
 - Returns `OK` when Traefik is healthy
 
@@ -143,13 +176,13 @@ This is the recommended way to health check Traefik rather than checking the das
 
 ## All Health Checks Now Passing
 
-| Service | Health Check Command | Status |
-|---------|---------------------|--------|
-| bitetrack-api | `wget http://localhost:3000/bitetrack/health` | Healthy |
-| bitetrack-frontend | `wget http://127.0.0.1/health` | Healthy |
-| bitetrack-mcp | `wget http://localhost:3001/health` | Healthy |
-| bitetrack-mongodb | `mongosh --eval "db.adminCommand('ping')"` | Healthy |
-| bitetrack-traefik | `traefik healthcheck --ping` | Healthy |
+| Service            | Health Check Command                          | Status  |
+| ------------------ | --------------------------------------------- | ------- |
+| bitetrack-api      | `wget http://localhost:3000/bitetrack/health` | Healthy |
+| bitetrack-frontend | `wget http://127.0.0.1/health`                | Healthy |
+| bitetrack-mcp      | `wget http://localhost:3001/health`           | Healthy |
+| bitetrack-mongodb  | `mongosh --eval "db.adminCommand('ping')"`    | Healthy |
+| bitetrack-traefik  | `traefik healthcheck --ping`                  | Healthy |
 
 ## Commands to Apply Changes
 

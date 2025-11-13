@@ -5,6 +5,7 @@ This directory contains **historical and completed documentation** that provides
 ## Directory Structure
 
 ### `planning/`
+
 **Completed planning documents and strategic decisions**
 
 - **ESM-MIGRATION-ROADMAP.md** - Detailed plan for CommonJS → ES Modules migration ( Completed Nov 2025)
@@ -15,6 +16,7 @@ This directory contains **historical and completed documentation** that provides
 **Why archived:** These documents were planning/strategy docs for work that has been completed or superseded by current roadmap.
 
 ### `status-snapshots/`
+
 **Point-in-time project status reports**
 
 - **PROJECT-STATUS.md** - Comprehensive status report from November 4, 2025
@@ -23,6 +25,7 @@ This directory contains **historical and completed documentation** that provides
 **Why archived:** These are historical snapshots. Current status is always in README.md and ROADMAP.md.
 
 ### `implementation-details/`
+
 **Feature implementation specifications and analysis**
 
 - **PASSWORD_RESET_IMPLEMENTATION.md** - Password reset feature technical spec
@@ -57,12 +60,14 @@ For up-to-date project information, refer to:
 ## When to Use Archive Documents
 
 **Use archived docs when you need to:**
+
 - Understand why a particular architectural decision was made
 - Reference implementation patterns from completed features
 - Review historical project milestones and evolution
 - Find detailed technical specifications for existing features
 
 **Don't use archived docs for:**
+
 - Current API endpoints (use API-documentation.md)
 - Setup instructions (use README.md)
 - Current project status (use README.md and ROADMAP.md)

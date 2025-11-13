@@ -17,12 +17,14 @@ Everything is orchestrated with Docker Compose and accessible through **one doma
 ## Quick Start (3 Steps)
 
 ### 1. **One-Command Setup**
+
 ```bash
 cd infrastructure
 ./scripts/init.sh
 ```
 
 This automated script will:
+
 - Check Docker prerequisites
 - Generate secure secrets (JWT, MongoDB password)
 - Build all service images
@@ -36,17 +38,18 @@ This automated script will:
 
 Open your browser and visit:
 
-| Service | URL | What You'll See |
-|---------|-----|-----------------|
-| **Frontend** | http://localhost | Beautiful landing page with system status |
-| **API** | http://localhost/bitetrack/health | API health check |
-| **API Docs** | http://localhost/bitetrack/api-docs | Interactive Swagger UI |
-| **MCP** | http://localhost/mcp | AI server info |
-| **Traefik Dashboard** | http://localhost:8080 | Service routing overview |
+| Service               | URL                                 | What You'll See                           |
+| --------------------- | ----------------------------------- | ----------------------------------------- |
+| **Frontend**          | http://localhost                    | Beautiful landing page with system status |
+| **API**               | http://localhost/bitetrack/health   | API health check                          |
+| **API Docs**          | http://localhost/bitetrack/api-docs | Interactive Swagger UI                    |
+| **MCP**               | http://localhost/mcp                | AI server info                            |
+| **Traefik Dashboard** | http://localhost:8080               | Service routing overview                  |
 
 ### 3. **Test Traefik Routing**
 
 All services are accessible through **one port (80)**:
+
 ```bash
 # Frontend
 curl http://localhost/
@@ -114,6 +117,7 @@ Examples:
 ```
 
 **Why this is awesome:**
+
 - One domain for everything
 - No port management (3000, 3001, etc.)
 - Easy SSL/HTTPS setup (just uncomment config)
@@ -125,6 +129,7 @@ Examples:
 ## Development Workflow
 
 ### **Option A: Docker Development** (Recommended for testing full stack)
+
 ```bash
 cd infrastructure
 
@@ -147,6 +152,7 @@ docker compose down
 ### **Option B: Local Development** (Faster for rapid iteration)
 
 **Terminal 1 - API:**
+
 ```bash
 cd services/api
 npm install
@@ -154,6 +160,7 @@ npm run dev # Port 3000
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 cd services/frontend
 npm install
@@ -161,6 +168,7 @@ npm run dev # Port 5173
 ```
 
 **Terminal 3 - MCP:**
+
 ```bash
 cd services/mcp
 npm install
@@ -168,6 +176,7 @@ npm run dev # Port 3001
 ```
 
 Then access directly:
+
 - Frontend: http://localhost:5173
 - API: http://localhost:3000
 - MCP: http://localhost:3001
@@ -177,6 +186,7 @@ Then access directly:
 ## Common Commands
 
 ### Service Management
+
 ```bash
 # Start all services
 cd infrastructure && docker compose up -d
@@ -195,6 +205,7 @@ docker compose logs -f bitetrack-api
 ```
 
 ### Development
+
 ```bash
 # Rebuild after code changes
 docker compose build bitetrack-api
@@ -209,6 +220,7 @@ docker compose up -d --build
 ```
 
 ### Database
+
 ```bash
 # Connect to MongoDB
 docker compose exec mongodb mongosh -u admin -p
@@ -222,18 +234,21 @@ docker compose exec mongodb mongosh --eval "rs.status()"
 ## Next Steps
 
 ### **For Frontend Development:**
+
 1. Open `services/frontend/src/App.jsx`
 2. Start building your dashboard
 3. API calls work automatically via Traefik: `fetch('/api/...')`
 4. Hot reload enabled (`npm run dev`)
 
 ### **For MCP Integration:**
+
 1. Open `services/mcp/index.js`
 2. Add Gemini API integration
 3. Implement MCP protocol
 4. Create tool definitions for BiteTrack API
 
 ### **For CI/CD:**
+
 1. Create `.github/workflows/ci.yml`
 2. Test all services
 3. Build Docker images
@@ -244,6 +259,7 @@ docker compose exec mongodb mongosh --eval "rs.status()"
 ## Troubleshooting
 
 ### **Services won't start**
+
 ```bash
 # Check Docker is running
 docker ps
@@ -259,6 +275,7 @@ docker compose up -d
 ```
 
 ### **Can't access frontend/API**
+
 ```bash
 # Verify Traefik is running
 docker compose ps traefik
@@ -271,6 +288,7 @@ curl http://localhost/bitetrack/health
 ```
 
 ### **MongoDB connection issues**
+
 ```bash
 # Check MongoDB is healthy
 docker compose ps mongodb
@@ -294,6 +312,7 @@ docker compose exec mongodb mongosh --eval "rs.initiate()"
 ## You're All Set!
 
 Your BiteTrack infrastructure is **production-ready** with:
+
 - Service independence (each has own Dockerfile)
 - Network isolation (MongoDB not exposed externally)
 - Automatic routing (Traefik)
@@ -302,6 +321,7 @@ Your BiteTrack infrastructure is **production-ready** with:
 - Development + Production configs
 
 **Start developing:**
+
 ```bash
 cd infrastructure
 ./scripts/init.sh

@@ -7,7 +7,11 @@
   "scripts": {
     "test": "echo \"No tests yet\""
   },
-  "keywords": ["types", "shared", "bitetrack"],
+  "keywords": [
+    "types",
+    "shared",
+    "bitetrack"
+  ],
   "author": "fcortesbio",
   "license": "MIT"
 }

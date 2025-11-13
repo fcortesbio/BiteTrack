@@ -1,6 +1,7 @@
 # Request Recovery Integration Tests
 
 ## Overview
+
 Comprehensive integration tests have been added to validate the `/auth/request-recovery` endpoint functionality, security properties, and error handling.
 
 ## Test Coverage
@@ -10,9 +11,11 @@ All tests are located in: `tests/integration/auth-real.test.js`
 ### Success Scenarios (4 tests)
 
 #### 1. Request Recovery with Valid Email and DOB
+
 **Test:** `should request password recovery with valid email and DOB`
 
 Tests that a valid password recovery request:
+
 - Returns HTTP 200 status
 - Creates a PasswordResetToken in the database
 - Token has proper expiration date (24 hours)
@@ -23,9 +26,11 @@ npm test -- --testNamePattern="should request password recovery with valid email
 ```
 
 #### 2. Security: Same Response for Non-Existent Email
+
 **Test:** `should return same message for non-existent email (security)`
 
 Validates email enumeration prevention:
+
 - Non-existent email returns identical success response
 - Prevents attackers from discovering registered emails
 - Generic message: "If an account exists with this email..."
@@ -35,9 +40,11 @@ npm test -- --testNamePattern="should return same message for non-existent email
 ```
 
 #### 3. Security: Same Response for Incorrect DOB
+
 **Test:** `should return same message for incorrect DOB (security)`
 
 Validates identity verification security:
+
 - Incorrect date of birth returns same generic message
 - No token created for non-matching DOB
 - Prevents attackers from brute-forcing DOB
@@ -47,9 +54,11 @@ npm test -- --testNamePattern="should return same message for incorrect DOB"
 ```
 
 #### 4. Token Creation Verification
+
 **Test:** `should create reset token when valid account found`
 
 Validates token lifecycle:
+
 - Reset token is created in database
 - Token is properly linked to seller ID
 - Token persists even if email sending fails (graceful degradation)
@@ -61,25 +70,33 @@ npm test -- --testNamePattern="should create reset token when valid account foun
 ### Validation Error Tests (4 tests)
 
 #### 1. Missing Email
+
 **Test:** `should reject missing email`
+
 - Status: 400
 - Returns validation error
 - Prevents incomplete requests
 
 #### 2. Invalid Email Format
+
 **Test:** `should reject invalid email format`
+
 - Status: 400
 - Returns validation error
 - Validates email format requirements
 
 #### 3. Missing Date of Birth
+
 **Test:** `should reject missing dateOfBirth`
+
 - Status: 400
 - Returns validation error
 - Ensures both identity fields are provided
 
 #### 4. Invalid Date Format
+
 **Test:** `should reject invalid date format`
+
 - Status: 400
 - Returns validation error
 - Validates ISO 8601 date format
@@ -87,26 +104,31 @@ npm test -- --testNamePattern="should create reset token when valid account foun
 ## Running Tests
 
 ### Run All Auth Tests
+
 ```bash
 npm test -- tests/integration/auth-real.test.js
 ```
 
 ### Run Specific Test Suite
+
 ```bash
 npm test -- --testNamePattern="request-recovery"
 ```
 
 ### Run Specific Test
+
 ```bash
 npm test -- --testNamePattern="should request password recovery with valid email and DOB"
 ```
 
 ### Run with Coverage
+
 ```bash
 npm run test:coverage -- tests/integration/auth-real.test.js
 ```
 
 ### Watch Mode (Development)
+
 ```bash
 npm run test:watch -- tests/integration/auth-real.test.js
 ```
@@ -147,6 +169,7 @@ The tests validate these critical security properties:
 ## Integration with Other Tests
 
 These tests integrate with existing auth tests:
+
 - **`POST /bitetrack/auth/login`** - 4 tests
 - **`POST /bitetrack/auth/activate`** - 3 tests
 - **`GET /bitetrack/auth/seller-status`** - 3 tests
@@ -158,6 +181,7 @@ These tests integrate with existing auth tests:
 To manually test the complete password recovery flow:
 
 ### Step 1: Request Recovery
+
 ```bash
 curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
   -H "Content-Type: application/json" \
@@ -168,7 +192,9 @@ curl -X POST http://localhost:3000/bitetrack/auth/request-recovery \
 ```
 
 ### Step 2: Extract Token (Development Only)
+
 In development mode, the response includes the token:
+
 ```json
 {
   "token": "abc123xyz...",
@@ -177,6 +203,7 @@ In development mode, the response includes the token:
 ```
 
 ### Step 3: Reset Password
+
 ```bash
 curl -X POST http://localhost:3000/bitetrack/auth/reset \
   -H "Content-Type: application/json" \
@@ -189,6 +216,7 @@ curl -X POST http://localhost:3000/bitetrack/auth/reset \
 ```
 
 ### Step 4: Login with New Password
+
 ```bash
 curl -X POST http://localhost:3000/bitetrack/auth/login \
   -H "Content-Type: application/json" \
@@ -209,17 +237,20 @@ curl -X POST http://localhost:3000/bitetrack/auth/login \
 ## CI/CD Integration
 
 These tests are automatically run in CI/CD pipelines:
+
 ```bash
 npm test
 ```
 
 ### GitHub Actions Example
+
 ```yaml
 - name: Run Tests
   run: npm test
 ```
 
 ### Jenkins Example
+
 ```groovy
 stage('Test') {
   steps {
@@ -231,11 +262,13 @@ stage('Test') {
 ## Debugging Failed Tests
 
 ### Enable Verbose Output
+
 ```bash
 npm run test:verbose -- tests/integration/auth-real.test.js
 ```
 
 ### Debug Single Test
+
 ```bash
 node --inspect-brk ./node_modules/.bin/jest --runInBand \
   tests/integration/auth-real.test.js \
@@ -243,6 +276,7 @@ node --inspect-brk ./node_modules/.bin/jest --runInBand \
 ```
 
 ### Check Database State
+
 Tests use MongoDB Memory Server, so database is cleaned between tests. To debug:
 
 ```javascript
@@ -251,7 +285,7 @@ afterEach(async () => {
   // Database automatically cleaned by MongoDB Memory Server
   // But you can log state before cleanup
   const tokens = await PasswordResetToken.find({});
-  console.log('PasswordResetTokens:', tokens);
+  console.log("PasswordResetTokens:", tokens);
 });
 ```
 
@@ -289,6 +323,7 @@ Potential additional tests:
 ## Support
 
 For questions or issues with tests:
+
 1. Check test output for specific failures
 2. Review error messages and stack traces
 3. Examine test expectations vs actual responses

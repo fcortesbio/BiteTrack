@@ -11,7 +11,7 @@ BiteTrack is a **production-ready business intelligence platform** that transfor
 
 > **Strategic Position**: The backend platform is **90% UI-ready** with 38 professional endpoints, advanced analytics, compliance features, and multi-role security. **Frontend development is the next strategic phase.**
 
- **[View Complete UI Development Roadmap](ROADMAP.md)** | **[Explore All 38 API Endpoints](docs/API-documentation.md)**
+**[View Complete UI Development Roadmap](ROADMAP.md)** | **[Explore All 38 API Endpoints](docs/API-documentation.md)**
 
 ---
 
@@ -115,12 +115,12 @@ For development or when you need full control:
 
 BiteTrack uses different environment files for different deployment scenarios:
 
-| File | Purpose | Tracked in Git |
-|------|---------|----------------|
-| `.env.development.example` | Development template | Yes (safe defaults) |
-| `.env.development` | Local development config | No (contains secrets) |
-| `.env.production.template` | Production deployment guide | Yes (template only) |
-| `.env.production` | Production config | No (contains secrets) |
+| File                       | Purpose                     | Tracked in Git        |
+| -------------------------- | --------------------------- | --------------------- |
+| `.env.development.example` | Development template        | Yes (safe defaults)   |
+| `.env.development`         | Local development config    | No (contains secrets) |
+| `.env.production.template` | Production deployment guide | Yes (template only)   |
+| `.env.production`          | Production config           | No (contains secrets) |
 
 ### **Environment Setup**
 
@@ -137,6 +137,7 @@ cp .env.production.template .env.production
 ### **NPM Scripts**
 
 #### ** Development & Production**
+
 ```bash
 npm run dev # Development mode with auto-reload (.env.development)
 npm run dev:watch # Same as dev (nodemon with file watching)
@@ -146,6 +147,7 @@ npm run start:production # Explicit production mode with NODE_ENV=production
 ```
 
 #### ** Testing & Quality Assurance**
+
 ```bash
 npm test # Run all tests (Jest with MongoDB Memory Server)
 npm run test:watch # Run tests in watch mode (for active development)
@@ -154,6 +156,7 @@ npm run test:verbose # Run tests with detailed output
 ```
 
 #### ** Code Quality & Linting**
+
 ```bash
 npm run lint # Run ESLint to check code quality
 npm run lint:fix # Run ESLint and automatically fix issues
@@ -161,6 +164,7 @@ npm run lint:check # Run ESLint with zero warnings policy (CI-ready)
 ```
 
 #### ** Documentation & API Tools**
+
 ```bash
 # Current API documentation access
 curl http://localhost:3000/bitetrack/ # API overview endpoint
@@ -195,6 +199,7 @@ curl http://localhost:3000/bitetrack/ # API overview endpoint
 ```
 
 **Benefits for UI Development:**
+
 - **Database utilities** - Quick data reset/seeding for frontend testing
 - **Documentation scripts** - Serve API docs alongside frontend development
 - **Quality gates** - Ensure backend stability while building UI
@@ -400,17 +405,17 @@ npm test -- sales # Sales tests (placeholder - ready for implementation)
 
 **Base URL:** `http://localhost:3000/bitetrack`
 
-| Feature | Endpoints | Key Actions |
-|---------|-----------|-------------|
-| ** Auth** | `/auth/*` | Login, activate accounts, password recovery |
-| ** Check Account** | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps) |
-| ** Sellers** | `/sellers/*` | Manage staff, roles, and permissions |
-| ** Customers** | `/customers/*` | Customer database, CSV import, contact info, transaction history |
-| ** Products** | `/products/*` | Inventory management, pricing, and catalog |
-| ** Sales** | `/sales/*` | Process orders, CSV import, advanced filtering, payment tracking |
-| ** Reporting** | `/reporting/*` | **NEW:** Sales analytics, CSV exports, business intelligence |
-| ** Waste Management** | `/inventory-drops/*` | **NEW:** Food waste tracking, cost analysis, compliance |
-| ** Test Data** | `/test-data/*` | **DEV:** Development data management, testing scenarios |
+| Feature               | Endpoints                     | Key Actions                                                      |
+| --------------------- | ----------------------------- | ---------------------------------------------------------------- |
+| ** Auth**             | `/auth/*`                     | Login, activate accounts, password recovery                      |
+| ** Check Account**    | `/auth/seller-status?email=x` | **PUBLIC:** Check if email exists (useful for client apps)       |
+| ** Sellers**          | `/sellers/*`                  | Manage staff, roles, and permissions                             |
+| ** Customers**        | `/customers/*`                | Customer database, CSV import, contact info, transaction history |
+| ** Products**         | `/products/*`                 | Inventory management, pricing, and catalog                       |
+| ** Sales**            | `/sales/*`                    | Process orders, CSV import, advanced filtering, payment tracking |
+| ** Reporting**        | `/reporting/*`                | **NEW:** Sales analytics, CSV exports, business intelligence     |
+| ** Waste Management** | `/inventory-drops/*`          | **NEW:** Food waste tracking, cost analysis, compliance          |
+| ** Test Data**        | `/test-data/*`                | **DEV:** Development data management, testing scenarios          |
 
 > **Full API documentation:** [`docs/API-documentation.md`](docs/API-documentation.md) | **Postman Collection:** [`docs/postman-collection.json`](docs/postman-collection.json)
 
@@ -844,33 +849,37 @@ mongodb://admin:YOUR_MONGO_PASSWORD@localhost:27017/bitetrack
 // MongoDB shell examples for system administrators
 
 // 1. Audit trail - Find recent actions by specific user
-db.sales.find({
-  "createdAt": { $gte: new Date("2024-01-01") },
-  "sellerId": ObjectId("USER_ID_HERE")
-}).sort({ "createdAt": -1 })
+db.sales
+  .find({
+    createdAt: { $gte: new Date("2024-01-01") },
+    sellerId: ObjectId("USER_ID_HERE"),
+  })
+  .sort({ createdAt: -1 });
 
 // 2. Data integrity checks - Find orphaned references
 db.sales.find({
-  "customerId": { $nin: db.customers.distinct("_id") }
-})
+  customerId: { $nin: db.customers.distinct("_id") },
+});
 
 // 3. Business intelligence - Sales performance by seller
 db.sales.aggregate([
-  { $group: {
-    _id: "$sellerId",
-    totalSales: { $sum: "$totalAmount" },
-    orderCount: { $sum: 1 },
-    avgOrderValue: { $avg: "$totalAmount" }
-  }},
-  { $sort: { totalSales: -1 } }
-])
+  {
+    $group: {
+      _id: "$sellerId",
+      totalSales: { $sum: "$totalAmount" },
+      orderCount: { $sum: 1 },
+      avgOrderValue: { $avg: "$totalAmount" },
+    },
+  },
+  { $sort: { totalSales: -1 } },
+]);
 
 // 4. Data cleanup - Remove test data (be careful!)
-db.sales.deleteMany({ "totalAmount": { $lt: 1 } }) // Remove penny transactions
+db.sales.deleteMany({ totalAmount: { $lt: 1 } }); // Remove penny transactions
 
 // 5. Index management
-db.sales.createIndex({ "createdAt": -1, "sellerId": 1 }) // Optimize queries
-db.sales.getIndexes() // View all indexes
+db.sales.createIndex({ createdAt: -1, sellerId: 1 }); // Optimize queries
+db.sales.getIndexes(); // View all indexes
 ```
 
 #### **Backup & Restore Operations:**
@@ -895,14 +904,14 @@ docker compose exec mongodb mongoexport \
 
 #### **Enterprise Integration Benefits:**
 
- **Dual Management Approach** - Both API and direct database access
- **Standard MongoDB Tools** - No vendor lock-in, use familiar tools
- **Advanced Analytics** - Complex aggregations beyond API capabilities
- **Audit & Compliance** - Direct access to all data for compliance reporting
- **Performance Tuning** - Index optimization and query analysis
- **Data Migration** - Easy import/export for system migrations
- **Backup Integration** - Integrate with enterprise backup solutions
- **Monitoring Integration** - Connect MongoDB monitoring tools (Ops Manager, etc.)
+**Dual Management Approach** - Both API and direct database access
+**Standard MongoDB Tools** - No vendor lock-in, use familiar tools
+**Advanced Analytics** - Complex aggregations beyond API capabilities
+**Audit & Compliance** - Direct access to all data for compliance reporting
+**Performance Tuning** - Index optimization and query analysis
+**Data Migration** - Easy import/export for system migrations
+**Backup Integration** - Integrate with enterprise backup solutions
+**Monitoring Integration** - Connect MongoDB monitoring tools (Ops Manager, etc.)
 
 > ** Pro Tip**: System administrators can use both the BiteTrack API for application-level operations and direct MongoDB access for database-level administration, providing complete flexibility for enterprise environments.
 
@@ -911,7 +920,7 @@ docker compose exec mongodb mongoexport \
 > **ACHIEVEMENT**: Enterprise backend **100% complete** with 38 professional endpoints
 > **STRATEGIC PIVOT**: Now focusing on **frontend development** to create complete business solution
 
- **[Complete UI Development Roadmap](ROADMAP.md)** - Detailed frontend implementation plan
+**[Complete UI Development Roadmap](ROADMAP.md)** - Detailed frontend implementation plan
 
 ### **Backend Foundation (v2.0+ Complete)**
 

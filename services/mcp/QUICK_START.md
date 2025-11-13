@@ -7,6 +7,7 @@ An MCP (Model Context Protocol) server that lets AI agents like Claude interact 
 ## Why Code Execution Instead of Direct Tool Calls?
 
 ### Traditional Approach (Bad)
+
 ```
 Agent needs to:
 1. Load ALL 38+ tool definitions → 150,000 tokens
@@ -17,10 +18,11 @@ Total: ~200,000 tokens per query 💸💸💸
 ```
 
 ### Our Approach (Good)
+
 ```
 Agent:
 1. Explores tools like files: ls ./tools/sales/ → 500 tokens
-2. Loads only what it needs: cat getSales.js → 1,000 tokens  
+2. Loads only what it needs: cat getSales.js → 1,000 tokens
 3. Executes code that filters data → 500 tokens
 
 Total: ~2,000 tokens per query ✅
@@ -32,22 +34,20 @@ Total: ~2,000 tokens per query ✅
 
 ```javascript
 // Agent writes code like this:
-import * as auth from './tools/auth';
-import * as sales from './tools/sales';
+import * as auth from "./tools/auth";
+import * as sales from "./tools/sales";
 
 // Login (JWT stored automatically)
-await auth.login({ email: 'user@example.com', password: 'pass' });
+await auth.login({ email: "user@example.com", password: "pass" });
 
 // Get data (JWT injected automatically)
-const data = await sales.getSales({ 
-  startDate: '2024-01-01',
-  settlementStatus: 'pending'
+const data = await sales.getSales({
+  startDate: "2024-01-01",
+  settlementStatus: "pending",
 });
 
 // Filter in code, not in agent context
-const topSales = data.sales
-  .filter(s => s.total > 100)
-  .slice(0, 5);
+const topSales = data.sales.filter((s) => s.total > 100).slice(0, 5);
 
 console.log(topSales); // Agent sees only this
 ```
@@ -69,6 +69,7 @@ BiteTrack API (Port 3000)
 ## Key Components
 
 ### 1. Virtual Filesystem
+
 ```
 tools/
 ├── auth/
@@ -86,6 +87,7 @@ tools/
 ```
 
 ### 2. Authentication Flow
+
 ```javascript
 // Step 1: Agent logs in
 const { token, role } = await auth.login({ email, password });
@@ -97,6 +99,7 @@ const sales = await sales.getSales();
 ```
 
 ### 3. Code Execution Sandbox
+
 - **Isolated environment** (vm2): Agent code can't access filesystem, network
 - **Time limits**: 10 second timeout
 - **Memory limits**: 256MB max
@@ -104,13 +107,13 @@ const sales = await sales.getSales();
 
 ## Implementation Phases
 
-| Phase | Goal | Duration | Status |
-|-------|------|----------|--------|
-| 1 | SSE endpoint + code execution + auth | Weeks 1-2 | 🔄 Planning |
-| 2 | All read operations (GET endpoints) | Weeks 3-4 | ⏳ Pending |
-| 3 | Sale settlement (write operation) | Week 5 | ⏳ Pending |
-| 4 | Advanced features (search, optimization) | Weeks 6-7 | ⏳ Pending |
-| 5 | Production ready (tests, monitoring) | Week 8 | ⏳ Pending |
+| Phase | Goal                                     | Duration  | Status      |
+| ----- | ---------------------------------------- | --------- | ----------- |
+| 1     | SSE endpoint + code execution + auth     | Weeks 1-2 | 🔄 Planning |
+| 2     | All read operations (GET endpoints)      | Weeks 3-4 | ⏳ Pending  |
+| 3     | Sale settlement (write operation)        | Week 5    | ⏳ Pending  |
+| 4     | Advanced features (search, optimization) | Weeks 6-7 | ⏳ Pending  |
+| 5     | Production ready (tests, monitoring)     | Week 8    | ⏳ Pending  |
 
 ## Tech Stack
 
@@ -131,39 +134,45 @@ const sales = await sales.getSales();
 ## Example User Interactions
 
 ### Query 1: "Show me today's sales"
+
 ```javascript
 // Agent discovers tools
-const fs = require('fs');
-const salesTools = fs.readdirSync('./tools/sales');
+const fs = require("fs");
+const salesTools = fs.readdirSync("./tools/sales");
 // → ['getSales.js', 'getSaleById.js', 'settleSale.js']
 
 // Agent reads tool definition
-const getSalesDef = fs.readFileSync('./tools/sales/getSales.js');
+const getSalesDef = fs.readFileSync("./tools/sales/getSales.js");
 // → Full JSDoc with parameters
 
 // Agent writes code
-import * as sales from './tools/sales';
-const today = new Date().toISOString().split('T')[0];
-const result = await sales.getSales({ 
-  startDate: today, 
-  endDate: today 
+import * as sales from "./tools/sales";
+const today = new Date().toISOString().split("T")[0];
+const result = await sales.getSales({
+  startDate: today,
+  endDate: today,
 });
-console.log(`Found ${result.sales.length} sales totaling $${result.totalRevenue}`);
+console.log(
+  `Found ${result.sales.length} sales totaling $${result.totalRevenue}`,
+);
 ```
 
 ### Query 2: "Settle all sales for customer John Doe"
+
 ```javascript
 // Agent finds customer
-import * as customers from './tools/customers';
-const john = (await customers.getCustomers({ 
-  search: 'John Doe' 
-})).customers[0];
+import * as customers from "./tools/customers";
+const john = (
+  await customers.getCustomers({
+    search: "John Doe",
+  })
+).customers[0];
 
 // Get unsettled sales
-import * as sales from './tools/sales';
-const unsettled = await sales.getSales({ 
-  customerId: john._id, 
-  settlementStatus: 'pending' 
+import * as sales from "./tools/sales";
+const unsettled = await sales.getSales({
+  customerId: john._id,
+  settlementStatus: "pending",
 });
 
 // Settle each (with confirmation)
@@ -173,12 +182,13 @@ console.log(`About to settle ${unsettled.sales.length} sales. Confirm?`);
 for (const sale of unsettled.sales) {
   await sales.settleSale({ saleId: sale._id });
 }
-console.log('Done!');
+console.log("Done!");
 ```
 
 ## Configuration
 
 ### Environment Variables
+
 ```bash
 # MCP Server
 MCP_PORT=3001
@@ -192,11 +202,12 @@ JWT_SECRET=<same-as-bitetrack-api>
 CODE_TIMEOUT_MS=10000
 CODE_MEMORY_LIMIT_MB=256
 
-# Session Management  
+# Session Management
 SESSION_TIMEOUT_MINUTES=30
 ```
 
 ### Warp Configuration
+
 ```json
 {
   "BiteTrack MCP": {
@@ -208,6 +219,7 @@ SESSION_TIMEOUT_MINUTES=30
 ## Development Workflow
 
 ### 1. Start Services
+
 ```bash
 # Start BiteTrack API (required)
 cd services/api
@@ -219,12 +231,15 @@ npm run dev
 ```
 
 ### 2. Configure Warp
+
 - Open Warp → Settings → AI → MCP Servers
 - Add SSE server: `http://localhost:3001/sse`
 - Start the server
 
 ### 3. Test with Agent
+
 In Warp's AI chat:
+
 ```
 "Connect to BiteTrack and show me today's sales"
 ```
@@ -248,17 +263,20 @@ npm run test:load
 ## Monitoring
 
 ### Health Check
+
 ```bash
 curl http://localhost:3001/health
 ```
 
 ### Metrics
+
 - Token usage per query
 - Response times (p50, p95, p99)
 - Error rates
 - Most used tools
 
 ### Logs
+
 ```bash
 # View logs
 tail -f logs/mcp-server.log
@@ -270,16 +288,19 @@ cat logs/mcp-server.log | jq '.level, .message'
 ## Troubleshooting
 
 ### Agent can't authenticate
+
 - Check JWT_SECRET matches API
 - Verify API is running on correct port
 - Check session storage hasn't expired
 
 ### Code execution timeout
+
 - Check API response times
 - Increase CODE_TIMEOUT_MS if needed
 - Look for infinite loops in agent code
 
 ### Tools not found
+
 - Verify virtual filesystem is loaded
 - Check tool module exports
 - Ensure proper path in imports

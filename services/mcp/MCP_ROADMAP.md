@@ -101,6 +101,7 @@ Instead of traditional MCP implementations that load all tool definitions into t
 ### Phase 1: Core MCP Infrastructure with Code Execution (Weeks 1-2)
 
 #### Goal
+
 Implement SSE-based MCP server with filesystem-based tool discovery and code execution sandbox.
 
 #### Tasks
@@ -133,12 +134,14 @@ Implement SSE-based MCP server with filesystem-based tool discovery and code exe
    - [ ] Implement token validation and refresh logic
 
 #### Deliverables
+
 - Working SSE MCP server on `/sse` endpoint
 - Code execution sandbox that can run agent-generated code
 - Virtual filesystem with at least auth and one category (sales) implemented
 - Session-based JWT authentication working
 
 #### Success Criteria
+
 - Agent can discover tools by listing directories
 - Agent can read tool definitions on-demand
 - Agent can execute code that calls tools
@@ -149,6 +152,7 @@ Implement SSE-based MCP server with filesystem-based tool discovery and code exe
 ### Phase 2: Core Read Operations (Weeks 3-4)
 
 #### Goal
+
 Implement read-only GET operations for all major entities with proper authentication.
 
 #### Tasks
@@ -186,11 +190,13 @@ Implement read-only GET operations for all major entities with proper authentica
    - [ ] Create helper functions for common query patterns
 
 #### Deliverables
+
 - All read operations implemented as tool modules
 - Comprehensive error handling
 - Agent can query all major entities using natural language
 
 #### Success Criteria
+
 - Agent can answer queries like: "Show me today's sales"
 - Agent can filter data: "Find customers who haven't purchased in 30 days"
 - Agent can generate analytics: "What are the top 5 products this month?"
@@ -201,6 +207,7 @@ Implement read-only GET operations for all major entities with proper authentica
 ### Phase 3: Write Operations - Settlement (Week 5)
 
 #### Goal
+
 Implement sale settlement functionality (most critical write operation).
 
 #### Tasks
@@ -223,11 +230,13 @@ Implement sale settlement functionality (most critical write operation).
    - [ ] Implement guardrails to prevent accidental bulk operations
 
 #### Deliverables
+
 - Settlement tool fully functional
 - Safety mechanisms in place
 - Agent can settle sales with proper confirmation
 
 #### Success Criteria
+
 - Agent can settle a single sale: "Mark sale #12345 as paid"
 - Agent can handle batch operations: "Settle all sales for customer John Doe"
 - Confirmation flow prevents accidental operations
@@ -238,6 +247,7 @@ Implement sale settlement functionality (most critical write operation).
 ### Phase 4: Advanced Features (Weeks 6-7)
 
 #### Goal
+
 Add context efficiency features, advanced tooling, and optimization.
 
 #### Tasks
@@ -273,12 +283,14 @@ Add context efficiency features, advanced tooling, and optimization.
    - [ ] Optimize tool definition storage and retrieval
 
 #### Deliverables
+
 - `search_tools` function working
 - Context efficiency improvements measurable
 - Multi-step workflows functional
 - Performance metrics showing token reduction
 
 #### Success Criteria
+
 - Agent uses 70-90% fewer tokens compared to direct tool calling
 - Agent can handle complex multi-step workflows
 - Search function helps agent find relevant tools quickly
@@ -289,6 +301,7 @@ Add context efficiency features, advanced tooling, and optimization.
 ### Phase 5: Production Readiness (Week 8)
 
 #### Goal
+
 Harden the system for production use with monitoring, testing, and documentation.
 
 #### Tasks
@@ -329,6 +342,7 @@ Harden the system for production use with monitoring, testing, and documentation
    - [ ] Create rollback procedures
 
 #### Deliverables
+
 - Production-ready MCP server
 - Comprehensive test suite (>80% coverage)
 - Complete documentation
@@ -336,6 +350,7 @@ Harden the system for production use with monitoring, testing, and documentation
 - Deployment automation
 
 #### Success Criteria
+
 - All tests passing
 - Documentation complete and clear
 - Security audit passed
@@ -350,20 +365,20 @@ Harden the system for production use with monitoring, testing, and documentation
 
 ```javascript
 // Agent's perspective:
-import * as auth from './tools/auth';
-import * as sales from './tools/sales';
+import * as auth from "./tools/auth";
+import * as sales from "./tools/sales";
 
 // Step 1: Login and get JWT (stored in session automatically)
 const loginResult = await auth.login({
-  email: 'user@example.com',
-  password: 'password123'
+  email: "user@example.com",
+  password: "password123",
 });
 console.log(`Logged in as ${loginResult.role}`);
 
 // Step 2: Use authenticated tools (JWT injected automatically)
 const todaySales = await sales.getSales({
-  startDate: '2024-01-01',
-  endDate: '2024-01-31'
+  startDate: "2024-01-01",
+  endDate: "2024-01-31",
 });
 
 console.log(`Found ${todaySales.length} sales`);
@@ -375,11 +390,11 @@ Each tool is a JavaScript module with clear JSDoc comments:
 
 ```javascript
 // tools/sales/getSales.js
-import { callAPI } from '../../lib/api-client.js';
+import { callAPI } from "../../lib/api-client.js";
 
 /**
  * Retrieve sales records with optional filtering
- * 
+ *
  * @param {Object} params - Query parameters
  * @param {string} [params.startDate] - ISO date string (YYYY-MM-DD)
  * @param {string} [params.endDate] - ISO date string (YYYY-MM-DD)
@@ -390,9 +405,9 @@ import { callAPI } from '../../lib/api-client.js';
  * @param {number} [params.limit=50] - Items per page (max 100)
  * @param {string} [params.sortBy='saleDate'] - Sort field
  * @param {string} [params.sortOrder='desc'] - 'asc' | 'desc'
- * 
+ *
  * @returns {Promise<{sales: Array, pagination: Object}>}
- * 
+ *
  * @example
  * // Get today's unsettled sales
  * const result = await getSales({
@@ -403,7 +418,7 @@ import { callAPI } from '../../lib/api-client.js';
  */
 export async function getSales(params = {}) {
   const queryString = new URLSearchParams(params).toString();
-  return callAPI('GET', `/bitetrack/sales?${queryString}`);
+  return callAPI("GET", `/bitetrack/sales?${queryString}`);
 }
 ```
 
@@ -411,19 +426,19 @@ export async function getSales(params = {}) {
 
 ```javascript
 // lib/api-client.js
-import axios from 'axios';
-import { getSessionToken } from './session-manager.js';
+import axios from "axios";
+import { getSessionToken } from "./session-manager.js";
 
-const API_BASE_URL = process.env.API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.API_URL || "http://localhost:3000";
 
 export async function callAPI(method, path, data = null) {
   const token = getSessionToken();
-  
+
   const config = {
     method,
     url: `${API_BASE_URL}${path}`,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
-    ...(data && { data })
+    ...(data && { data }),
   };
 
   try {
@@ -433,7 +448,7 @@ export async function callAPI(method, path, data = null) {
     // Enhanced error handling
     if (error.response) {
       throw new Error(
-        `API Error ${error.response.status}: ${error.response.data.message || error.message}`
+        `API Error ${error.response.status}: ${error.response.data.message || error.message}`,
       );
     }
     throw error;
@@ -445,8 +460,8 @@ export async function callAPI(method, path, data = null) {
 
 ```javascript
 // lib/code-executor.js
-import { VM } from 'vm2';
-import * as apiClient from './api-client.js';
+import { VM } from "vm2";
+import * as apiClient from "./api-client.js";
 
 export async function executeCode(code, sessionId) {
   const vm = new VM({
@@ -456,11 +471,11 @@ export async function executeCode(code, sessionId) {
       require: createSafeRequire(sessionId),
       // Inject utilities
       apiClient,
-    }
+    },
   });
 
   const output = [];
-  
+
   try {
     const result = await vm.run(code);
     return { success: true, result, output };
@@ -472,8 +487,8 @@ export async function executeCode(code, sessionId) {
 function createSafeRequire(sessionId) {
   // Only allow importing from tools directory
   return (modulePath) => {
-    if (!modulePath.startsWith('./tools/')) {
-      throw new Error('Can only import from tools directory');
+    if (!modulePath.startsWith("./tools/")) {
+      throw new Error("Can only import from tools directory");
     }
     // Load from virtual filesystem
     return loadToolModule(modulePath, sessionId);
@@ -485,41 +500,43 @@ function createSafeRequire(sessionId) {
 
 ```javascript
 // routes/mcp.js
-app.get('/sse', async (req, res) => {
+app.get("/sse", async (req, res) => {
   // Set up SSE
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
 
   const sessionId = generateSessionId();
-  
+
   // Send initial connection success
-  res.write(`data: ${JSON.stringify({ type: 'connection', sessionId })}\n\n`);
+  res.write(`data: ${JSON.stringify({ type: "connection", sessionId })}\n\n`);
 
   // Handle MCP protocol messages
-  req.on('data', async (chunk) => {
+  req.on("data", async (chunk) => {
     const message = JSON.parse(chunk.toString());
-    
+
     switch (message.type) {
-      case 'initialize':
-        res.write(`data: ${JSON.stringify({
-          type: 'initialized',
-          capabilities: {
-            tools: true,
-            codeExecution: true,
-            fileSystem: true
-          }
-        })}\n\n`);
+      case "initialize":
+        res.write(
+          `data: ${JSON.stringify({
+            type: "initialized",
+            capabilities: {
+              tools: true,
+              codeExecution: true,
+              fileSystem: true,
+            },
+          })}\n\n`,
+        );
         break;
-        
-      case 'tools/list':
-        const tools = await listTools(message.params.path || '/');
-        res.write(`data: ${JSON.stringify({ type: 'tools', tools })}\n\n`);
+
+      case "tools/list":
+        const tools = await listTools(message.params.path || "/");
+        res.write(`data: ${JSON.stringify({ type: "tools", tools })}\n\n`);
         break;
-        
-      case 'tools/execute':
+
+      case "tools/execute":
         const result = await executeCode(message.params.code, sessionId);
-        res.write(`data: ${JSON.stringify({ type: 'result', result })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "result", result })}\n\n`);
         break;
     }
   });
@@ -529,6 +546,7 @@ app.get('/sse', async (req, res) => {
 ## Token Efficiency Comparison
 
 ### Traditional Direct Tool Calling
+
 ```
 Context Window Usage:
 - Tool definitions: ~150,000 tokens (all tools loaded upfront)
@@ -539,6 +557,7 @@ TOTAL: ~201,000 tokens
 ```
 
 ### Agentic Code Execution (Our Approach)
+
 ```
 Context Window Usage:
 - Tool discovery: 500 tokens (list directories)
@@ -551,6 +570,7 @@ TOTAL: ~2,000 tokens (99% reduction!)
 ## Security Considerations
 
 ### 1. Code Execution Safety
+
 - Use `vm2` or `isolated-vm` for sandboxing
 - Set strict memory limits (256MB)
 - Set execution timeouts (10 seconds)
@@ -558,6 +578,7 @@ TOTAL: ~2,000 tokens (99% reduction!)
 - No access to filesystem, network (except via API client)
 
 ### 2. JWT Token Security
+
 - Store tokens encrypted in session store
 - Implement token refresh before expiration
 - Clear tokens on session end
@@ -565,11 +586,13 @@ TOTAL: ~2,000 tokens (99% reduction!)
 - Use HTTPS in production
 
 ### 3. Rate Limiting
+
 - Per-session rate limits (100 req/15min)
 - Code execution limits (10/minute)
 - API call limits (inherited from BiteTrack API)
 
 ### 4. Input Validation
+
 - Sanitize all tool parameters
 - Validate code syntax before execution
 - Check for malicious patterns
@@ -578,6 +601,7 @@ TOTAL: ~2,000 tokens (99% reduction!)
 ## Monitoring & Metrics
 
 ### Key Metrics to Track
+
 1. **Token Efficiency**
    - Average tokens per query
    - Token savings vs. direct tool calling
@@ -604,18 +628,21 @@ TOTAL: ~2,000 tokens (99% reduction!)
 ## Testing Strategy
 
 ### 1. Unit Tests
+
 - Each tool module tested independently
 - API client error handling
 - Session management
 - Code executor sandbox
 
 ### 2. Integration Tests
+
 - MCP protocol compliance
 - Authentication flow end-to-end
 - Tool discovery and loading
 - Code execution with API calls
 
 ### 3. E2E Tests
+
 - Real agent scenarios:
   - "Show me today's sales"
   - "Find top 5 products this month"
@@ -623,6 +650,7 @@ TOTAL: ~2,000 tokens (99% reduction!)
   - "Generate sales report for Q1"
 
 ### 4. Performance Tests
+
 - Concurrent sessions (10, 50, 100)
 - Large dataset handling
 - Token usage benchmarks
@@ -631,6 +659,7 @@ TOTAL: ~2,000 tokens (99% reduction!)
 ## Deployment Configuration
 
 ### Environment Variables
+
 ```bash
 # MCP Server
 MCP_PORT=3001
@@ -655,6 +684,7 @@ METRICS_ENABLED=true
 ```
 
 ### Docker Compose Integration
+
 ```yaml
 services:
   mcp-server:
@@ -677,6 +707,7 @@ services:
 ## Success Metrics (Overall Project)
 
 ### Technical Goals
+
 - ✅ 90%+ token reduction vs. direct tool calling
 - ✅ < 5s response time for most queries
 - ✅ 99.9% uptime
@@ -684,12 +715,14 @@ services:
 - ✅ Zero security vulnerabilities
 
 ### User Experience Goals
+
 - ✅ Agents can complete common tasks in 1-3 interactions
 - ✅ Natural language queries work intuitively
 - ✅ Error messages are clear and actionable
 - ✅ Documentation enables self-service
 
 ### Business Goals
+
 - ✅ Reduced operational costs (fewer tokens = lower API costs)
 - ✅ Faster data access and reporting
 - ✅ Improved user satisfaction with AI interactions
@@ -732,6 +765,7 @@ services:
 ## Contributing
 
 This is a living document. As we implement phases, we'll update with:
+
 - Lessons learned
 - Performance data
 - Architecture refinements

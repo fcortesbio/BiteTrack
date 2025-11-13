@@ -60,7 +60,9 @@
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .feature-card:hover {
@@ -190,11 +192,11 @@
   .app-header h1 {
     font-size: 2rem;
   }
-  
+
   .hero h2 {
     font-size: 1.8rem;
   }
-  
+
   .features {
     grid-template-columns: 1fr;
   }

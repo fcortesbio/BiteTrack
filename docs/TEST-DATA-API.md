@@ -22,11 +22,13 @@ The Test Data Management API provides powerful endpoints for populating, managin
 **Description:** Get comprehensive statistics about current test data in the database.
 
 ### Request Headers:
+
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 ### Response (200 OK):
+
 ```json
 {
   "environment": "development",
@@ -58,6 +60,7 @@ Authorization: Bearer <jwt_token>
 ```
 
 **Use Cases:**
+
 - Check current database state before populating
 - Monitor test environment health
 - Get sample IDs for manual testing
@@ -72,12 +75,14 @@ Authorization: Bearer <jwt_token>
 **Description:** Populate the database with realistic test data from JSON templates.
 
 ### Request Headers:
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 ### Request Body:
+
 ```json
 {
   "preset": "dev",
@@ -87,6 +92,7 @@ Content-Type: application/json
 ```
 
 ### Parameters:
+
 - **`preset`** (optional): Data set size
   - `"minimal"` - 5 customers, 7 products, 3 sales (default)
   - `"dev"` - 10 customers, 14 products, 7 sales
@@ -96,6 +102,7 @@ Content-Type: application/json
 - **`verbose`** (optional): Enable detailed logging (default: false)
 
 ### Response (201 Created):
+
 ```json
 {
   "message": "Test data populated successfully",
@@ -117,7 +124,7 @@ Content-Type: application/json
     },
     "statistics": {
       "totalSalesValue": 158.93,
-      "averageOrderValue": 22.70,
+      "averageOrderValue": 22.7,
       "settledSales": 4,
       "unsettledSales": 3
     }
@@ -127,6 +134,7 @@ Content-Type: application/json
 ```
 
 **Example Usage:**
+
 ```bash
 # Populate development dataset with cleanup
 curl -X POST http://localhost:3000/bitetrack/test-data/populate \
@@ -148,12 +156,14 @@ curl -X POST http://localhost:3000/bitetrack/test-data/populate \
 **Description:** Selectively remove test data from the database with preservation options.
 
 ### Request Headers:
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 ### Request Body:
+
 ```json
 {
   "confirmClean": true,
@@ -162,12 +172,14 @@ Content-Type: application/json
 ```
 
 ### Parameters:
+
 - **`confirmClean`** (required): Must be `true` to proceed (safety measure)
 - **`preserveData`** (optional): Array of data types to preserve
   - Available options: `["customers", "products", "sales", "pendingSellers"]`
   - Seller accounts are always preserved
 
 ### Response (200 OK):
+
 ```json
 {
   "message": "Successfully cleaned test data. Deleted 25 records.",
@@ -188,6 +200,7 @@ Content-Type: application/json
 ```
 
 **Example Usage:**
+
 ```bash
 # Clean all data except products
 curl -X DELETE http://localhost:3000/bitetrack/test-data/clean \
@@ -208,12 +221,14 @@ curl -X DELETE http://localhost:3000/bitetrack/test-data/clean \
 **Description:** Reset the entire database to a specific test scenario (most destructive operation).
 
 ### Request Headers:
+
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
 ### Request Body:
+
 ```json
 {
   "scenario": "dev",
@@ -222,6 +237,7 @@ Content-Type: application/json
 ```
 
 ### Parameters:
+
 - **`scenario`** (optional): Target scenario
   - `"clean"` - Remove all test data, keep only sellers (default)
   - `"minimal"` - Reset to minimal test dataset
@@ -230,6 +246,7 @@ Content-Type: application/json
 - **`confirmReset`** (required): Must be `true` to proceed (safety measure)
 
 ### Response (200 OK):
+
 ```json
 {
   "message": "Database reset completed successfully",
@@ -251,6 +268,7 @@ Content-Type: application/json
 ```
 
 **Example Usage:**
+
 ```bash
 # Reset to clean state (no test data)
 curl -X POST http://localhost:3000/bitetrack/test-data/reset \
@@ -267,41 +285,45 @@ curl -X POST http://localhost:3000/bitetrack/test-data/reset \
 ## **Integration Examples**
 
 ### Frontend Dashboard Integration
+
 ```javascript
 // React example - Reset environment button
-const resetEnvironment = async (scenario = 'dev') => {
+const resetEnvironment = async (scenario = "dev") => {
   try {
-    const response = await fetch('/bitetrack/test-data/reset', {
-      method: 'POST',
+    const response = await fetch("/bitetrack/test-data/reset", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         scenario,
-        confirmReset: true
-      })
+        confirmReset: true,
+      }),
     });
 
     const result = await response.json();
-    console.log(`Environment reset: ${result.summary.counts.customers} customers, ${result.summary.counts.products} products created`);
+    console.log(
+      `Environment reset: ${result.summary.counts.customers} customers, ${result.summary.counts.products} products created`,
+    );
   } catch (error) {
-    console.error('Reset failed:', error);
+    console.error("Reset failed:", error);
   }
 };
 ```
 
 ### Automated Testing Integration
+
 ```javascript
 // Jest/Testing example - Setup test environment
 beforeEach(async () => {
   // Reset to minimal dataset before each test
   await request(app)
-    .post('/bitetrack/test-data/reset')
-    .set('Authorization', `Bearer ${adminToken}`)
+    .post("/bitetrack/test-data/reset")
+    .set("Authorization", `Bearer ${adminToken}`)
     .send({
-      scenario: 'minimal',
-      confirmReset: true
+      scenario: "minimal",
+      confirmReset: true,
     })
     .expect(200);
 });
@@ -309,14 +331,15 @@ beforeEach(async () => {
 afterAll(async () => {
   // Clean up after all tests
   await request(app)
-    .delete('/bitetrack/test-data/clean')
-    .set('Authorization', `Bearer ${adminToken}`)
+    .delete("/bitetrack/test-data/clean")
+    .set("Authorization", `Bearer ${adminToken}`)
     .send({ confirmClean: true })
     .expect(200);
 });
 ```
 
 ### CI/CD Pipeline Integration
+
 ```bash
 #!/bin/bash
 # CI pipeline script example
@@ -355,6 +378,7 @@ echo " Test environment cleaned"
 ## **Error Responses**
 
 ### Production Environment (403 Forbidden):
+
 ```json
 {
   "error": "Forbidden",
@@ -364,6 +388,7 @@ echo " Test environment cleaned"
 ```
 
 ### Missing Confirmation (400 Bad Request):
+
 ```json
 {
   "error": "Confirmation Required",
@@ -374,6 +399,7 @@ echo " Test environment cleaned"
 ```
 
 ### Insufficient Permissions (403 Forbidden):
+
 ```json
 {
   "error": "Forbidden",
@@ -383,6 +409,7 @@ echo " Test environment cleaned"
 ```
 
 ### Invalid Preset (400 Bad Request):
+
 ```json
 {
   "error": "Validation Error",
@@ -396,17 +423,20 @@ echo " Test environment cleaned"
 ## **Best Practices**
 
 ### Development Workflow:
+
 1. **Check Status First**: Always check current state with `GET /status`
 2. **Use Appropriate Preset**: Choose the right data size for your needs
 3. **Clean Before Major Changes**: Use `cleanBefore: true` when switching scenarios
 4. **Preserve Selectively**: Use `preserveData` to keep specific data types during cleanup
 
 ### Testing Workflow:
+
 1. **Reset Before Tests**: Use `POST /reset` to ensure clean starting state
 2. **Use Minimal Dataset**: Choose `"minimal"` preset for faster test execution
 3. **Clean After Tests**: Always clean up test data after test suites
 
 ### Safety Guidelines:
+
 1. **Double-check Environment**: These endpoints are disabled in production automatically
 2. **Require Confirmation**: All destructive operations require explicit confirmation
 3. **Limit SuperAdmin Access**: Only give SuperAdmin role to trusted users for reset operations
@@ -416,11 +446,11 @@ echo " Test environment cleaned"
 
 ## **Benefits of API-Based Test Data Management**
 
- **Remote Management** - Trigger from CI/CD, frontend dashboards, or external tools
- **Consistent Authentication** - Uses same JWT security model as rest of API
- **Granular Control** - Choose exactly what data to populate or preserve
- **Audit Trail** - All operations logged with user attribution
- **Safety Features** - Multiple confirmation requirements and environment checks
- **Integration Ready** - Perfect for automated testing and development workflows
+**Remote Management** - Trigger from CI/CD, frontend dashboards, or external tools
+**Consistent Authentication** - Uses same JWT security model as rest of API
+**Granular Control** - Choose exactly what data to populate or preserve
+**Audit Trail** - All operations logged with user attribution
+**Safety Features** - Multiple confirmation requirements and environment checks
+**Integration Ready** - Perfect for automated testing and development workflows
 
 These endpoints transform test data management from manual script execution to a professional, integrated part of your development workflow!
