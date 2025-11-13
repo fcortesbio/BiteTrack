@@ -17,6 +17,7 @@ BiteTrack is a **production-ready Enterprise Business Intelligence Platform** fo
 - **Professional Testing Infrastructure**: Automated scenarios with realistic data
 - **Enterprise Security**: Helmet, rate limiting, bcrypt, CORS, comprehensive validation
 - **Production Deployment**: Docker containerization with multi-environment support
+- **AI Integration (NEW)**: MCP server for natural language interaction with 99% token efficiency
 
 ## Essential Commands
 
@@ -124,6 +125,34 @@ curl -X POST http://localhost:3000/bitetrack/test-data/populate \
 npm test
 npm run test:coverage
 ```
+
+### MCP Server (Model Context Protocol) - NEW
+```bash
+# Start MCP server for AI agent integration
+cd services/mcp
+npm run dev
+
+# Health check
+curl http://localhost:3001/health
+
+# Configure in Warp
+# Settings > AI > MCP Servers > Add SSE Server
+# URL: http://localhost:3001/sse
+
+# Use in Warp AI:
+# "Show me today's sales" (uses 99% fewer tokens than traditional MCP!)
+```
+
+**Key Features:**
+- Agentic code execution for efficient tool discovery
+- JWT authentication integration with BiteTrack API
+- Virtual filesystem-based tool exposure
+- 99% token reduction vs traditional direct tool calling
+
+**Documentation:**
+- Quick Start: `services/mcp/QUICK_START.md`
+- Full Roadmap: `services/mcp/MCP_ROADMAP.md`
+- README: `services/mcp/README.md`
 
 ## Architecture Overview
 

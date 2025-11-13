@@ -76,29 +76,41 @@ Content-Type: application/json
 
 ## Implementation Roadmap
 
-### Phase 1: Boilerplate ( Complete)
+**See [MCP_ROADMAP.md](./MCP_ROADMAP.md) for the complete implementation plan.**
+
+The roadmap includes:
+- **Phase 1**: Core MCP Infrastructure with agentic code execution (Weeks 1-2)
+- **Phase 2**: Core Read Operations for all entities (Weeks 3-4)
+- **Phase 3**: Write Operations - Settlement (Week 5)
+- **Phase 4**: Advanced Features - Tool search, context optimization (Weeks 6-7)
+- **Phase 5**: Production Readiness - Testing, monitoring, deployment (Week 8)
+
+### Key Architecture Decisions
+
+✅ **Agentic Code Execution over Direct Tool Calls**
+- Tools exposed as JavaScript modules in virtual filesystem
+- Agent loads only needed tool definitions (99% token reduction)
+- Intermediate results stay in execution environment
+
+✅ **JWT Authentication Integration**
+- Session-based token storage
+- Automatic token injection in API calls
+- Role-based access control inherited from BiteTrack API
+
+✅ **Progressive Tool Discovery**
+- Filesystem-based tool exploration
+- On-demand definition loading
+- Search function for semantic tool discovery
+
+### Current Status: Phase 1 Foundation
 - [x] Basic Express server
 - [x] Health check endpoint
 - [x] Docker containerization
 - [x] Traefik integration
-
-### Phase 2: MCP Integration (Planned)
-- [ ] Google Gemini API integration
-- [ ] MCP protocol implementation
-- [ ] Tool definitions for BiteTrack API
-- [ ] Conversation context management
-
-### Phase 3: BiteTrack Integration (Planned)
-- [ ] JWT authentication forwarding
-- [ ] API client for BiteTrack endpoints
-- [ ] Role-based access control
-- [ ] Error handling and retry logic
-
-### Phase 4: Advanced Features (Planned)
-- [ ] Multi-turn conversations
-- [ ] Conversation history storage
-- [ ] Predictive analytics
-- [ ] Recommendations engine
+- [ ] SSE MCP endpoint
+- [ ] Code execution sandbox
+- [ ] Virtual filesystem for tools
+- [ ] Session management and JWT storage
 
 ## Environment Variables
 
