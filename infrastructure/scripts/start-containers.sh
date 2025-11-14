@@ -42,27 +42,42 @@ log_header() {
 
 log_header "STARTING DOCKER CONTAINERS"
 
-# Determine which env file to use
+# Determine which env file to use and what to start
 if [[ "$SETUP_MODE" == "dev" ]]; then
     ENV_FILE="$PROJECT_ROOT/.env.development"
-elif [[ "$SETUP_MODE" == "prod" || "$SETUP_MODE" == "both" ]]; then
+    START_MODE="mongodb-only"
+elif [[ "$SETUP_MODE" == "prod" ]]; then
     ENV_FILE="$PROJECT_ROOT/.env.production"
+    START_MODE="full-stack"
+elif [[ "$SETUP_MODE" == "both" ]]; then
+    ENV_FILE="$PROJECT_ROOT/.env.production"
+    START_MODE="mongodb-only"  # For 'both', start only MongoDB (dev services run locally)
 else
     log_error "Invalid SETUP_MODE: $SETUP_MODE"
     exit 1
 fi
 
 log_info "Using environment file: $ENV_FILE"
+log_info "Start mode: $START_MODE"
 
-# Start MongoDB first
-log_info "Starting MongoDB container..."
 cd "$PROJECT_ROOT"
-docker compose --env-file "$ENV_FILE" up -d mongodb
+
+# Start services based on mode
+if [[ "$START_MODE" == "full-stack" ]]; then
+    log_info "Starting all services (production mode)..."
+    docker compose --env-file "$ENV_FILE" up -d
+    
+    log_info "Waiting for all services to start..."
+    sleep 10
+else
+    log_info "Starting MongoDB only (development/both mode)..."
+    docker compose --env-file "$ENV_FILE" up -d mongodb
+fi
 
 # Wait for MongoDB to be healthy
 log_info "Waiting for MongoDB to be healthy..."
-local max_attempts=30
-local attempt=0
+max_attempts=30
+attempt=0
 
 while [[ $attempt -lt $max_attempts ]]; do
     if docker compose ps mongodb | grep -q "healthy"; then
@@ -104,3 +119,28 @@ sleep 5
 
 log_success "MongoDB is ready"
 log_info "MongoDB accessible at localhost:27017"
+
+# If full stack was started, check other services
+if [[ "$START_MODE" == "full-stack" ]]; then
+    echo ""
+    log_info "Checking other services..."
+    
+    # Wait a bit more for other services
+    sleep 10
+    
+    # Show container status
+    log_info "Container status:"
+    docker compose ps
+    
+    echo ""
+    log_success "Full production stack started"
+    log_info "Access points:"
+    echo "  - Frontend: http://localhost (Traefik routing)"
+    echo "  - API: http://localhost/bitetrack"
+    echo "  - MCP: http://localhost/mcp"
+    echo "  - Traefik Dashboard: http://localhost:8080"
+else
+    echo ""
+    log_info "MongoDB ready for development"
+    log_info "Run 'npm run dev' to start development services locally"
+fi
