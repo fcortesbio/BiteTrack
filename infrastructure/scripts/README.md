@@ -54,12 +54,16 @@ bash infrastructure/scripts/init.sh
 
 **Setup Modes:**
 
-1. **Development environment only** - Generates `.env.development`, starts MongoDB only
-2. **Production environment only** - Generates `.env.production`, starts **full Docker stack** (API, MCP, Frontend, Traefik, MongoDB)
-3. **Both development and production** - Generates both `.env` files, starts MongoDB only (you can start full stack later with `docker compose up -d`)
+1. **Development environment only** - Generates `.env.development`, starts MongoDB only (for local development)
+2. **Production environment only** - Generates `.env.production`, starts **full Docker stack**
+3. **Both development and production** - Generates both `.env` files, starts **full Docker stack** (you can switch to dev mode later)
 4. **Quick start** - Uses existing environment files, starts MongoDB only
 
-**Important Note:** Only mode 2 (Production environment only) automatically starts the full Docker stack. Other modes prepare the environment and start MongoDB, allowing you to choose when to start additional services.
+**Important Note:**
+
+- **Mode 1 (Dev)**: MongoDB only - services run locally via `npm run dev`
+- **Modes 2 & 3 (Prod/Both)**: Full Docker stack - all services accessible via Traefik
+- **Mode 3** gives you the flexibility to switch between production (currently running) and development (stop Docker, run `npm run dev`)
 
 ### `setup-env.sh`
 
@@ -108,7 +112,7 @@ Starts Docker containers and initializes MongoDB replica set.
 
 - **Dev mode**: Starts MongoDB only (services run locally via `npm run dev`)
 - **Prod mode**: Starts full stack (API, MCP, Frontend, Traefik, MongoDB)
-- **Both mode**: Starts MongoDB only (flexibility to run dev locally or start prod later)
+- **Both mode**: Starts full stack (production running, but dev config also available for later)
 
 ### `create-superadmin.sh`
 

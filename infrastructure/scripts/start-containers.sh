@@ -46,12 +46,10 @@ log_header "STARTING DOCKER CONTAINERS"
 if [[ "$SETUP_MODE" == "dev" ]]; then
     ENV_FILE="$PROJECT_ROOT/.env.development"
     START_MODE="mongodb-only"
-elif [[ "$SETUP_MODE" == "prod" ]]; then
+elif [[ "$SETUP_MODE" == "prod" || "$SETUP_MODE" == "both" ]]; then
+    # Both prod and 'both' modes start the full stack
     ENV_FILE="$PROJECT_ROOT/.env.production"
     START_MODE="full-stack"
-elif [[ "$SETUP_MODE" == "both" ]]; then
-    ENV_FILE="$PROJECT_ROOT/.env.production"
-    START_MODE="mongodb-only"  # For 'both', start only MongoDB (dev services run locally)
 else
     log_error "Invalid SETUP_MODE: $SETUP_MODE"
     exit 1
