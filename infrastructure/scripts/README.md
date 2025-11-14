@@ -131,6 +131,30 @@ Creates initial SuperAdmin user in MongoDB.
 - MongoDB container must be running and healthy
 - Python with bcrypt module installed
 
+### `quick-start.sh`
+
+Quick restart script for existing environments (mode 4 in init menu).
+
+**Features:**
+
+- Uses existing `.env.development` and/or `.env.production` files
+- No reconfiguration needed - just starts services
+- Auto-detects which environment files exist
+- If both exist, prompts user to choose
+- Ensures MongoDB replica set is initialized
+
+**Behavior:**
+
+- **Dev environment only**: Starts MongoDB only
+- **Prod environment only**: Starts full Docker stack
+- **Both environments exist**: Prompts user to choose which to start
+
+**Use Cases:**
+
+- Restart after `docker compose down`
+- Switch between environments quickly
+- Skip full setup when environment is already configured
+
 ### `check-dev-env.sh`
 
 Pre-flight validation for `npm run dev` command.
