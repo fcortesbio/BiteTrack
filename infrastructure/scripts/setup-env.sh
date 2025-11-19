@@ -223,6 +223,10 @@ GEMINI_API_KEY=${GEMINI_API_KEY}
 # Frontend Configuration
 FRONTEND_PORT=${FRONTEND_PORT_PROD:-$DEFAULT_FRONTEND_PORT_PROD}
 
+# Vite environment variables (exposed to frontend)
+VITE_API_URL=http://localhost:${API_PORT_PROD:-$DEFAULT_API_PORT_PROD}
+VITE_MCP_URL=http://localhost:${MCP_PORT_PROD:-$DEFAULT_MCP_PORT_PROD}
+
 # MongoDB Configuration
 MONGO_ROOT_USERNAME=$MONGO_USER
 MONGO_ROOT_PASSWORD=$MONGO_PASS
@@ -268,6 +272,10 @@ GEMINI_API_KEY=${GEMINI_API_KEY}
 
 # Frontend Configuration
 FRONTEND_PORT=${FRONTEND_PORT_DEV:-$DEFAULT_FRONTEND_PORT_DEV}
+
+# Vite environment variables (exposed to frontend)
+VITE_API_URL=http://localhost:${API_PORT_DEV:-$DEFAULT_API_PORT_DEV}
+VITE_MCP_URL=http://localhost:${MCP_PORT_DEV:-$DEFAULT_MCP_PORT_DEV}
 
 # MongoDB Configuration (connects to localhost for local development)
 MONGO_ROOT_USERNAME=$MONGO_USER
