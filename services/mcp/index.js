@@ -7,7 +7,7 @@ import sessionManager from "./lib/sessionManager.js";
 import CodeExecutor from "./lib/codeExecutor.js";
 
 const app = express();
-const PORT = process.env.MCP_PORT || 3001;
+const PORT = process.env.MCP_PORT ?? 4004; // Use MCP_PORT from env, fallback to 4004 (signals env not loaded)
 const codeExecutor = new CodeExecutor(sessionManager);
 
 // Middleware
@@ -163,7 +163,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🤖 BiteTrack MCP Server running on port ${PORT}`);
-  console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`BiteTrack MCP Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
 });
