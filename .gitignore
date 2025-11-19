@@ -40,3 +40,4 @@ keyfile
 .env.backup.*
 error-logs.txt
 init-exampleremove_emojis.py
+keyfile.backup
