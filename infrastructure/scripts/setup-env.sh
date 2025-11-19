@@ -300,6 +300,36 @@ EOF
     log_success "Created .env.development"
 }
 
+# Create symlink for Docker Compose
+create_env_symlink() {
+    local target_env=""
+    local env_filename=""
+    
+    if [[ "$SETUP_MODE" == "dev" ]]; then
+        env_filename=".env.development"
+    elif [[ "$SETUP_MODE" == "prod" || "$SETUP_MODE" == "both" ]]; then
+        env_filename=".env.production"
+    fi
+    
+    log_info "Creating symlink: infrastructure/.env -> ../$env_filename"
+    
+    # Remove existing .env or symlink in infrastructure directory
+    rm -f "$PROJECT_ROOT/infrastructure/.env"
+    
+    # Create relative symlink
+    cd "$PROJECT_ROOT/infrastructure"
+    ln -sf "../$env_filename" .env
+    cd "$PROJECT_ROOT"
+    
+    # Verify symlink was created
+    if [ -L "$PROJECT_ROOT/infrastructure/.env" ]; then
+        log_success "Symlink created: infrastructure/.env -> $env_filename"
+    else
+        log_error "Failed to create symlink"
+        exit 1
+    fi
+}
+
 # Create .secrets file
 create_secrets_file() {
     log_info "Creating .secrets file..."
@@ -376,6 +406,9 @@ main() {
             exit 1
             ;;
     esac
+    
+    # Create symlink for Docker Compose
+    create_env_symlink
     
     # Create secrets file
     create_secrets_file
