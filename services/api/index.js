@@ -23,7 +23,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import { setupSwaggerUI } from "./config/swagger.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3004;
 const isDevelopment = process.env.NODE_ENV === "development";
 
 // Development environment logging
@@ -136,22 +136,22 @@ mongoose
 setupSwaggerUI(app, PORT);
 
 // Welcome route - redirect to interactive documentation
-app.get("/bitetrack", (req, res) => {
+app.get("/api/v2", (req, res) => {
   const host = req.get("host") || `localhost:${PORT}`;
   const protocol = req.protocol || "http";
 
   res.json({
     message:
       "Welcome to BiteTrack API - Enterprise Business Intelligence Platform",
-    version: "2.0.0+",
+    version: "2.0.0",
     server: {
       host: host,
       port: PORT,
       environment: process.env.NODE_ENV || "development",
     },
     documentation: {
-      interactive: `${protocol}://${host}/bitetrack/api-docs`,
-      json: `${protocol}://${host}/bitetrack/api-docs.json`,
+      interactive: `${protocol}://${host}/api/v2/docs`,
+      json: `${protocol}://${host}/api/v2/docs.json`,
       static:
         "https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md",
     },
@@ -167,17 +167,17 @@ app.get("/bitetrack", (req, res) => {
       ],
     },
     quickStart: {
-      step1: "Visit /bitetrack/api-docs for interactive documentation",
-      step2: "Use POST /bitetrack/auth/login to get JWT token",
+      step1: "Visit /api/v2/docs for interactive documentation",
+      step2: "Use POST /api/v2/auth/login to get JWT token",
       step3: "Add Bearer token to Authorization header",
       step4: "Explore all 36 endpoints with live testing",
     },
-    health: `${req.protocol}://${req.get("host")}/bitetrack/health`,
+    health: `${req.protocol}://${req.get("host")}/api/v2/health`,
   });
 });
 
 // Health check endpoint
-app.get("/bitetrack/health", (req, res) => {
+app.get("/api/v2/health", (req, res) => {
   res.json({
     status: "OK",
     timestamp: new Date().toISOString(),
@@ -185,15 +185,45 @@ app.get("/bitetrack/health", (req, res) => {
   });
 });
 
+// MongoDB health check endpoint
+app.get("/api/v2/health/mongodb", (req, res) => {
+  const dbState = mongoose.connection.readyState;
+  const stateMap = {
+    0: "disconnected",
+    1: "connected",
+    2: "connecting",
+    3: "disconnecting",
+  };
+
+  const status = stateMap[dbState] || "unknown";
+  const isHealthy = dbState === 1;
+
+  if (isHealthy) {
+    res.json({
+      status: "connected",
+      database: mongoose.connection.name,
+      host: mongoose.connection.host,
+      port: mongoose.connection.port,
+      timestamp: new Date().toISOString(),
+    });
+  } else {
+    res.status(503).json({
+      status,
+      message: "MongoDB connection is not healthy",
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
 // API routes
-app.use("/bitetrack/auth", authRoutes);
-app.use("/bitetrack/sellers", sellerRoutes);
-app.use("/bitetrack/customers", customerRoutes);
-app.use("/bitetrack/products", productRoutes);
-app.use("/bitetrack/sales", salesRoutes);
-app.use("/bitetrack/inventory-drops", inventoryDropRoutes);
-app.use("/bitetrack/test-data", testDataRoutes);
-app.use("/bitetrack/reporting", reportingRoutes);
+app.use("/api/v2/auth", authRoutes);
+app.use("/api/v2/sellers", sellerRoutes);
+app.use("/api/v2/customers", customerRoutes);
+app.use("/api/v2/products", productRoutes);
+app.use("/api/v2/sales", salesRoutes);
+app.use("/api/v2/inventory-drops", inventoryDropRoutes);
+app.use("/api/v2/test-data", testDataRoutes);
+app.use("/api/v2/reporting", reportingRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {
