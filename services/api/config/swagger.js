@@ -96,7 +96,7 @@ const swaggerOptions = (port, host = "localhost") => ({
     ...swaggerDefinition,
     servers: [
       {
-        url: `http://${host}:${port}/bitetrack`,
+        url: `http://${host}:${port}/api/v2`,
         description: `${process.env.NODE_ENV || "development"} server (Port ${port})`,
       },
     ],
@@ -176,14 +176,14 @@ export const setupSwaggerUI = (app, port, host = "localhost") => {
   const swaggerSpec = swaggerJSDoc(swaggerOptions(port, host));
 
   // Swagger UI endpoint
-  app.use("/bitetrack/api-docs", swaggerUi.serve);
+  app.use("/api/v2/docs", swaggerUi.serve);
   app.get(
-    "/bitetrack/api-docs",
+    "/api/v2/docs",
     swaggerUi.setup(swaggerSpec, swaggerUiOptions),
   );
 
   // JSON endpoint for raw spec
-  app.get("/bitetrack/api-docs.json", (req, res) => {
+  app.get("/api/v2/docs.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
     res.send(swaggerSpec);
   });
@@ -193,10 +193,10 @@ export const setupSwaggerUI = (app, port, host = "localhost") => {
   console.log(`Swagger UI Documentation Portal initialized (${environment})`);
   console.log(`Docs generated from JSDoc comments in routes`);
   console.log(
-    `Interactive docs available at: http://${host}:${port}/bitetrack/api-docs`,
+    `Interactive docs available at: http://${host}:${port}/api/v2/docs`,
   );
   console.log(
-    `JSON specification at: http://${host}:${port}/bitetrack/api-docs.json`,
+    `JSON specification at: http://${host}:${port}/api/v2/docs.json`,
   );
 
   // Return the spec for potential use elsewhere
