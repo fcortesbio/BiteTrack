@@ -63,13 +63,13 @@ cd "$PROJECT_ROOT"
 # Start services based on mode
 if [[ "$START_MODE" == "full-stack" ]]; then
     log_info "Starting all services (production mode)..."
-    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d
+    docker compose -f infrastructure/docker-compose.yml up -d
     
     log_info "Waiting for all services to start..."
     sleep 10
 else
-    log_info "Starting MongoDB only (development/both mode)..."
-    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d mongodb
+    log_info "Starting MongoDB only (development mode)..."
+    docker compose -f infrastructure/docker-compose.yml up -d mongodb
 fi
 
 # Wait for MongoDB to be healthy
@@ -114,6 +114,35 @@ try {
 
 # Wait a moment for replica set to stabilize
 sleep 5
+
+# Create MongoDB admin user
+log_info "Creating MongoDB admin user..."
+
+# Source environment variables from symlink
+if [ -f "$PROJECT_ROOT/infrastructure/.env" ]; then
+    source "$PROJECT_ROOT/infrastructure/.env"
+fi
+
+docker compose -f infrastructure/docker-compose.yml exec -T mongodb mongosh --quiet --eval "
+db = db.getSiblingDB('admin');
+try {
+    db.createUser({
+        user: '$MONGO_ROOT_USERNAME',
+        pwd: '$MONGO_ROOT_PASSWORD',
+        roles: [
+            { role: 'root', db: 'admin' },
+            { role: 'readWrite', db: 'bitetrack' }
+        ]
+    });
+    print('[SUCCESS] MongoDB user created');
+} catch(e) {
+    if (e.codeName === 'DuplicateKey') {
+        print('[INFO] User already exists');
+    } else {
+        print('[ERROR] User creation failed: ' + e.message);
+    }
+}
+" || log_warning "User may already exist"
 
 log_success "MongoDB is ready"
 log_info "MongoDB accessible at localhost:27017"
