@@ -100,12 +100,10 @@ Add this to your VS Code settings.json:
 
 ### "Strings must use singlequote"
 
-❌ `const message = "Hello world";`
-✅ `const message = 'Hello world';`
+`const message = "Hello world";`
+`const message = 'Hello world';`
 
 ### "Missing trailing comma"
-
-❌
 
 ```javascript
 const config = {
@@ -113,8 +111,6 @@ const config = {
   port: 3001,
 };
 ```
-
-✅
 
 ```javascript
 const config = {
@@ -125,14 +121,14 @@ const config = {
 
 ### "Unexpected space before function parentheses"
 
-❌ `const handler = async (req, res) => {}`
-✅ `const handler = async(req, res) => {}`
+`const handler = async (req, res) => {}`
+`const handler = async(req, res) => {}`
 
 ### "No unused variables"
 
-❌ `const unused = getData();`
-✅ `const _unused = getData();` (if intentionally unused)
-✅ Just remove the unused variable
+`const unused = getData();`
+`const _unused = getData();` (if intentionally unused)
+Just remove the unused variable
 
 ## Console Warnings
 
@@ -170,7 +166,7 @@ console.log("This is allowed");
 The `lint:check` command fails if there are any errors, making it suitable for CI pipelines:
 
 ```bash
-npm run lint:check  # Returns exit code 1 if errors found
+npm run lint:check # Returns exit code 1 if errors found
 ```
 
 Consider adding this to your pre-commit hooks or CI pipeline.
@@ -181,4 +177,4 @@ Consider adding this to your pre-commit hooks or CI pipeline.
 - Review existing code for patterns
 - Ask team members for guidance on style decisions
 
-Remember: Linting helps maintain code quality and consistency across the team. It's a tool to help us write better code together! 🚀
+Remember: Linting helps maintain code quality and consistency across the team. It's a tool to help us write better code together!

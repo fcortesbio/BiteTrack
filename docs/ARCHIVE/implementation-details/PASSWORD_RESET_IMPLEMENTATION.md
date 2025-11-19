@@ -45,7 +45,7 @@ The password reset functionality has been successfully implemented with email in
 
 ## Security Features
 
-### ✅ Implemented
+### Implemented
 
 - **Token Security**: Unique, cryptographically secure tokens
 - **Expiration**: 24-hour token lifetime

@@ -1,26 +1,26 @@
-# 🍔 BiteTrack Monorepo
+# BiteTrack Monorepo
 
 Enterprise Business Intelligence Platform for Food Businesses
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
-BiteTrack/                          # Monorepo root
-├── services/                       # Application services
-│   ├── api/                       # REST API (Express + MongoDB)
-│   ├── frontend/                  # (Coming soon) React/Next.js UI
-│   └── mcp/                       # (Coming soon) AI/MCP server
-├── packages/                       # Shared code
-│   └── shared-types/              # Constants, types, schemas
-├── infrastructure/                 # Deployment configs
-│   ├── docker-compose.yml         # Orchestration
-│   ├── traefik/                   # Reverse proxy config
-│   └── scripts/                   # Deployment scripts
-└── docs/                          # Documentation
+BiteTrack/ # Monorepo root
+ services/ # Application services
+    api/ # REST API (Express + MongoDB)
+    frontend/ # (Coming soon) React/Next.js UI
+    mcp/ # (Coming soon) AI/MCP server
+ packages/ # Shared code
+    shared-types/ # Constants, types, schemas
+ infrastructure/ # Deployment configs
+    docker-compose.yml # Orchestration
+    traefik/ # Reverse proxy config
+    scripts/ # Deployment scripts
+ docs/ # Documentation
 
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -58,16 +58,16 @@ npm run lint
 npm run build
 ```
 
-## 📦 NPM Workspaces
+## NPM Workspaces
 
 This monorepo uses **NPM Workspaces** for managing multiple packages:
 
 ### Benefits
 
-- ✅ Shared dependencies (single `node_modules`)
-- ✅ Local package linking (no `npm link` needed)
-- ✅ Unified scripts across services
-- ✅ Consistent versions
+- Shared dependencies (single `node_modules`)
+- Local package linking (no `npm link` needed)
+- Unified scripts across services
+- Consistent versions
 
 ### Adding a New Service
 
@@ -98,7 +98,7 @@ npm install
 npm run dev -w services/new-service
 ```
 
-## 🐳 Docker Development
+## Docker Development
 
 ### Run entire stack:
 
@@ -119,30 +119,30 @@ Services available at:
 docker compose build bitetrack-api
 ```
 
-## 📚 Documentation
+## Documentation
 
 - **API Documentation**: [services/api/README.md](services/api/README.md)
 - **Shared Types**: [packages/shared-types/README.md](packages/shared-types/README.md)
 - **Full API Reference**: [docs/API-documentation.md](docs/API-documentation.md)
 - **Interactive API Docs**: http://localhost:3000/api-docs (when running)
 
-## 🛠️ Workspace Commands Reference
+## Workspace Commands Reference
 
 ### Root Level (affects all workspaces)
 
 ```bash
-npm install                     # Install all workspace dependencies
-npm run test                    # Run tests in all workspaces
-npm run lint                    # Lint all code
-npm run clean                   # Remove all node_modules
+npm install # Install all workspace dependencies
+npm run test # Run tests in all workspaces
+npm run lint # Lint all code
+npm run clean # Remove all node_modules
 ```
 
 ### Service Level (specific workspace)
 
 ```bash
-npm run test -w services/api           # Test API only
-npm run dev -w services/frontend       # Run frontend dev server
-npm run build -w services/mcp          # Build MCP service
+npm run test -w services/api # Test API only
+npm run dev -w services/frontend # Run frontend dev server
+npm run build -w services/mcp # Build MCP service
 ```
 
 ### Package Management
@@ -158,7 +158,7 @@ npm install -D jest -w services/api
 # (just reference in package.json, npm install handles linking)
 ```
 
-## 🏗️ CI/CD
+## CI/CD
 
 (Coming soon)
 
@@ -166,16 +166,16 @@ npm install -D jest -w services/api
 - Automated Docker image builds
 - Deployment to production
 
-## 📖 Service-Specific READMEs
+## Service-Specific READMEs
 
 Each service has its own README with detailed information:
 
 - [services/api/README.md](services/api/README.md) - REST API documentation
 
-## 🤝 Contributing
+## Contributing
 
 See individual service READMEs for specific contribution guidelines.
 
-## 📄 License
+## License
 
 MIT - See [LICENSE](LICENSE) file

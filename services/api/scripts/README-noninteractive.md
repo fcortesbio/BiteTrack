@@ -47,17 +47,17 @@ BITETRACK_ADMIN_DOB='1990-01-01' \
 
 The non-interactive script performs all the same steps as the interactive version:
 
-1. ✅ **Prerequisites Check** - Verifies Docker, tools, etc.
-2. 🧹 **Docker Cleanup** - Cleans up existing containers
-3. ⚙️ **Environment Configuration** - Creates `.env.production`
-4. 🔐 **MongoDB Keyfile Setup** - Generates security keyfile
-5. 🐳 **Docker Containers** - Starts all services
-6. ❤️ **System Health Check** - Verifies API is running
-7. 👤 **SuperAdmin User** - Creates initial admin account
-8. 🔐 **Secrets File** - Generates `.secrets` with credentials
-9. 🔗 **Environment Symlink** - Creates `.env` → `.env.production`
-10. 📊 **Test Data** - Populates sample data (optional)
-11. 🧪 **Tests** - Runs comprehensive tests (optional)
+1. **Prerequisites Check** - Verifies Docker, tools, etc.
+2. **Docker Cleanup** - Cleans up existing containers
+3. **Environment Configuration** - Creates `.env.production`
+4. **MongoDB Keyfile Setup** - Generates security keyfile
+5. **Docker Containers** - Starts all services
+6. **System Health Check** - Verifies API is running
+7. **SuperAdmin User** - Creates initial admin account
+8. **Secrets File** - Generates `.secrets` with credentials
+9. **Environment Symlink** - Creates `.env` → `.env.production`
+10. **Test Data** - Populates sample data (optional)
+11. **Tests** - Runs comprehensive tests (optional)
 
 ## Required Parameters
 
@@ -137,10 +137,10 @@ All other parameters have sensible defaults:
 
 Once the script completes successfully, your BiteTrack instance will be ready with:
 
-- 🌐 **API**: http://localhost:3000/bitetrack/\*
-- 📚 **Documentation**: http://localhost:3000/bitetrack/api-docs
-- ❤️ **Health Check**: http://localhost:3000/bitetrack/health
-- 🔐 **Credentials**: Stored in `.secrets` file
+- **API**: http://localhost:3000/bitetrack/\*
+- **Documentation**: http://localhost:3000/bitetrack/api-docs
+- **Health Check**: http://localhost:3000/bitetrack/health
+- **Credentials**: Stored in `.secrets` file
 
 ## Troubleshooting
 

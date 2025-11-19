@@ -1,14 +1,14 @@
-# 🌐 BiteTrack Frontend
+# BiteTrack Frontend
 
 Modern web interface for BiteTrack business management platform.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **React 18** - UI library
 - **Vite** - Build tool and dev server
 - **Nginx** - Production web server
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Install dependencies
@@ -20,7 +20,7 @@ npm run dev
 
 Server runs on `http://localhost:5173`
 
-## 🏗️ Build
+## Build
 
 ```bash
 # Create production build
@@ -30,7 +30,7 @@ npm run build
 npm run preview
 ```
 
-## 🐳 Docker
+## Docker
 
 ```bash
 # Build image
@@ -40,24 +40,24 @@ docker build -t bitetrack-frontend .
 docker run -p 80:80 bitetrack-frontend
 ```
 
-## 📡 API Integration
+## API Integration
 
 The frontend expects these backend services to be available (via Traefik routing):
 
 - `/api/*` → BiteTrack API
 - `/mcp/*` → MCP AI Server
 
-## 🎨 Features (Boilerplate)
+## Features (Boilerplate)
 
 Current implementation includes:
 
-- ✅ Landing page with system status
-- ✅ Service health checks
-- ✅ Responsive design
-- ✅ Modern gradient UI
-- ✅ Links to API documentation
+- Landing page with system status
+- Service health checks
+- Responsive design
+- Modern gradient UI
+- Links to API documentation
 
-## 🔜 Planned Features
+## Planned Features
 
 - [ ] User authentication (JWT)
 - [ ] Dashboard with analytics
@@ -68,24 +68,24 @@ Current implementation includes:
 - [ ] AI chat interface (MCP integration)
 - [ ] Reporting and exports
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 frontend/
-├── src/
-│   ├── App.jsx          # Main app component
-│   ├── App.css          # App styles
-│   ├── main.jsx         # React entry point
-│   └── index.css        # Global styles
-├── public/              # Static assets
-├── index.html           # HTML template
-├── vite.config.js       # Vite configuration
-├── nginx.conf           # Nginx config for production
-├── Dockerfile           # Multi-stage Docker build
-└── package.json         # Dependencies and scripts
+ src/
+    App.jsx # Main app component
+    App.css # App styles
+    main.jsx # React entry point
+    index.css # Global styles
+ public/ # Static assets
+ index.html # HTML template
+ vite.config.js # Vite configuration
+ nginx.conf # Nginx config for production
+ Dockerfile # Multi-stage Docker build
+ package.json # Dependencies and scripts
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### Development
 
@@ -103,7 +103,7 @@ Nginx serves static files from `/usr/share/nginx/html`:
 - Static asset caching
 - Security headers
 
-## 🧪 Testing Routes
+## Testing Routes
 
 Access through Traefik (when full stack is running):
 
@@ -118,7 +118,7 @@ http://localhost/api/health
 http://localhost/mcp/health
 ```
 
-## 🔗 Related Services
+## Related Services
 
 - **API**: `services/api/` - Backend REST API
 - **MCP**: `services/mcp/` - AI server

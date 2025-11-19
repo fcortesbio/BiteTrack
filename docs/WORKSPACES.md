@@ -1,17 +1,17 @@
-# 📦 NPM Workspaces Quick Reference
+# NPM Workspaces Quick Reference
 
 ## What are NPM Workspaces?
 
 NPM Workspaces let you manage multiple packages (services) in a single repository. Think of it as having multiple `package.json` files that share dependencies and can reference each other.
 
-## ✨ Key Benefits
+## Key Benefits
 
 1. **Single `node_modules`** - All services share dependencies (saves disk space)
 2. **Automatic linking** - Local packages reference each other without `npm link`
 3. **Unified commands** - Run scripts across all services at once
 4. **Version consistency** - Ensure same library versions across services
 
-## 🚀 Essential Commands
+## Essential Commands
 
 ### Installation
 
@@ -71,20 +71,20 @@ rm -rf node_modules services/*/node_modules packages/*/node_modules
 npm install
 ```
 
-## 📁 Current Workspace Structure
+## Current Workspace Structure
 
 ```
 BiteTrack/
-├── package.json              # Root workspace config
-├── services/
-│   └── api/
-│       └── package.json      # Workspace: bitetrack
-└── packages/
-    └── shared-types/
-        └── package.json      # Workspace: @bitetrack/shared-types
+ package.json # Root workspace config
+ services/
+    api/
+        package.json # Workspace: bitetrack
+ packages/
+     shared-types/
+         package.json # Workspace: @bitetrack/shared-types
 ```
 
-## 🔗 Referencing Shared Packages
+## Referencing Shared Packages
 
 To use `@bitetrack/shared-types` in any service:
 
@@ -108,7 +108,7 @@ import { USER_ROLES, PAYMENT_STATUS } from "@bitetrack/shared-types";
 
 NPM Workspaces automatically links local packages - no manual linking needed!
 
-## 📝 Adding New Services
+## Adding New Services
 
 ### Step 1: Create directory
 
@@ -145,7 +145,7 @@ cd /home/fcortesbio/projects/BiteTrack
 npm install
 ```
 
-The new service is now part of the workspace! 🎉
+The new service is now part of the workspace!
 
 ### Step 4: Add dependencies
 
@@ -154,7 +154,7 @@ npm install express -w services/new-service
 npm install @bitetrack/shared-types -w services/new-service
 ```
 
-## 🐳 Docker with Workspaces
+## Docker with Workspaces
 
 Dockerfiles need to be workspace-aware:
 
@@ -178,7 +178,7 @@ COPY services/my-service ./services/my-service/
 WORKDIR /app/services/my-service
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Problem: "Cannot find module '@bitetrack/shared-types'"
 
@@ -210,13 +210,13 @@ rm -f package-lock.json services/*/package-lock.json
 npm install
 ```
 
-## 📚 Learn More
+## Learn More
 
 - [Official NPM Workspaces Docs](https://docs.npmjs.com/cli/v9/using-npm/workspaces)
 - [Monorepo Best Practices](https://monorepo.tools/)
 - [BiteTrack Monorepo README](README.monorepo.md)
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Always run `npm install` from root** - it handles all workspaces
 2. **Use `-w` flag** for workspace-specific commands

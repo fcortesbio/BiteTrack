@@ -17,11 +17,12 @@
   "author": "fcortesbio",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.21.2",
+    "axios": "^1.12.2",
     "cors": "^2.8.5",
-    "helmet": "^7.2.0",
     "dotenv": "^16.6.1",
-    "axios": "^1.12.2"
+    "express": "^4.21.2",
+    "helmet": "^7.2.0",
+    "vm2": "^3.10.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

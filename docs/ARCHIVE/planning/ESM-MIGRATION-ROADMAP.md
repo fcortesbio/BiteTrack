@@ -1,68 +1,68 @@
 # ES Modules (ESM) Migration Roadmap
 
-> **Migration Type**: CommonJS → ES Modules  
-> **Approach**: Red-Green-Refactor (TDD)  
-> **Total Files**: 51 JavaScript files  
-> **Estimated Time**: 2-3 hours  
+> **Migration Type**: CommonJS → ES Modules
+> **Approach**: Red-Green-Refactor (TDD)
+> **Total Files**: 51 JavaScript files
+> **Estimated Time**: 2-3 hours
 > **Branch**: `feature/esm-migration`
 
 ---
 
-## 🎯 Migration Goals
+## Migration Goals
 
 ### Primary Objectives
 
-1. ✅ Convert all CommonJS modules to ES Modules
-2. ✅ Maintain 100% test pass rate (204/204 tests)
-3. ✅ Zero breaking changes to API functionality
-4. ✅ Docker builds successfully
-5. ✅ All linting passes
+1. Convert all CommonJS modules to ES Modules
+2. Maintain 100% test pass rate (204/204 tests)
+3. Zero breaking changes to API functionality
+4. Docker builds successfully
+5. All linting passes
 
 ### Secondary Benefits
 
-- 🚀 Modern JavaScript standard (future-proof)
-- 📦 Better tree-shaking and bundle optimization
-- 🔧 Improved IDE support and autocomplete
-- 🌐 Native browser ESM compatibility (future UI)
-- 📝 Cleaner, more maintainable code
+- Modern JavaScript standard (future-proof)
+- Better tree-shaking and bundle optimization
+- Improved IDE support and autocomplete
+- Native browser ESM compatibility (future UI)
+- Cleaner, more maintainable code
 
 ---
 
-## 📊 Migration Scope Analysis
+## Migration Scope Analysis
 
 ### File Inventory (51 files)
 
 ```
 BiteTrack/
-├── 📝 Configuration (2 files)
-│   ├── index.js
-│   └── config/swagger.js
-├── 🧪 Tests (19 files)
-│   ├── tests/setup.js
-│   ├── tests/helpers/ (3 files)
-│   ├── tests/integration/ (5 files)
-│   └── tests/unit/ (10 files)
-├── 🗄️ Models (8 files)
-│   └── models/*.js
-├── 🎮 Controllers (8 files)
-│   └── controllers/*.js
-├── 🛣️ Routes (8 files)
-│   └── routes/*.js
-├── 🔒 Middleware (3 files)
-│   └── middleware/*.js
-├── 🔧 Utils (2 files)
-│   └── utils/*.js
-└── 📜 Scripts (1+ files)
-    └── create-superadmin.js
+  Configuration (2 files)
+    index.js
+    config/swagger.js
+  Tests (19 files)
+    tests/setup.js
+    tests/helpers/ (3 files)
+    tests/integration/ (5 files)
+    tests/unit/ (10 files)
+  Models (8 files)
+    models/*.js
+  Controllers (8 files)
+    controllers/*.js
+  Routes (8 files)
+    routes/*.js
+  Middleware (3 files)
+    middleware/*.js
+  Utils (2 files)
+    utils/*.js
+  Scripts (1+ files)
+     create-superadmin.js
 ```
 
 ---
 
-## 🔄 Migration Strategy: Red-Green-Refactor (TDD)
+## Migration Strategy: Red-Green-Refactor (TDD)
 
-### Phase 0: Pre-Migration Setup ⚙️
+### Phase 0: Pre-Migration Setup
 
-**Goal**: Prepare environment and create safety net  
+**Goal**: Prepare environment and create safety net
 **Duration**: 10-15 minutes
 
 #### Checklist:
@@ -75,11 +75,11 @@ BiteTrack/
 
 ---
 
-## 🔴 RED Phase: Test Infrastructure Migration
+## RED Phase: Test Infrastructure Migration
 
 ### Phase 1: Jest Configuration & Test Setup
 
-**Goal**: Make tests ESM-compatible (they will fail - RED state)  
+**Goal**: Make tests ESM-compatible (they will fail - RED state)
 **Duration**: 15-20 minutes
 
 #### 1.1 Update package.json (5 min)
@@ -182,15 +182,15 @@ import jwt from "jsonwebtoken";
 export { generateToken, createTestUser };
 ```
 
-**Expected State**: ❌ Tests fail (RED) - dependencies not yet migrated
+**Expected State**: Tests fail (RED) - dependencies not yet migrated
 
 ---
 
-## 🟢 GREEN Phase: Core Dependencies Migration
+## GREEN Phase: Core Dependencies Migration
 
 ### Phase 2: Foundation Layer (Utils & Helpers)
 
-**Goal**: Migrate lowest-level dependencies first  
+**Goal**: Migrate lowest-level dependencies first
 **Duration**: 10-15 minutes
 
 #### 2.1 Migrate utils/ (10 min)
@@ -227,7 +227,7 @@ export const verifyToken = (token) => {
 
 ### Phase 3: Data Layer (Models)
 
-**Goal**: Migrate Mongoose schemas  
+**Goal**: Migrate Mongoose schemas
 **Duration**: 15-20 minutes
 
 #### 3.1 Migrate models/ (15 min)
@@ -272,13 +272,13 @@ export default mongoose.model("Seller", sellerSchema);
 npm test -- tests/unit/models/
 ```
 
-**Expected**: 🟢 Model tests passing
+**Expected**: Model tests passing
 
 ---
 
 ### Phase 4: Business Logic Layer (Middleware)
 
-**Goal**: Migrate authentication and middleware  
+**Goal**: Migrate authentication and middleware
 **Duration**: 10-15 minutes
 
 #### 4.1 Migrate middleware/ (10 min)
@@ -323,13 +323,13 @@ export const authorize = (...roles) => {
 npm test -- tests/unit/middleware/
 ```
 
-**Expected**: 🟢 Middleware tests passing
+**Expected**: Middleware tests passing
 
 ---
 
 ### Phase 5: Controllers
 
-**Goal**: Migrate business logic controllers  
+**Goal**: Migrate business logic controllers
 **Duration**: 20-25 minutes
 
 #### 5.1 Migrate controllers/ (20 min)
@@ -379,13 +379,13 @@ export const activate = async (req, res, next) => {
 npm test -- tests/unit/controllers/
 ```
 
-**Expected**: 🟢 Controller tests passing
+**Expected**: Controller tests passing
 
 ---
 
 ### Phase 6: Routes
 
-**Goal**: Migrate Express route definitions  
+**Goal**: Migrate Express route definitions
 **Duration**: 15-20 minutes
 
 #### 6.1 Migrate routes/ (15 min)
@@ -434,13 +434,13 @@ export default router;
 npm test -- tests/integration/auth-real.test.js
 ```
 
-**Expected**: 🟢 Auth integration tests passing
+**Expected**: Auth integration tests passing
 
 ---
 
 ### Phase 7: Configuration & Main Entry
 
-**Goal**: Migrate Swagger config and main index.js  
+**Goal**: Migrate Swagger config and main index.js
 **Duration**: 10-15 minutes
 
 #### 7.1 Migrate config/swagger.js (5 min)
@@ -517,13 +517,13 @@ export default app;
 npm test
 ```
 
-**Expected**: 🟢 All 204 tests passing (GREEN state achieved!)
+**Expected**: All 204 tests passing (GREEN state achieved!)
 
 ---
 
 ### Phase 8: Scripts & Utilities
 
-**Goal**: Migrate standalone scripts  
+**Goal**: Migrate standalone scripts
 **Duration**: 5-10 minutes
 
 #### 8.1 Migrate create-superadmin.js (5 min)
@@ -545,11 +545,11 @@ const __dirname = dirname(__filename);
 
 ---
 
-## ♻️ REFACTOR Phase: Optimization & Cleanup
+## REFACTOR Phase: Optimization & Cleanup
 
 ### Phase 9: Integration Tests Migration
 
-**Goal**: Migrate all integration tests  
+**Goal**: Migrate all integration tests
 **Duration**: 20-25 minutes
 
 #### 9.1 Migrate integration tests (20 min)
@@ -604,13 +604,13 @@ describe("Auth API", () => {
 npm test -- tests/integration/
 ```
 
-**Expected**: 🟢 All integration tests passing
+**Expected**: All integration tests passing
 
 ---
 
 ### Phase 10: Unit Tests Migration
 
-**Goal**: Migrate all unit tests  
+**Goal**: Migrate all unit tests
 **Duration**: 15-20 minutes
 
 #### 10.1 Migrate unit tests (15 min)
@@ -653,11 +653,11 @@ npm test
 npm run test:coverage
 ```
 
-**Expected**: 🟢 All 204 tests passing with coverage report
+**Expected**: All 204 tests passing with coverage report
 
 ---
 
-## ✅ Phase 11: Final Validation & Cleanup
+## Phase 11: Final Validation & Cleanup
 
 ### 11.1 Docker & Deployment Validation (10 min)
 
@@ -696,7 +696,7 @@ npm run lint:check
 
 ---
 
-## 🎯 Success Criteria Checklist
+## Success Criteria Checklist
 
 ### Must-Have (Blocking)
 
@@ -721,17 +721,17 @@ npm run lint:check
 
 ---
 
-## 🚨 Common ESM Migration Pitfalls
+## Common ESM Migration Pitfalls
 
 ### 1. Missing .js Extensions
 
-❌ **Wrong**: `import User from './models/User'`  
-✅ **Correct**: `import User from './models/User.js'`
+**Wrong**: `import User from './models/User'`
+**Correct**: `import User from './models/User.js'`
 
 ### 2. \_\_dirname Not Available
 
-❌ **Wrong**: `path.join(__dirname, 'file.txt')`  
-✅ **Correct**:
+**Wrong**: `path.join(__dirname, 'file.txt')`
+**Correct**:
 
 ```javascript
 import { fileURLToPath } from "url";
@@ -742,8 +742,8 @@ const __dirname = dirname(__filename);
 
 ### 3. Dynamic require() Statements
 
-❌ **Wrong**: `require(dynamicPath)`  
-✅ **Correct**: Use dynamic `import()` (returns Promise)
+**Wrong**: `require(dynamicPath)`
+**Correct**: Use dynamic `import()` (returns Promise)
 
 ```javascript
 const module = await import(dynamicPath);
@@ -751,8 +751,8 @@ const module = await import(dynamicPath);
 
 ### 4. JSON Imports
 
-❌ **Wrong**: `const config = require('./config.json')`  
-✅ **Correct**:
+**Wrong**: `const config = require('./config.json')`
+**Correct**:
 
 ```javascript
 import { readFileSync } from "fs";
@@ -769,7 +769,7 @@ import config from "./config.json" assert { type: "json" };
 
 ---
 
-## 📝 Migration Checklist Summary
+## Migration Checklist Summary
 
 ### Pre-Migration
 
@@ -809,26 +809,26 @@ import config from "./config.json" assert { type: "json" };
 
 ---
 
-## 🎉 Post-Migration Benefits
+## Post-Migration Benefits
 
 ### Immediate Improvements
 
-- ✅ Modern JavaScript standard compliance
-- ✅ Better IDE autocomplete and IntelliSense
-- ✅ Cleaner import syntax
-- ✅ Elimination of circular dependency issues
+- Modern JavaScript standard compliance
+- Better IDE autocomplete and IntelliSense
+- Cleaner import syntax
+- Elimination of circular dependency issues
 
 ### Future Capabilities Unlocked
 
-- ✅ Top-level await support
-- ✅ Native browser compatibility (for future UI)
-- ✅ Better tree-shaking (smaller bundles)
-- ✅ TypeScript migration path (if needed)
-- ✅ Modern build tools compatibility
+- Top-level await support
+- Native browser compatibility (for future UI)
+- Better tree-shaking (smaller bundles)
+- TypeScript migration path (if needed)
+- Modern build tools compatibility
 
 ---
 
-## 🆘 Rollback Plan
+## Rollback Plan
 
 If migration fails:
 
@@ -844,7 +844,7 @@ git reset --hard <commit-hash-before-migration>
 
 ---
 
-## 📚 ESM Resources
+## ESM Resources
 
 ### Official Documentation
 
@@ -859,7 +859,7 @@ git reset --hard <commit-hash-before-migration>
 
 ---
 
-## 🎯 Next Steps After ESM Migration
+## Next Steps After ESM Migration
 
 1. **MCP Server Integration** - ESM makes external tool integration easier
 2. **Frontend Development** - ESM shares modules between backend/frontend
@@ -868,6 +868,6 @@ git reset --hard <commit-hash-before-migration>
 
 ---
 
-**Migration Status**: 🔴 Not Started  
-**Last Updated**: January 5, 2025  
+**Migration Status**: Not Started
+**Last Updated**: January 5, 2025
 **Maintainer**: @fcortesbio

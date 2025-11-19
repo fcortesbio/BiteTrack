@@ -23,7 +23,7 @@ if (user.role === USER_ROLES.ADMIN) {
 
 ## What to Put Here
 
-✅ **Good candidates:**
+**Good candidates:**
 
 - Constants (user roles, status enums, categories)
 - API endpoint paths
@@ -31,7 +31,7 @@ if (user.role === USER_ROLES.ADMIN) {
 - TypeScript interfaces (for frontend)
 - Error codes and messages
 
-❌ **Don't put here:**
+  **Don't put here:**
 
 - Database models (Mongoose schemas stay in API)
 - Business logic (keep in services)
