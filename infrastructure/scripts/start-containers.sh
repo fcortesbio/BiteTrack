@@ -63,13 +63,13 @@ cd "$PROJECT_ROOT"
 # Start services based on mode
 if [[ "$START_MODE" == "full-stack" ]]; then
     log_info "Starting all services (production mode)..."
-    docker compose --env-file "$ENV_FILE" up -d
+    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d
     
     log_info "Waiting for all services to start..."
     sleep 10
 else
     log_info "Starting MongoDB only (development/both mode)..."
-    docker compose --env-file "$ENV_FILE" up -d mongodb
+    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d mongodb
 fi
 
 # Wait for MongoDB to be healthy
@@ -78,7 +78,7 @@ max_attempts=30
 attempt=0
 
 while [[ $attempt -lt $max_attempts ]]; do
-    if docker compose ps mongodb | grep -q "healthy"; then
+    if docker compose -f infrastructure/docker-compose.yml ps mongodb | grep -q "healthy"; then
         log_success "MongoDB is healthy"
         break
     fi
@@ -90,13 +90,13 @@ done
 
 if [[ $attempt -eq $max_attempts ]]; then
     log_error "MongoDB failed to become healthy"
-    docker compose logs mongodb --tail 20
+    docker compose -f infrastructure/docker-compose.yml logs mongodb --tail 20
     exit 1
 fi
 
 # Initialize replica set
 log_info "Initializing MongoDB replica set..."
-docker compose exec -T mongodb mongosh --quiet --eval "
+docker compose -f infrastructure/docker-compose.yml exec -T mongodb mongosh --quiet --eval "
 try {
     rs.initiate({
         _id: 'rs0',
@@ -128,7 +128,7 @@ if [[ "$START_MODE" == "full-stack" ]]; then
     
     # Show container status
     log_info "Container status:"
-    docker compose ps
+    docker compose -f infrastructure/docker-compose.yml ps
     
     echo ""
     log_success "Full production stack started"

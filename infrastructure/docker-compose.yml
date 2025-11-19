@@ -106,6 +106,8 @@ services:
       dockerfile: Dockerfile
     container_name: bitetrack-api
     restart: unless-stopped
+    ports:
+      - "${API_PORT:-3000}:3000" # Exposed for local development
     environment:
       MONGO_URI: ${MONGO_URI}
       JWT_SECRET: ${JWT_SECRET}
@@ -179,6 +181,8 @@ services:
       dockerfile: Dockerfile
     container_name: bitetrack-mcp
     restart: unless-stopped
+    ports:
+      - "${MCP_PORT:-4000}:3001" # Exposed for local development
     environment:
       MCP_PORT: 3001
       NODE_ENV: ${NODE_ENV:-production}

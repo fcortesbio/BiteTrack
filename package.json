@@ -36,10 +36,10 @@
     "prettier:check": "prettier --check .",
     "clean": "rm -rf node_modules services/*/node_modules packages/*/node_modules",
     "init": "bash infrastructure/scripts/init.sh",
-    "docker:up": "docker compose up -d",
-    "docker:down": "docker compose down",
-    "docker:logs": "docker compose logs -f",
-    "docker:clean": "docker compose down -v && docker system prune -f",
+    "docker:up": "docker compose -f infrastructure/docker-compose.yml up -d",
+    "docker:down": "docker compose -f infrastructure/docker-compose.yml down",
+    "docker:logs": "docker compose -f infrastructure/docker-compose.yml logs -f",
+    "docker:clean": "docker compose -f infrastructure/docker-compose.yml down -v && docker system prune -f",
     "postinstall": "echo '✅ All workspaces installed successfully'"
   },
   "engines": {

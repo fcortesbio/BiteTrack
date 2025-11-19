@@ -91,9 +91,9 @@ fi
 
 # Start services
 if [[ "$START_MODE" == "full-stack" ]]; then
-    docker compose --env-file "$ENV_FILE" up -d
+    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d
 else
-    docker compose --env-file "$ENV_FILE" up -d mongodb
+    docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d mongodb
 fi
 
 # Wait for MongoDB to be healthy
@@ -101,7 +101,7 @@ log_info "Waiting for MongoDB to be healthy..."
 max_attempts=30
 attempt=0
 while [[ $attempt -lt $max_attempts ]]; do
-    if docker compose ps mongodb 2>/dev/null | grep -q "healthy"; then
+    if docker compose -f infrastructure/docker-compose.yml ps mongodb 2>/dev/null | grep -q "healthy"; then
         log_success "MongoDB is healthy."
         break
     fi
@@ -112,13 +112,13 @@ done
 
 if [[ $attempt -eq $max_attempts ]]; then
     log_error "MongoDB failed to become healthy in time."
-    docker compose logs mongodb --tail 20
+    docker compose -f infrastructure/docker-compose.yml logs mongodb --tail 20
     exit 1
 fi
 
 # Initialize replica set
 log_info "Ensuring MongoDB replica set is initialized..."
-docker compose exec -T mongodb mongosh --quiet --eval "
+docker compose -f infrastructure/docker-compose.yml exec -T mongodb mongosh --quiet --eval "
 try {
     rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongodb:27017' }] });
     print('[SUCCESS] Replica set initialized');

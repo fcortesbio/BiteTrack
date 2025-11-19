@@ -236,7 +236,7 @@ collect_superadmin_data() {
 check_existing_user() {
     log_info "Checking if user already exists..."
     
-    local existing_user=$(docker compose exec -T mongodb mongosh \
+    local existing_user=$(docker compose -f infrastructure/docker-compose.yml exec -T mongodb mongosh \
         -u "$MONGO_USER" -p "$MONGO_PASS" \
         --authenticationDatabase admin "$MONGO_DB" \
         --eval "db.sellers.findOne({email: '$EMAIL'})" \
@@ -268,7 +268,7 @@ create_superadmin_user() {
     # Insert user
     log_info "Inserting user into MongoDB..."
     
-    local result=$(docker compose exec -T mongodb mongosh \
+    local result=$(docker compose -f infrastructure/docker-compose.yml exec -T mongodb mongosh \
         -u "$MONGO_USER" -p "$MONGO_PASS" \
         --authenticationDatabase admin "$MONGO_DB" \
         --eval "

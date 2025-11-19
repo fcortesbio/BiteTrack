@@ -197,7 +197,7 @@ clean_environment() {
         1)
             log_info "Cleaning up BiteTrack containers only..."
             cd "$PROJECT_ROOT"
-            docker compose down -v 2>/dev/null || true
+            docker compose -f infrastructure/docker-compose.yml down -v 2>/dev/null || true
             log_success "BiteTrack cleanup completed"
             ;;
         2)
