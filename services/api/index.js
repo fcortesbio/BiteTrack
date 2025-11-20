@@ -153,7 +153,7 @@ app.get("/api/v2", (req, res) => {
       interactive: `${protocol}://${host}/api/v2/docs`,
       json: `${protocol}://${host}/api/v2/docs.json`,
       static:
-        "https://github.com/fcortesbio/BiteTrack/blob/main/docs/API-documentation.md",
+        "https://github.com/fcortesbio/BiteTrack/blob/main/docs/backend.md",
     },
     capabilities: {
       endpoints: "36 professional API endpoints",
@@ -331,12 +331,13 @@ const server = app.listen(PORT, () => {
 
   if (isDevelopment) {
     console.log("\nDevelopment Server Information:");
-    console.log(`API Base URL: http://localhost:${PORT}/bitetrack`);
+    console.log(`API Base URL: http://localhost:${PORT}/api/v2`);
     console.log(
-      `Interactive Docs: http://localhost:${PORT}/bitetrack/api-docs`,
+      `Interactive Docs: http://localhost:${PORT}/api/v2/docs`,
     );
-    console.log(`Health Check: http://localhost:${PORT}/bitetrack/health`);
-    console.log(`API Overview: http://localhost:${PORT}/`);
+    console.log(`Health Check: http://localhost:${PORT}/api/v2/health`);
+    console.log(`Mongo Health: http://localhost:${PORT}/api/v2/health/mongodb`);
+    console.log(`API Overview: http://localhost:${PORT}/api/v2`);
     console.log(
       "\nReady for development! File changes will trigger automatic restart.",
     );

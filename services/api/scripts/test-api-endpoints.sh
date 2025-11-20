@@ -58,35 +58,35 @@ main() {
     
     # Health and basic endpoints
     log_info "=== Core System Endpoints ==="
-    test_endpoint "Health Check" "$API_BASE_URL/bitetrack/health" "200"
-    test_endpoint "API Documentation" "$API_BASE_URL/bitetrack/api-docs/" "200"
-    test_endpoint "OpenAPI Spec JSON" "$API_BASE_URL/bitetrack/api-docs.json" "200"
+    test_endpoint "Health Check" "$API_BASE_URL/api/v2/health" "200"
+    test_endpoint "API Documentation" "$API_BASE_URL/api/v2/docs" "200"
+    test_endpoint "OpenAPI Spec JSON" "$API_BASE_URL/api/v2/docs.json" "200"
     test_endpoint "Welcome Page" "$API_BASE_URL/" "200"
     echo ""
     
     # Authentication endpoints
     log_info "=== Authentication Endpoints ==="
-    test_endpoint "Login (Invalid Data)" "$API_BASE_URL/bitetrack/auth/login" "400" "POST" '{"email":"invalid","password":"test"}'
-    test_endpoint "Login (Valid Format)" "$API_BASE_URL/bitetrack/auth/login" "401" "POST" '{"email":"test@example.com","password":"wrongpassword"}'
+    test_endpoint "Login (Invalid Data)" "$API_BASE_URL/api/v2/auth/login" "400" "POST" '{"email":"invalid","password":"test"}'
+    test_endpoint "Login (Valid Format)" "$API_BASE_URL/api/v2/auth/login" "401" "POST" '{"email":"test@example.com","password":"wrongpassword"}'
     echo ""
     
     # Resource endpoints (should require authentication)
     log_info "=== Protected Resource Endpoints ==="
-    test_endpoint "Sellers List (Unauthorized)" "$API_BASE_URL/bitetrack/sellers" "401"
-    test_endpoint "Customers List (Unauthorized)" "$API_BASE_URL/bitetrack/customers" "401"
-    test_endpoint "Products List (Unauthorized)" "$API_BASE_URL/bitetrack/products" "401"
-    test_endpoint "Sales List (Unauthorized)" "$API_BASE_URL/bitetrack/sales" "401"
-    test_endpoint "Reporting Analytics (Unauthorized)" "$API_BASE_URL/bitetrack/reporting/sales/analytics" "401"
+    test_endpoint "Sellers List (Unauthorized)" "$API_BASE_URL/api/v2/sellers" "401"
+    test_endpoint "Customers List (Unauthorized)" "$API_BASE_URL/api/v2/customers" "401"
+    test_endpoint "Products List (Unauthorized)" "$API_BASE_URL/api/v2/products" "401"
+    test_endpoint "Sales List (Unauthorized)" "$API_BASE_URL/api/v2/sales" "401"
+    test_endpoint "Reporting Analytics (Unauthorized)" "$API_BASE_URL/api/v2/reporting/sales/analytics" "401"
     echo ""
     
     # Test data endpoints
     log_info "=== Test Data Endpoints ==="
-    test_endpoint "Test Data Status (Unauthorized)" "$API_BASE_URL/bitetrack/test-data/status" "401"
+    test_endpoint "Test Data Status (Unauthorized)" "$API_BASE_URL/api/v2/test-data/status" "401"
     echo ""
     
     # Non-existent endpoints (should return 404)
     log_info "=== Non-Existent Endpoints ==="
-    test_endpoint "Non-existent Route" "$API_BASE_URL/bitetrack/nonexistent" "404"
+    test_endpoint "Non-existent Route" "$API_BASE_URL/api/v2/nonexistent" "404"
     test_endpoint "Old API Path (No Prefix)" "$API_BASE_URL/auth/login" "404"
     test_endpoint "Old Docs Path" "$API_BASE_URL/api-docs" "404"
     echo ""
@@ -100,10 +100,10 @@ main() {
         log_error "Failed: $TESTS_FAILED"
         exit 1
     else
-        log_success "All tests passed! 🎉"
+        log_success "All tests passed!"
         echo ""
-        log_info "Your BiteTrack API is working correctly with the /bitetrack prefix."
-        log_info "Ready for Nginx cluster deployment!"
+        log_info "Your BiteTrack API is responding on the /api/v2 namespace."
+        log_info "Ready for reverse-proxy deployment!"
     fi
 }
 
