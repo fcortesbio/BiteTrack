@@ -20,6 +20,68 @@ BiteTrack is a **production-ready Enterprise Business Intelligence Platform** fo
 - **Production Deployment**: Docker containerization with multi-environment support
 - **AI Integration (NEW)**: MCP server for natural language interaction with 99% token efficiency
 
+## Environment Configuration
+
+### Setup & Initialization
+
+BiteTrack uses a symlink-based environment configuration system:
+
+```bash
+# Initialize environment (interactive setup)
+npm run init
+
+# Options:
+# 1. Development - Creates .env.development + MongoDB only
+# 2. Production - Creates .env.production + full Docker stack  
+# 3. Both - Creates both env files
+
+# The script creates:
+# - .env.production or .env.development at project root
+# - infrastructure/.env symlink pointing to the active env file
+# - MongoDB with replica set and admin user
+# - .secrets file with credentials
+```
+
+### Environment Variables
+
+Key variables exposed to services:
+
+**API Service:**
+- `API_PORT` - External port (default: 3000 prod, 3001 dev, fallback: 3004)
+- `MONGO_URI` - MongoDB connection string
+- `JWT_SECRET` - JWT signing key
+- `NODE_ENV` - Environment mode
+
+**MCP Service:**
+- `MCP_PORT` - External port (default: 4000 prod, 4001 dev, fallback: 4004)
+- `GEMINI_API_KEY` - Optional Gemini API key
+
+**Frontend (Vite):**
+- `VITE_API_URL` - API base URL (e.g., http://localhost:3000)
+- `VITE_MCP_URL` - MCP base URL (e.g., http://localhost:4000)
+
+**Fallback Ports:**
+If a service starts on port 3004 or 4004, it means the .env file wasn't loaded properly.
+
+### Docker Operations
+
+```bash
+# Start all services (uses infrastructure/.env symlink)
+npm run docker:up
+
+# Stop all services
+npm run docker:down
+
+# Update containers with latest code changes (for CI/CD)
+npm run docker:update
+
+# View logs
+npm run docker:logs
+
+# Clean everything (removes volumes)
+npm run docker:clean
+```
+
 ## Essential Commands
 
 ### Development
@@ -45,7 +107,7 @@ mongosh localhost:27017 --eval 'db.adminCommand({ping: 1})'
 node create-superadmin.js
 
 # Connect to database
-mongosh mongodb://admin:password@localhost:27017/bitetrack
+mongosh mongodb://admin:password@localhost:27017/api/v2
 ```
 
 ### Docker Operations
@@ -58,7 +120,7 @@ DOCKER_BUILDKIT=1 docker build . -t bitetrack:latest
 docker run -d -p 3000:3000 --env-file .env --name bitetrack-api bitetrack:latest
 
 # Health check
-curl http://localhost:3000/bitetrack/health
+curl http://localhost:3000/api/v2/health
 ```
 
 ### Interactive API Documentation (NEW)
@@ -78,23 +140,23 @@ curl http://localhost:3000/
 
 ```bash
 # Login to get JWT token
-curl -X POST http://localhost:3000/bitetrack/auth/login \
+curl -X POST http://localhost:3000/api/v2/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password"}'
 
 # Test authenticated endpoint (replace TOKEN)
-curl -X GET http://localhost:3000/bitetrack/sellers \
+curl -X GET http://localhost:3000/api/v2/sellers \
   -H "Authorization: Bearer TOKEN"
 
 # Check account status (public endpoint)
-curl "http://localhost:3000/bitetrack/auth/seller-status?email=user@example.com"
+curl "http://localhost:3000/api/v2/auth/seller-status?email=user@example.com"
 
 # Business Intelligence - Sales Analytics
-curl -X GET "http://localhost:3000/bitetrack/reporting/sales/analytics?groupBy=month" \
+curl -X GET "http://localhost:3000/api/v2/reporting/sales/analytics?groupBy=month" \
   -H "Authorization: Bearer TOKEN"
 
 # CSV Export - Multiple formats available
-curl -X GET "http://localhost:3000/bitetrack/reporting/sales/export?format=detailed" \
+curl -X GET "http://localhost:3000/api/v2/reporting/sales/export?format=detailed" \
   -H "Authorization: Bearer TOKEN"
 ```
 
@@ -102,17 +164,17 @@ curl -X GET "http://localhost:3000/bitetrack/reporting/sales/export?format=detai
 
 ```bash
 # Drop inventory for compliance (admin/superadmin only)
-curl -X POST http://localhost:3000/bitetrack/inventory-drops \
+curl -X POST http://localhost:3000/api/v2/inventory-drops \
   -H "Authorization: Bearer TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"productId":"PRODUCT_ID","quantityToDrop":5,"reason":"expired"}'
 
 # Get waste analytics and cost analysis
-curl -X GET http://localhost:3000/bitetrack/inventory-drops/analytics \
+curl -X GET http://localhost:3000/api/v2/inventory-drops/analytics \
   -H "Authorization: Bearer TOKEN"
 
 # View undoable drops (8-hour window)
-curl -X GET http://localhost:3000/bitetrack/inventory-drops/undoable \
+curl -X GET http://localhost:3000/api/v2/inventory-drops/undoable \
   -H "Authorization: Bearer TOKEN"
 ```
 
@@ -120,11 +182,11 @@ curl -X GET http://localhost:3000/bitetrack/inventory-drops/undoable \
 
 ```bash
 # Get comprehensive test data status
-curl -X GET http://localhost:3000/bitetrack/test-data/status \
+curl -X GET http://localhost:3000/api/v2/test-data/status \
   -H "Authorization: Bearer TOKEN"
 
 # Populate realistic test scenarios
-curl -X POST http://localhost:3000/bitetrack/test-data/populate \
+curl -X POST http://localhost:3000/api/v2/test-data/populate \
   -H "Authorization: Bearer TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"preset":"dev","verbose":true}'
@@ -284,9 +346,9 @@ BiteTrack/
 
 **Key features and endpoints:**
 
-- `GET /api-docs` - Professional interactive documentation portal
-- `GET /api-docs.json` - Raw OpenAPI specification for integration
-- `GET /` - API overview with quick start guide and platform capabilities
+- `GET /api/v2/docs` - Professional interactive documentation portal
+- `GET /api/v2/docs.json` - Raw OpenAPI specification for integration
+- `GET /api/v2` - API overview with quick start guide and platform capabilities
 
 ### Professional Testing Infrastructure (NEW)
 
@@ -315,7 +377,7 @@ BiteTrack/
 
 ## Enterprise API Structure (38 Endpoints)
 
-**Base URL:** `http://localhost:3000/bitetrack`
+**Base URL:** `http://localhost:3000/api/v2`
 
 ### **Authentication & Authorization** (`/auth/*`)
 
@@ -380,18 +442,8 @@ BiteTrack/
 
 ### **System Health & Monitoring** (`/health`)
 
-- `GET /bitetrack/health` - **PUBLIC** - System status and uptime monitoring
-
-## Environment Configuration
-
-**Required environment variables:**
-
-```bash
-MONGO_URI=mongodb://admin:password@host:27017/bitetrack
-JWT_SECRET=your-super-secure-jwt-secret
-PORT=3000
-NODE_ENV=production # Optional
-```
+- `GET /api/v2/health` - **PUBLIC** - System status and uptime monitoring
+- `GET /api/v2/health/mongodb` - **PUBLIC** - MongoDB connection status
 
 ## Critical Setup Requirements
 
@@ -457,7 +509,7 @@ Sales creation automatically:
 
 ### **Monitoring & Health Checks**
 
-- **System Health:** `GET /bitetrack/health` - **PUBLIC** - No authentication required
+- **System Health:** `GET /api/v2/health` - **PUBLIC** - No authentication required
 - **Development Monitoring:** `GET /test-data/status` - Database and environment statistics
 - **Performance Testing:** Integration test suite with realistic business scenarios
 
