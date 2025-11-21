@@ -44,12 +44,15 @@ app.set("trust proxy", 1);
 // Security middleware
 app.use(helmet());
 
+
 // CORS configuration - environment-specific origins
+// This allows localhost on any port if no environment variable is set
+const localhostRegex = new RegExp("^http://localhost:(\\d+)$"); 
 const corsOptions = {
   origin: process.env.FRONTEND_URLS
     ? process.env.FRONTEND_URLS.split(",").map((url) => url.trim())
     : [
-      "http://localhost"
+      localhostRegex
     ],
   credentials: true,
   optionsSuccessStatus: 200,
