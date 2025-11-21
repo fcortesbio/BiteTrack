@@ -14,13 +14,13 @@ BiteTrack is a monorepo that packages every service, deployment asset, and scrip
 
 ## Service Matrix
 
-| Service | Location | Runtime | Docker Name | Default Port(s) | Notes |
-|---------|----------|---------|-------------|-----------------|-------|
-| Frontend | `services/frontend` | React 18 + Vite | `bitetrack-frontend` | 80 (Traefik), 5173 dev | Health dashboard + CTA links. |
-| API | `services/api` | Node 20/Express + Mongoose | `bitetrack-api` | 3000 (prod), 3001 dev | 9 route groups, Swagger UI at `/api/v2/docs`. |
-| MCP | `services/mcp` | Node 20/Express | `bitetrack-mcp` | 3001 internal, exposed via `${MCP_PORT}` | SSE, sandboxed code execution, tool registry. |
-| MongoDB | Docker | MongoDB 8 replica set | `bitetrack-mongodb` | 27017 | Replica set `rs0` with keyfile auth. |
-| Traefik | Docker | Traefik 3.5 | `bitetrack-traefik` | 80 / 8080 | Routes `/`, `/api`, `/mcp`, dashboard on 8080. |
+| Service  | Location            | Runtime                    | Docker Name          | Default Port(s)                          | Notes                                          |
+| -------- | ------------------- | -------------------------- | -------------------- | ---------------------------------------- | ---------------------------------------------- |
+| Frontend | `services/frontend` | React 18 + Vite            | `bitetrack-frontend` | 80 (Traefik), 5173 dev                   | Health dashboard + CTA links.                  |
+| API      | `services/api`      | Node 20/Express + Mongoose | `bitetrack-api`      | 3000 (prod), 3001 dev                    | 9 route groups, Swagger UI at `/api/v2/docs`.  |
+| MCP      | `services/mcp`      | Node 20/Express            | `bitetrack-mcp`      | 3001 internal, exposed via `${MCP_PORT}` | SSE, sandboxed code execution, tool registry.  |
+| MongoDB  | Docker              | MongoDB 8 replica set      | `bitetrack-mongodb`  | 27017                                    | Replica set `rs0` with keyfile auth.           |
+| Traefik  | Docker              | Traefik 3.5                | `bitetrack-traefik`  | 80 / 8080                                | Routes `/`, `/api`, `/mcp`, dashboard on 8080. |
 
 All containers share the `bitetrack_web` network; the API and MCP also join the internal `bitetrack_backend` network where MongoDB is isolated.
 

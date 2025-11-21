@@ -177,10 +177,7 @@ export const setupSwaggerUI = (app, port, host = "localhost") => {
 
   // Swagger UI endpoint
   app.use("/api/v2/docs", swaggerUi.serve);
-  app.get(
-    "/api/v2/docs",
-    swaggerUi.setup(swaggerSpec, swaggerUiOptions),
-  );
+  app.get("/api/v2/docs", swaggerUi.setup(swaggerSpec, swaggerUiOptions));
 
   // JSON endpoint for raw spec
   app.get("/api/v2/docs.json", (req, res) => {
@@ -195,9 +192,7 @@ export const setupSwaggerUI = (app, port, host = "localhost") => {
   console.log(
     `Interactive docs available at: http://${host}:${port}/api/v2/docs`,
   );
-  console.log(
-    `JSON specification at: http://${host}:${port}/api/v2/docs.json`,
-  );
+  console.log(`JSON specification at: http://${host}:${port}/api/v2/docs.json`);
 
   // Return the spec for potential use elsewhere
   return swaggerSpec;

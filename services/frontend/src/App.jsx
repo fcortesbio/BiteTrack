@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 
 // Get API and MCP URLs from environment variables
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3004"; // default to port 3004 if no .env file found 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3004"; // default to port 3004 if no .env file found
 const MCP_URL = import.meta.env.VITE_MCP_URL ?? "http://localhost:4004"; // default to port 4004 if no .env file found
 
 function App() {
@@ -14,36 +14,36 @@ function App() {
     // Check API health
     fetch(`${API_URL}/api/v2/health`)
       .then((res) => {
-        if (!res.ok) throw new Error('API health check failed');
+        if (!res.ok) throw new Error("API health check failed");
         return res.json();
       })
       .then((data) => setApiStatus(data))
       .catch((error) => {
-        console.error('API health check error:', error);
+        console.error("API health check error:", error);
         setApiStatus({ status: "ERROR", message: "API unreachable" });
       });
 
     // Check MCP health
     fetch(`${MCP_URL}/health`)
       .then((res) => {
-        if (!res.ok) throw new Error('MCP health check failed');
+        if (!res.ok) throw new Error("MCP health check failed");
         return res.json();
       })
       .then((data) => setMcpStatus(data))
       .catch((error) => {
-        console.error('MCP health check error:', error);
+        console.error("MCP health check error:", error);
         setMcpStatus({ status: "ERROR", message: "MCP unreachable" });
       });
 
     // Check MongoDB health via API
     fetch(`${API_URL}/api/v2/health/mongodb`)
       .then((res) => {
-        if (!res.ok) throw new Error('MongoDB health check failed');
+        if (!res.ok) throw new Error("MongoDB health check failed");
         return res.json();
       })
       .then((data) => setMongoStatus(data))
       .catch((error) => {
-        console.error('MongoDB health check error:', error);
+        console.error("MongoDB health check error:", error);
         setMongoStatus({ status: "ERROR", message: "MongoDB unreachable" });
       });
   }, []);
@@ -116,7 +116,11 @@ function App() {
             <a href="/api/v2/docs" className="button primary" target="_blank">
               API Docs
             </a>
-            <a href="/api/v2/health" className="button secondary" target="_blank">
+            <a
+              href="/api/v2/health"
+              className="button secondary"
+              target="_blank"
+            >
               API Health
             </a>
             <a href="/mcp/" className="button secondary" target="_blank">

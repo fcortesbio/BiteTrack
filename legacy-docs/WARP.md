@@ -32,7 +32,7 @@ npm run init
 
 # Options:
 # 1. Development - Creates .env.development + MongoDB only
-# 2. Production - Creates .env.production + full Docker stack  
+# 2. Production - Creates .env.production + full Docker stack
 # 3. Both - Creates both env files
 
 # The script creates:
@@ -47,16 +47,19 @@ npm run init
 Key variables exposed to services:
 
 **API Service:**
+
 - `API_PORT` - External port (default: 3000 prod, 3001 dev, fallback: 3004)
 - `MONGO_URI` - MongoDB connection string
 - `JWT_SECRET` - JWT signing key
 - `NODE_ENV` - Environment mode
 
 **MCP Service:**
+
 - `MCP_PORT` - External port (default: 4000 prod, 4001 dev, fallback: 4004)
 - `GEMINI_API_KEY` - Optional Gemini API key
 
 **Frontend (Vite):**
+
 - `VITE_API_URL` - API base URL (e.g., http://localhost:3000)
 - `VITE_MCP_URL` - MCP base URL (e.g., http://localhost:4000)
 

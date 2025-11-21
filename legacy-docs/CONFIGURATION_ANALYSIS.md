@@ -7,12 +7,14 @@
 **Problem**: The init script creates `.env.production` and `.env.development` at **project root**, but Docker Compose looks for `.env` in the **infrastructure directory**.
 
 **Evidence**:
+
 - `setup-env.sh` creates: `$PROJECT_ROOT/.env.production` and `$PROJECT_ROOT/.env.development`
 - `docker-compose.yml` location: `infrastructure/docker-compose.yml`
 - Docker Compose automatically loads: `infrastructure/.env` (same directory as docker-compose.yml)
 - Current manual `.env`: `infrastructure/.env` (735 bytes, created Nov 9)
 
 **Impact**:
+
 - When you run `docker compose up`, it uses `infrastructure/.env` (manually created)
 - Environment variables like `MCP_PORT` and `API_PORT` may not be set correctly
 - Services fall back to hardcoded defaults
@@ -24,6 +26,7 @@
 **Problem**: MCP server defaults to port **4004** (recently changed from 3001), but Docker Compose maps `${MCP_PORT:-4000}:3001`.
 
 **Code Evidence**:
+
 ```javascript
 // services/mcp/index.js:10
 const PORT = process.env.MCP_PORT || 4004;
@@ -34,10 +37,11 @@ const PORT = process.env.MCP_PORT || 4004;
 ports:
   - "${MCP_PORT:-4000}:3001"
 environment:
-  MCP_PORT: 3001  # <-- This is set but Docker maps external 4000 to internal 3001
+  MCP_PORT: 3001 # <-- This is set but Docker maps external 4000 to internal 3001
 ```
 
 **Current Behavior**:
+
 - Docker starts MCP with `MCP_PORT=3001` (from environment section)
 - MCP server listens on 3001 internally
 - Docker maps host port 4000 → container port 3001
@@ -52,11 +56,13 @@ environment:
 **Problem**: API can't authenticate to MongoDB despite correct credentials in `.env`.
 
 **Evidence from logs**:
+
 ```
 MongoServerError: Authentication failed.
 ```
 
 **Root Cause**: The `.env` file has:
+
 ```bash
 MONGO_URI='mongodb://bitetrack-admin:Mongopass123@mongodb:27017/bitetrack?authSource=admin&directConnection=true'
 ```
@@ -64,7 +70,8 @@ MONGO_URI='mongodb://bitetrack-admin:Mongopass123@mongodb:27017/bitetrack?authSo
 But MongoDB may not have the user created yet, OR the replica set init is using different credentials.
 
 **Docker Compose Flow**:
-1. MongoDB starts with `${MONGO_ROOT_USERNAME}` and `${MONGO_ROOT_PASSWORD}` 
+
+1. MongoDB starts with `${MONGO_ROOT_USERNAME}` and `${MONGO_ROOT_PASSWORD}`
 2. `mongodb-init` container tries to init replica set with these credentials
 3. API tries to connect with `${MONGO_URI}`
 
@@ -76,7 +83,8 @@ But MongoDB may not have the user created yet, OR the replica set init is using 
 
 **Documentation says**: "The init script creates an .env.production file and a symlink .env"
 
-**Reality**: 
+**Reality**:
+
 - No symlink creation found in scripts
 - `start-containers.sh` uses `--env-file` flag explicitly:
   ```bash
@@ -103,23 +111,23 @@ Add this function after line 300:
 # Create symlink for Docker Compose
 create_env_symlink() {
     local target_env=""
-    
+
     if [[ "$SETUP_MODE" == "dev" ]]; then
         target_env="$PROJECT_ROOT/.env.development"
     elif [[ "$SETUP_MODE" == "prod" || "$SETUP_MODE" == "both" ]]; then
         target_env="$PROJECT_ROOT/.env.production"
     fi
-    
+
     log_info "Creating symlink: infrastructure/.env → ${target_env}"
-    
+
     # Remove existing .env or symlink
     rm -f "$PROJECT_ROOT/infrastructure/.env"
-    
+
     # Create relative symlink
     cd "$PROJECT_ROOT/infrastructure"
     ln -sf "../$(basename $target_env)" .env
     cd "$PROJECT_ROOT"
-    
+
     log_success "Symlink created: infrastructure/.env"
 }
 ```
@@ -129,6 +137,7 @@ Call it in the main function after creating env files.
 #### B. Update `start-containers.sh` to rely on symlink
 
 Change line 66 and 72:
+
 ```bash
 # FROM:
 docker compose -f infrastructure/docker-compose.yml --env-file "$ENV_FILE" up -d
@@ -151,6 +160,7 @@ Docker Compose will automatically use `infrastructure/.env` (the symlink).
 ```
 
 **Benefits**:
+
 - Simple `docker compose up` works without init script
 - Clear which environment is active (check symlink target)
 - No `--env-file` flag needed
@@ -235,7 +245,9 @@ try {
 Document that MCP always uses internal port 3001, mapped to external 4000 in production.
 
 Changes:
+
 1. Update `services/mcp/index.js`:
+
 ```javascript
 // Change line 10 from:
 const PORT = process.env.MCP_PORT || 4004;
@@ -245,8 +257,10 @@ const PORT = process.env.MCP_PORT || 3001;
 ```
 
 2. Document in WARP.md:
+
 ```markdown
 ## MCP Service Ports
+
 - **Development**: External 4001 → Internal 3001 (npm run dev)
 - **Production**: External 4000 → Internal 3001 (Docker)
 - Internal port is always 3001
@@ -261,12 +275,13 @@ Remove `MCP_PORT: 3001` from docker-compose.yml environment section, let it come
 ports:
   - "${MCP_PORT:-4000}:${MCP_INTERNAL_PORT:-3001}"
 environment:
-  MCP_PORT: ${MCP_INTERNAL_PORT:-3001}  # Internal port
+  MCP_PORT: ${MCP_INTERNAL_PORT:-3001} # Internal port
   NODE_ENV: ${NODE_ENV:-production}
   # ...
 ```
 
 Then in `.env`:
+
 ```bash
 MCP_PORT=4000  # External host port
 MCP_INTERNAL_PORT=3001  # Internal container port
@@ -330,6 +345,7 @@ echo "Environment validation passed"
 ```
 
 Add to `package.json`:
+
 ```json
 "scripts": {
   "validate:env": "bash infrastructure/scripts/validate-env.sh",
@@ -391,18 +407,21 @@ docker compose -f infrastructure/docker-compose.yml logs -f
 ## Summary
 
 **Root Causes**:
+
 1. ✗ Environment files created at project root, but Docker looks in `infrastructure/`
 2. ✗ No symlink created despite documentation claiming it
 3. ✗ MongoDB user not created during initialization
 4. ✗ Port confusion between defaults and actual behavior
 
 **Fixes**:
+
 1. ✓ Create `infrastructure/.env` symlink to `.env.production` or `.env.development`
 2. ✓ Add MongoDB user creation to init script
 3. ✓ Standardize MCP port to always use 3001 internally
 4. ✓ Add environment validation script
 
 **After fixes, the flow will be**:
+
 ```bash
 npm run init                    # Creates .env.production + symlink
 docker compose up -d            # Uses infrastructure/.env (symlink)

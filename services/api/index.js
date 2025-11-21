@@ -44,16 +44,13 @@ app.set("trust proxy", 1);
 // Security middleware
 app.use(helmet());
 
-
 // CORS configuration - environment-specific origins
 // This allows localhost on any port if no environment variable is set
-const localhostRegex = new RegExp("^http://localhost:(\\d+)$"); 
+const localhostRegex = new RegExp("^http://localhost:(\\d+)$");
 const corsOptions = {
   origin: process.env.FRONTEND_URLS
     ? process.env.FRONTEND_URLS.split(",").map((url) => url.trim())
-    : [
-      localhostRegex
-    ],
+    : [localhostRegex],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -333,9 +330,7 @@ const server = app.listen(PORT, () => {
   if (isDevelopment) {
     console.log("\nDevelopment Server Information:");
     console.log(`API Base URL: http://localhost:${PORT}/api/v2`);
-    console.log(
-      `Interactive Docs: http://localhost:${PORT}/api/v2/docs`,
-    );
+    console.log(`Interactive Docs: http://localhost:${PORT}/api/v2/docs`);
     console.log(`Health Check: http://localhost:${PORT}/api/v2/health`);
     console.log(`Mongo Health: http://localhost:${PORT}/api/v2/health/mongodb`);
     console.log(`API Overview: http://localhost:${PORT}/api/v2`);

@@ -16,14 +16,14 @@ This repo contains every service (API, frontend, MCP), infrastructure asset, and
 
 ## Repository Layout
 
-| Path | Description |
-|------|-------------|
-| `services/api` | Express + MongoDB backend with tests, scripts, and Swagger config. |
-| `services/frontend` | React/Vite client used for health/status views. |
-| `services/mcp` | Model Context Protocol server and runtime tools. |
-| `infrastructure` | Docker Compose stack, Traefik config, and setup scripts invoked by `npm run init`. |
-| `docs` | Fresh documentation (`overview`, service guides, deployment, scripts) plus `openapi.yaml` and Postman collection. |
-| `legacy-docs` | Archived markdown copied verbatim from earlier phases—do not treat as canonical. |
+| Path                | Description                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `services/api`      | Express + MongoDB backend with tests, scripts, and Swagger config.                                                |
+| `services/frontend` | React/Vite client used for health/status views.                                                                   |
+| `services/mcp`      | Model Context Protocol server and runtime tools.                                                                  |
+| `infrastructure`    | Docker Compose stack, Traefik config, and setup scripts invoked by `npm run init`.                                |
+| `docs`              | Fresh documentation (`overview`, service guides, deployment, scripts) plus `openapi.yaml` and Postman collection. |
+| `legacy-docs`       | Archived markdown copied verbatim from earlier phases—do not treat as canonical.                                  |
 
 ## Getting Started
 
@@ -54,14 +54,14 @@ For local development outside Docker, navigate into each service directory and r
 
 ## Documentation
 
-| File | Focus |
-|------|-------|
-| `docs/overview.md` | High-level monorepo summary, service matrix, data flow. |
-| `docs/backend.md` | REST API internals, directory layout, env requirements, QA. |
-| `docs/frontend.md` | React/Vite client behavior and configuration. |
-| `docs/mcp.md` | MCP endpoints, session management, sandbox design. |
-| `docs/deployment.md` | Environment files, Docker orchestration, health verification. |
-| `docs/scripts.md` | Reference for `infrastructure/scripts` and `services/api/scripts`. |
+| File                 | Focus                                                              |
+| -------------------- | ------------------------------------------------------------------ |
+| `docs/overview.md`   | High-level monorepo summary, service matrix, data flow.            |
+| `docs/backend.md`    | REST API internals, directory layout, env requirements, QA.        |
+| `docs/frontend.md`   | React/Vite client behavior and configuration.                      |
+| `docs/mcp.md`        | MCP endpoints, session management, sandbox design.                 |
+| `docs/deployment.md` | Environment files, Docker orchestration, health verification.      |
+| `docs/scripts.md`    | Reference for `infrastructure/scripts` and `services/api/scripts`. |
 
 `legacy-docs/` contains the previous markdown files exactly as they were. Keep it around for historical context, but update the files above when making process changes.
 
@@ -74,4 +74,3 @@ For local development outside Docker, navigate into each service directory and r
 ## License
 
 MIT © fcortesbio
-
