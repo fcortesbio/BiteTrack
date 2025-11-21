@@ -62,6 +62,7 @@ For local development outside Docker, navigate into each service directory and r
 | `docs/mcp.md`        | MCP endpoints, session management, sandbox design.                 |
 | `docs/deployment.md` | Environment files, Docker orchestration, health verification.      |
 | `docs/scripts.md`    | Reference for `infrastructure/scripts` and `services/api/scripts`. |
+| `docs/roadmap.md`    | Delivery plan with milestones and suggested board setup.           |
 
 `legacy-docs/` contains the previous markdown files exactly as they were. Keep it around for historical context, but update the files above when making process changes.
 
