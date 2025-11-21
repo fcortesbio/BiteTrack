@@ -49,10 +49,8 @@ const corsOptions = {
   origin: process.env.FRONTEND_URLS
     ? process.env.FRONTEND_URLS.split(",").map((url) => url.trim())
     : [
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://localhost:5173",
-      ],
+      "http://localhost"
+    ],
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
