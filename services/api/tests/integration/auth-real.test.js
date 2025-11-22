@@ -211,9 +211,7 @@ describe("BiteTrack Authentication Routes", () => {
         };
 
         // Act
-        await request(app)
-          .post("/api/v2/auth/activate")
-          .send(activationData);
+        await request(app).post("/api/v2/auth/activate").send(activationData);
 
         // Assert
         const seller = await Seller.findOne({
@@ -233,14 +231,12 @@ describe("BiteTrack Authentication Routes", () => {
     describe("Validation errors", () => {
       it("should reject activation with invalid pending seller data", async () => {
         // Act - Try to activate without matching pending seller
-        const response = await request(app)
-          .post("/api/v2/auth/activate")
-          .send({
-            email: "nonexistent@example.com",
-            lastName: "Test",
-            dateOfBirth: "1990-01-01",
-            password: "ValidPassword123!",
-          });
+        const response = await request(app).post("/api/v2/auth/activate").send({
+          email: "nonexistent@example.com",
+          lastName: "Test",
+          dateOfBirth: "1990-01-01",
+          password: "ValidPassword123!",
+        });
 
         // Assert
         expect(response.status).toBe(404);
@@ -270,14 +266,12 @@ describe("BiteTrack Authentication Routes", () => {
         await activeSeller.save();
 
         // Act - Try to activate the pending seller
-        const response = await request(app)
-          .post("/api/v2/auth/activate")
-          .send({
-            email: pendingSellerData.email,
-            lastName: pendingSellerData.lastName,
-            dateOfBirth: "1990-01-01",
-            password: "ValidPassword123!",
-          });
+        const response = await request(app).post("/api/v2/auth/activate").send({
+          email: pendingSellerData.email,
+          lastName: pendingSellerData.lastName,
+          dateOfBirth: "1990-01-01",
+          password: "ValidPassword123!",
+        });
 
         // Assert
         expect(response.status).toBe(409);
@@ -355,9 +349,7 @@ describe("BiteTrack Authentication Routes", () => {
     describe("Validation errors", () => {
       it("should reject missing email query parameter", async () => {
         // Act
-        const response = await request(app).get(
-          "/api/v2/auth/seller-status",
-        );
+        const response = await request(app).get("/api/v2/auth/seller-status");
 
         // Assert
         expect(response.status).toBe(400);

@@ -193,9 +193,8 @@ class TestDataPopulator {
         ...p,
         isTestData: true,
       }));
-      this.createdData.products = await Product.insertMany(
-        productsWithTestFlag,
-      );
+      this.createdData.products =
+        await Product.insertMany(productsWithTestFlag);
       this.log(`Created ${this.createdData.products.length} products`);
     } catch (error) {
       throw new Error(`Product creation failed: ${error.message}`);
@@ -311,9 +310,7 @@ class TestDataPopulator {
 
     try {
       this.createdData.sales = await Sale.insertMany(realSales);
-      this.log(
-        `Created ${this.createdData.sales.length} sales transactions`,
-      );
+      this.log(`Created ${this.createdData.sales.length} sales transactions`);
     } catch (error) {
       throw new Error(`Sales creation failed: ${error.message}`);
     }
@@ -420,4 +417,3 @@ class TestDataPopulator {
 }
 
 export default TestDataPopulator;
-

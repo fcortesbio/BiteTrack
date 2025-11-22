@@ -26,12 +26,10 @@ describe("Product Management Routes", () => {
     await testSeller.save();
 
     // Login to get auth token
-    const loginResponse = await request(app)
-      .post("/api/v2/auth/login")
-      .send({
-        email: "salesman@bitetrack.io",
-        password: "TestPassword123!",
-      });
+    const loginResponse = await request(app).post("/api/v2/auth/login").send({
+      email: "salesman@bitetrack.io",
+      password: "TestPassword123!",
+    });
 
     authToken = loginResponse.body.token;
   });
