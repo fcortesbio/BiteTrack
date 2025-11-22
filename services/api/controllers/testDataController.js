@@ -1,4 +1,4 @@
-import TestDataPopulator from "../scripts/04-populate-test-data.js";
+import TestDataPopulator from "../utils/testDataPopulator.js";
 import Customer from "../models/Customer.js";
 import Product from "../models/Product.js";
 import Sale from "../models/Sale.js";
