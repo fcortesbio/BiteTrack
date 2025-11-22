@@ -5,6 +5,7 @@ This guide helps you migrate the static roadmap (`docs/roadmap.md`) to a dynamic
 ## Overview
 
 GitHub Projects provides:
+
 - **Roadmap view**: Timeline-based planning with milestones
 - **Board view**: Kanban-style workflow (To Do → In Progress → Done)
 - **Table view**: Spreadsheet-like task management
@@ -23,12 +24,14 @@ GitHub Projects provides:
 Add these custom fields to your project:
 
 ### Status Field (Single Select)
+
 - `Not Started`
 - `In Progress`
 - `Blocked`
 - `Done`
 
 ### Phase Field (Single Select)
+
 - `P1 - Stabilize Core Services`
 - `P2 - Developer Experience & Quality`
 - `P3 - Product Features`
@@ -36,6 +39,7 @@ Add these custom fields to your project:
 - `P5 - Documentation & Launch`
 
 ### Area Field (Single Select)
+
 - `API`
 - `Frontend`
 - `MCP`
@@ -44,6 +48,7 @@ Add these custom fields to your project:
 - `Documentation`
 
 ### Priority Field (Single Select)
+
 - `Critical`
 - `High`
 - `Medium`
@@ -99,21 +104,26 @@ For each roadmap item, create an issue with:
 **Title**: `[Phase X] Brief task description`
 
 **Body**:
+
 ```markdown
 ## Description
+
 [Detailed description from roadmap]
 
 ## Acceptance Criteria
+
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
 
 ## Related
+
 - Part of Phase X
 - Blocks: [issue numbers]
 - Blocked by: [issue numbers]
 
 ## Notes
+
 [Any additional context]
 ```
 
@@ -135,16 +145,19 @@ For each roadmap item, create an issue with:
 ## Step 7: Configure Project Views
 
 ### Roadmap View
+
 - Group by: **Milestone**
 - Filter: Show all phases
 - Timeline: Set start/end dates for each milestone
 
 ### Board View
+
 - Columns: `Not Started` | `In Progress` | `Blocked` | `Done`
 - Group by: **Phase** or **Area**
 - Filter: Use labels to show specific areas
 
 ### Table View
+
 - Columns: Title, Status, Phase, Area, Priority, Assignee, Milestone
 - Sort by: Priority, then Phase
 
@@ -176,4 +189,3 @@ GitHub Projects supports automation rules:
 3. Configure views (Roadmap, Board, Table)
 4. Set up automation rules
 5. Start tracking work!
-
