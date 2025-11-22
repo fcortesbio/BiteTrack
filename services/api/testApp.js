@@ -59,7 +59,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint for testing
-app.get("/bitetrack/health", (req, res) => {
+app.get("/api/v2/health", (req, res) => {
   res.json({
     status: "OK",
     environment: "test",
@@ -68,14 +68,14 @@ app.get("/bitetrack/health", (req, res) => {
 });
 
 // API routes
-app.use("/bitetrack/auth", authRoutes);
-app.use("/bitetrack/sellers", sellerRoutes);
-app.use("/bitetrack/customers", customerRoutes);
-app.use("/bitetrack/products", productRoutes);
-app.use("/bitetrack/sales", salesRoutes);
-app.use("/bitetrack/inventory-drops", inventoryDropRoutes);
-app.use("/bitetrack/test-data", testDataRoutes);
-app.use("/bitetrack/reporting", reportingRoutes);
+app.use("/api/v2/auth", authRoutes);
+app.use("/api/v2/sellers", sellerRoutes);
+app.use("/api/v2/customers", customerRoutes);
+app.use("/api/v2/products", productRoutes);
+app.use("/api/v2/sales", salesRoutes);
+app.use("/api/v2/inventory-drops", inventoryDropRoutes);
+app.use("/api/v2/test-data", testDataRoutes);
+app.use("/api/v2/reporting", reportingRoutes);
 
 // 404 handler
 app.use("*", (req, res) => {

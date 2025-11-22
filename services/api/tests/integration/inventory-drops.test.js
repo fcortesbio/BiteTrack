@@ -42,13 +42,13 @@ describe("Inventory Drop System Routes", () => {
 
     // Login as admin
     const adminLogin = await request(app)
-      .post("/bitetrack/auth/login")
+      .post("/api/v2/auth/login")
       .send({ email: "admin@test.com", password: "AdminPassword123!" });
     adminToken = adminLogin.body.token;
 
     // Login as user
     const userLogin = await request(app)
-      .post("/bitetrack/auth/login")
+      .post("/api/v2/auth/login")
       .send({ email: "user@test.com", password: "UserPassword123!" });
     userToken = userLogin.body.token;
 
@@ -61,7 +61,7 @@ describe("Inventory Drop System Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/inventory-drops", () => {
+  describe("POST /api/v2/inventory-drops", () => {
     it("should create inventory drop with admin role", async () => {
       const dropData = {
         productId: testProduct._id.toString(),
@@ -71,7 +71,7 @@ describe("Inventory Drop System Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/inventory-drops")
+        .post("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${adminToken}`)
         .send(dropData);
 
@@ -95,7 +95,7 @@ describe("Inventory Drop System Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/inventory-drops")
+        .post("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${userToken}`)
         .send(dropData);
 
@@ -114,7 +114,7 @@ describe("Inventory Drop System Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/inventory-drops")
+        .post("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${adminToken}`)
         .send(dropData);
 
@@ -130,7 +130,7 @@ describe("Inventory Drop System Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/inventory-drops")
+        .post("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${adminToken}`)
         .send(dropData);
 
@@ -158,7 +158,7 @@ describe("Inventory Drop System Routes", () => {
         });
 
         const response = await request(app)
-          .post("/bitetrack/inventory-drops")
+          .post("/api/v2/inventory-drops")
           .set("Authorization", `Bearer ${adminToken}`)
           .send({
             productId: product._id.toString(),
@@ -179,7 +179,7 @@ describe("Inventory Drop System Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/inventory-drops")
+        .post("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${adminToken}`)
         .send(dropData);
 
@@ -188,7 +188,7 @@ describe("Inventory Drop System Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/inventory-drops/:dropId/undo", () => {
+  describe("POST /api/v2/inventory-drops/:dropId/undo", () => {
     it("should undo a recent drop", async () => {
       // Create a drop
       const drop = await InventoryDrop.create({
@@ -208,7 +208,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .post(`/bitetrack/inventory-drops/${drop._id}/undo`)
+        .post(`/api/v2/inventory-drops/${drop._id}/undo`)
         .set("Authorization", `Bearer ${adminToken}`)
         .send({ undoReason: "Mistake in entry" });
 
@@ -234,7 +234,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .post(`/bitetrack/inventory-drops/${drop._id}/undo`)
+        .post(`/api/v2/inventory-drops/${drop._id}/undo`)
         .set("Authorization", `Bearer ${userToken}`)
         .send();
 
@@ -257,7 +257,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .post(`/bitetrack/inventory-drops/${drop._id}/undo`)
+        .post(`/api/v2/inventory-drops/${drop._id}/undo`)
         .set("Authorization", `Bearer ${adminToken}`)
         .send();
 
@@ -283,7 +283,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .post(`/bitetrack/inventory-drops/${drop._id}/undo`)
+        .post(`/api/v2/inventory-drops/${drop._id}/undo`)
         .set("Authorization", `Bearer ${adminToken}`)
         .send();
 
@@ -293,7 +293,7 @@ describe("Inventory Drop System Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/inventory-drops", () => {
+  describe("GET /api/v2/inventory-drops", () => {
     beforeEach(async () => {
       // Create multiple drops for filtering
       await InventoryDrop.create([
@@ -322,7 +322,7 @@ describe("Inventory Drop System Routes", () => {
 
     it("should list all drops for admin", async () => {
       const response = await request(app)
-        .get("/bitetrack/inventory-drops")
+        .get("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
@@ -337,14 +337,14 @@ describe("Inventory Drop System Routes", () => {
 
     it("should reject list request from regular user", async () => {
       const response = await request(app)
-        .get("/bitetrack/inventory-drops")
+        .get("/api/v2/inventory-drops")
         .set("Authorization", `Bearer ${userToken}`);
 
       expect(response.status).toBe(403);
     });
   });
 
-  describe("GET /bitetrack/inventory-drops/undoable", () => {
+  describe("GET /api/v2/inventory-drops/undoable", () => {
     it("should return only undoable drops", async () => {
       // Create recent drop (undoable)
       await InventoryDrop.create({
@@ -374,7 +374,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .get("/bitetrack/inventory-drops/undoable")
+        .get("/api/v2/inventory-drops/undoable")
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
@@ -386,14 +386,14 @@ describe("Inventory Drop System Routes", () => {
 
     it("should reject request from regular user", async () => {
       const response = await request(app)
-        .get("/bitetrack/inventory-drops/undoable")
+        .get("/api/v2/inventory-drops/undoable")
         .set("Authorization", `Bearer ${userToken}`);
 
       expect(response.status).toBe(403);
     });
   });
 
-  describe("GET /bitetrack/inventory-drops/analytics", () => {
+  describe("GET /api/v2/inventory-drops/analytics", () => {
     beforeEach(async () => {
       // Create drops for analytics
       await InventoryDrop.create([
@@ -422,7 +422,7 @@ describe("Inventory Drop System Routes", () => {
 
     it("should return waste analytics summary", async () => {
       const response = await request(app)
-        .get("/bitetrack/inventory-drops/analytics")
+        .get("/api/v2/inventory-drops/analytics")
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
@@ -435,14 +435,14 @@ describe("Inventory Drop System Routes", () => {
 
     it("should reject analytics request from regular user", async () => {
       const response = await request(app)
-        .get("/bitetrack/inventory-drops/analytics")
+        .get("/api/v2/inventory-drops/analytics")
         .set("Authorization", `Bearer ${userToken}`);
 
       expect(response.status).toBe(403);
     });
   });
 
-  describe("GET /bitetrack/inventory-drops/:dropId", () => {
+  describe("GET /api/v2/inventory-drops/:dropId", () => {
     it("should return drop details by ID", async () => {
       const drop = await InventoryDrop.create({
         productId: testProduct._id,
@@ -457,7 +457,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .get(`/bitetrack/inventory-drops/${drop._id}`)
+        .get(`/api/v2/inventory-drops/${drop._id}`)
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(200);
@@ -472,7 +472,7 @@ describe("Inventory Drop System Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .get(`/bitetrack/inventory-drops/${fakeId}`)
+        .get(`/api/v2/inventory-drops/${fakeId}`)
         .set("Authorization", `Bearer ${adminToken}`);
 
       expect(response.status).toBe(404);
@@ -491,7 +491,7 @@ describe("Inventory Drop System Routes", () => {
       });
 
       const response = await request(app)
-        .get(`/bitetrack/inventory-drops/${drop._id}`)
+        .get(`/api/v2/inventory-drops/${drop._id}`)
         .set("Authorization", `Bearer ${userToken}`);
 
       expect(response.status).toBe(403);

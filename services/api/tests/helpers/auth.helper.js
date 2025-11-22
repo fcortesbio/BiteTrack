@@ -14,7 +14,7 @@ import Seller from "../../models/Seller.js";
  */
 const loginUser = async (app, credentials) => {
   const response = await request(app)
-    .post("/bitetrack/auth/login")
+    .post("/api/v2/auth/login")
     .send(credentials);
 
   return response;
@@ -31,7 +31,7 @@ const getAuthToken = async (app, userData = null) => {
   const defaultUserData = userData || testUtils.createTestUser();
 
   // Register user
-  await request(app).post("/bitetrack/auth/register").send(defaultUserData);
+  await request(app).post("/api/v2/auth/register").send(defaultUserData);
 
   // Login user
   const loginResponse = await loginUser(app, {

@@ -27,7 +27,7 @@ describe("Product Management Routes", () => {
 
     // Login to get auth token
     const loginResponse = await request(app)
-      .post("/bitetrack/auth/login")
+      .post("/api/v2/auth/login")
       .send({
         email: "salesman@bitetrack.io",
         password: "TestPassword123!",
@@ -36,7 +36,7 @@ describe("Product Management Routes", () => {
     authToken = loginResponse.body.token;
   });
 
-  describe("POST /bitetrack/products", () => {
+  describe("POST /api/v2/products", () => {
     it("should create a new product with valid data", async () => {
       // Arrange
       const productData = {
@@ -48,7 +48,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send(productData);
 
@@ -78,7 +78,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send(minimalProductData);
 
@@ -92,7 +92,7 @@ describe("Product Management Routes", () => {
 
     it("should reject missing productName", async () => {
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ price: 10, count: 5 });
 
@@ -102,7 +102,7 @@ describe("Product Management Routes", () => {
 
     it("should reject missing price", async () => {
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ productName: "Testing product", count: 5 });
 
@@ -112,7 +112,7 @@ describe("Product Management Routes", () => {
 
     it("should reject missing count", async () => {
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ productName: "Testing product", price: 10 });
 
@@ -122,7 +122,7 @@ describe("Product Management Routes", () => {
 
     it("should reject negative price", async () => {
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ productName: "Test", price: -10, count: 5 });
 
@@ -131,7 +131,7 @@ describe("Product Management Routes", () => {
 
     it("should reject negative count", async () => {
       const response = await request(app)
-        .post("/bitetrack/products")
+        .post("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ productName: "Test", price: 10, count: -5 });
 
@@ -139,7 +139,7 @@ describe("Product Management Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/products", () => {
+  describe("GET /api/v2/products", () => {
     it("should list all products", async () => {
       // Arrange - Create test products
       await Product.create([
@@ -150,7 +150,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .get("/bitetrack/products")
+        .get("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`);
 
       // Assert
@@ -164,7 +164,7 @@ describe("Product Management Routes", () => {
 
     it("should return empty array when no products exist", async () => {
       const response = await request(app)
-        .get("/bitetrack/products")
+        .get("/api/v2/products")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -173,7 +173,7 @@ describe("Product Management Routes", () => {
     });
   });
 
-  describe("PATCH /bitetrack/products/:id", () => {
+  describe("PATCH /api/v2/products/:id", () => {
     it("should update product price", async () => {
       // Arrange - Create a product
       const product = await Product.create({
@@ -185,7 +185,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .patch(`/bitetrack/products/${product._id}`)
+        .patch(`/api/v2/products/${product._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ price: 15.99 });
 
@@ -210,7 +210,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .patch(`/bitetrack/products/${product._id}`)
+        .patch(`/api/v2/products/${product._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ count: 75 });
 
@@ -230,7 +230,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .patch(`/bitetrack/products/${product._id}`)
+        .patch(`/api/v2/products/${product._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           productName: "Updated Product",
@@ -251,7 +251,7 @@ describe("Product Management Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .patch(`/bitetrack/products/${fakeId}`)
+        .patch(`/api/v2/products/${fakeId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ price: 15.99 });
 
@@ -267,7 +267,7 @@ describe("Product Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/products/${product._id}`)
+        .patch(`/api/v2/products/${product._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ price: -10 });
 
@@ -275,7 +275,7 @@ describe("Product Management Routes", () => {
     });
   });
 
-  describe("DELETE /bitetrack/products/:id", () => {
+  describe("DELETE /api/v2/products/:id", () => {
     it("should delete existing product", async () => {
       // Arrange
       const product = await Product.create({
@@ -287,7 +287,7 @@ describe("Product Management Routes", () => {
 
       // Act
       const response = await request(app)
-        .delete(`/bitetrack/products/${product._id}`)
+        .delete(`/api/v2/products/${product._id}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       // Assert
@@ -302,7 +302,7 @@ describe("Product Management Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .delete(`/bitetrack/products/${fakeId}`)
+        .delete(`/api/v2/products/${fakeId}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
@@ -310,7 +310,7 @@ describe("Product Management Routes", () => {
 
     it("should reject invalid ObjectId", async () => {
       const response = await request(app)
-        .delete("/bitetrack/products/invalid-id")
+        .delete("/api/v2/products/invalid-id")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(400);
@@ -320,14 +320,14 @@ describe("Product Management Routes", () => {
 
   describe("Authentication requirements", () => {
     it("should reject requests without token", async () => {
-      const response = await request(app).get("/bitetrack/products");
+      const response = await request(app).get("/api/v2/products");
 
       expect(response.status).toBe(401);
     });
 
     it("should reject requests with invalid token", async () => {
       const response = await request(app)
-        .get("/bitetrack/products")
+        .get("/api/v2/products")
         .set("Authorization", "Bearer invalid-token");
 
       expect(response.status).toBe(401);

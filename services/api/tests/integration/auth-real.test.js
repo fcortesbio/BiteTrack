@@ -11,7 +11,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 describe("BiteTrack Authentication Routes", () => {
-  describe("POST /bitetrack/auth/login", () => {
+  describe("POST /api/v2/auth/login", () => {
     describe("Success scenarios", () => {
       it("should authenticate seller with valid credentials", async () => {
         // Arrange - Create an active seller directly in DB
@@ -29,7 +29,7 @@ describe("BiteTrack Authentication Routes", () => {
         await seller.save();
 
         // Act
-        const response = await request(app).post("/bitetrack/auth/login").send({
+        const response = await request(app).post("/api/v2/auth/login").send({
           email: sellerData.email,
           password: sellerData.password,
         });
@@ -58,7 +58,7 @@ describe("BiteTrack Authentication Routes", () => {
         await seller.save();
 
         // Act
-        const response = await request(app).post("/bitetrack/auth/login").send({
+        const response = await request(app).post("/api/v2/auth/login").send({
           email: sellerData.email,
           password: sellerData.password,
         });
@@ -95,7 +95,7 @@ describe("BiteTrack Authentication Routes", () => {
         await seller.save();
 
         // Act - Try with wrong password
-        const response = await request(app).post("/bitetrack/auth/login").send({
+        const response = await request(app).post("/api/v2/auth/login").send({
           email: sellerData.email,
           password: "WrongPassword123!",
         });
@@ -109,7 +109,7 @@ describe("BiteTrack Authentication Routes", () => {
 
       it("should reject non-existent user", async () => {
         // Act
-        const response = await request(app).post("/bitetrack/auth/login").send({
+        const response = await request(app).post("/api/v2/auth/login").send({
           email: "nonexistent@example.com",
           password: "SomePassword123!",
         });
@@ -124,7 +124,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject missing credentials", async () => {
         // Test missing email
         let response = await request(app)
-          .post("/bitetrack/auth/login")
+          .post("/api/v2/auth/login")
           .send({ password: "SomePassword123!" });
 
         expect(response.status).toBe(400);
@@ -132,14 +132,14 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Test missing password
         response = await request(app)
-          .post("/bitetrack/auth/login")
+          .post("/api/v2/auth/login")
           .send({ email: "test@example.com" });
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
 
         // Test missing both
-        response = await request(app).post("/bitetrack/auth/login").send({});
+        response = await request(app).post("/api/v2/auth/login").send({});
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty("message");
@@ -147,7 +147,7 @@ describe("BiteTrack Authentication Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/auth/activate", () => {
+  describe("POST /api/v2/auth/activate", () => {
     describe("Success scenarios", () => {
       it("should activate pending seller with valid data", async () => {
         // Arrange - Create a pending seller first
@@ -171,7 +171,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/activate")
+          .post("/api/v2/auth/activate")
           .send(activationData);
 
         // Assert
@@ -212,7 +212,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act
         await request(app)
-          .post("/bitetrack/auth/activate")
+          .post("/api/v2/auth/activate")
           .send(activationData);
 
         // Assert
@@ -234,7 +234,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject activation with invalid pending seller data", async () => {
         // Act - Try to activate without matching pending seller
         const response = await request(app)
-          .post("/bitetrack/auth/activate")
+          .post("/api/v2/auth/activate")
           .send({
             email: "nonexistent@example.com",
             lastName: "Test",
@@ -271,7 +271,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act - Try to activate the pending seller
         const response = await request(app)
-          .post("/bitetrack/auth/activate")
+          .post("/api/v2/auth/activate")
           .send({
             email: pendingSellerData.email,
             lastName: pendingSellerData.lastName,
@@ -287,7 +287,7 @@ describe("BiteTrack Authentication Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/auth/seller-status", () => {
+  describe("GET /api/v2/auth/seller-status", () => {
     describe("Success scenarios", () => {
       it("should return active status for active seller", async () => {
         // Arrange - Create an active seller
@@ -306,7 +306,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act
         const response = await request(app)
-          .get("/bitetrack/auth/seller-status")
+          .get("/api/v2/auth/seller-status")
           .query({ email: sellerData.email });
 
         // Assert
@@ -330,7 +330,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act
         const response = await request(app)
-          .get("/bitetrack/auth/seller-status")
+          .get("/api/v2/auth/seller-status")
           .query({ email: pendingSellerData.email });
 
         // Assert
@@ -342,7 +342,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should return 404 for non-existent seller", async () => {
         // Act
         const response = await request(app)
-          .get("/bitetrack/auth/seller-status")
+          .get("/api/v2/auth/seller-status")
           .query({ email: "nonexistent@example.com" });
 
         // Assert
@@ -356,7 +356,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject missing email query parameter", async () => {
         // Act
         const response = await request(app).get(
-          "/bitetrack/auth/seller-status",
+          "/api/v2/auth/seller-status",
         );
 
         // Assert
@@ -366,7 +366,7 @@ describe("BiteTrack Authentication Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/auth/request-recovery", () => {
+  describe("POST /api/v2/auth/request-recovery", () => {
     describe("Success scenarios", () => {
       it("should request password recovery with valid email and DOB", async () => {
         // Arrange - Create a seller
@@ -385,7 +385,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: sellerData.email,
             dateOfBirth: "1990-01-01",
@@ -408,7 +408,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should return same message for non-existent email (security)", async () => {
         // Act - Try with email that doesn't exist
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: "nonexistent.recovery@example.com",
             dateOfBirth: "1990-01-01",
@@ -438,7 +438,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act - Try with wrong DOB
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: sellerData.email,
             dateOfBirth: "1995-01-01", // Wrong DOB
@@ -474,7 +474,7 @@ describe("BiteTrack Authentication Routes", () => {
 
         // Act - Request recovery (will fail email but should create token)
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: sellerData.email,
             dateOfBirth: "1990-01-01",
@@ -498,7 +498,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject missing email", async () => {
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({ dateOfBirth: "1990-01-01" });
 
         // Assert
@@ -510,7 +510,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject invalid email format", async () => {
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: "not-an-email",
             dateOfBirth: "1990-01-01",
@@ -525,7 +525,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject missing dateOfBirth", async () => {
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({ email: "test@example.com" });
 
         // Assert
@@ -537,7 +537,7 @@ describe("BiteTrack Authentication Routes", () => {
       it("should reject invalid date format", async () => {
         // Act
         const response = await request(app)
-          .post("/bitetrack/auth/request-recovery")
+          .post("/api/v2/auth/request-recovery")
           .send({
             email: "test@example.com",
             dateOfBirth: "not-a-date",
@@ -551,7 +551,7 @@ describe("BiteTrack Authentication Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/auth/reset", () => {
+  describe("POST /api/v2/auth/reset", () => {
     describe("Success scenarios", () => {
       it("should reset password with valid token and seller details", async () => {
         // Arrange - Create seller and reset token
@@ -576,7 +576,7 @@ describe("BiteTrack Authentication Routes", () => {
         await resetToken.save();
 
         // Act
-        const response = await request(app).post("/bitetrack/auth/reset").send({
+        const response = await request(app).post("/api/v2/auth/reset").send({
           token: "valid-reset-token",
           email: sellerData.email,
           dateOfBirth: "1990-01-01",
@@ -608,7 +608,7 @@ describe("BiteTrack Authentication Routes", () => {
     describe("Validation errors", () => {
       it("should reject invalid or expired token", async () => {
         // Act
-        const response = await request(app).post("/bitetrack/auth/reset").send({
+        const response = await request(app).post("/api/v2/auth/reset").send({
           token: "invalid-token",
           email: "test@example.com",
           dateOfBirth: "1990-01-01",
@@ -644,7 +644,7 @@ describe("BiteTrack Authentication Routes", () => {
         await resetToken.save();
 
         // Act - Use wrong email
-        const response = await request(app).post("/bitetrack/auth/reset").send({
+        const response = await request(app).post("/api/v2/auth/reset").send({
           token: "valid-token",
           email: "wrong@example.com",
           dateOfBirth: "1990-01-01",

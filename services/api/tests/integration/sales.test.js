@@ -30,7 +30,7 @@ describe("Sales Transaction Routes", () => {
 
     // Login
     const loginResponse = await request(app)
-      .post("/bitetrack/auth/login")
+      .post("/api/v2/auth/login")
       .send({ email: "seller@test.com", password: "TestPassword123!" });
     authToken = loginResponse.body.token;
 
@@ -51,7 +51,7 @@ describe("Sales Transaction Routes", () => {
     });
   });
 
-  describe("POST /bitetrack/sales", () => {
+  describe("POST /api/v2/sales", () => {
     it("should create a sale with valid data", async () => {
       const saleData = {
         customerId: testCustomer._id.toString(),
@@ -64,7 +64,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -97,7 +97,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -119,7 +119,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -138,7 +138,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -152,7 +152,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -161,7 +161,7 @@ describe("Sales Transaction Routes", () => {
 
     it("should reject sale with missing customerId", async () => {
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           products: [{ productId: testProduct._id.toString(), quantity: 1 }],
@@ -173,7 +173,7 @@ describe("Sales Transaction Routes", () => {
 
     it("should reject sale with empty products array", async () => {
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           customerId: testCustomer._id.toString(),
@@ -190,7 +190,7 @@ describe("Sales Transaction Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/sales")
+        .post("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`)
         .send(saleData);
 
@@ -206,7 +206,7 @@ describe("Sales Transaction Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/sales", () => {
+  describe("GET /api/v2/sales", () => {
     beforeEach(async () => {
       // Create multiple sales for filtering tests
       await Sale.create([
@@ -243,7 +243,7 @@ describe("Sales Transaction Routes", () => {
 
     it("should list all sales", async () => {
       const response = await request(app)
-        .get("/bitetrack/sales")
+        .get("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -261,7 +261,7 @@ describe("Sales Transaction Routes", () => {
       await Sale.deleteMany({});
 
       const response = await request(app)
-        .get("/bitetrack/sales")
+        .get("/api/v2/sales")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -272,7 +272,7 @@ describe("Sales Transaction Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/sales/:id", () => {
+  describe("GET /api/v2/sales/:id", () => {
     it("should return sale details by ID", async () => {
       const sale = await Sale.create({
         customerId: testCustomer._id,
@@ -290,7 +290,7 @@ describe("Sales Transaction Routes", () => {
       });
 
       const response = await request(app)
-        .get(`/bitetrack/sales/${sale._id}`)
+        .get(`/api/v2/sales/${sale._id}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -303,14 +303,14 @@ describe("Sales Transaction Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .get(`/bitetrack/sales/${fakeId}`)
+        .get(`/api/v2/sales/${fakeId}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
     });
   });
 
-  describe("PATCH /bitetrack/sales/:id/settle", () => {
+  describe("PATCH /api/v2/sales/:id/settle", () => {
     it("should settle an unsettled sale", async () => {
       const sale = await Sale.create({
         customerId: testCustomer._id,
@@ -328,7 +328,7 @@ describe("Sales Transaction Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/sales/${sale._id}/settle`)
+        .patch(`/api/v2/sales/${sale._id}/settle`)
         .set("Authorization", `Bearer ${authToken}`)
         .send();
 
@@ -360,7 +360,7 @@ describe("Sales Transaction Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/sales/${sale._id}/settle`)
+        .patch(`/api/v2/sales/${sale._id}/settle`)
         .set("Authorization", `Bearer ${authToken}`)
         .send();
 
@@ -372,7 +372,7 @@ describe("Sales Transaction Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .patch(`/bitetrack/sales/${fakeId}/settle`)
+        .patch(`/api/v2/sales/${fakeId}/settle`)
         .set("Authorization", `Bearer ${authToken}`)
         .send();
 
@@ -382,14 +382,14 @@ describe("Sales Transaction Routes", () => {
 
   describe("Authentication requirements", () => {
     it("should reject requests without token", async () => {
-      const response = await request(app).get("/bitetrack/sales");
+      const response = await request(app).get("/api/v2/sales");
 
       expect(response.status).toBe(401);
     });
 
     it("should reject requests with invalid token", async () => {
       const response = await request(app)
-        .get("/bitetrack/sales")
+        .get("/api/v2/sales")
         .set("Authorization", "Bearer invalid-token");
 
       expect(response.status).toBe(401);

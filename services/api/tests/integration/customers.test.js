@@ -27,13 +27,13 @@ describe("Customer Management Routes", () => {
     await testSeller.save();
 
     const loginResponse = await request(app)
-      .post("/bitetrack/auth/login")
+      .post("/api/v2/auth/login")
       .send({ email: "seller@test.com", password: "TestPassword123!" });
 
     authToken = loginResponse.body.token;
   });
 
-  describe("POST /bitetrack/customers", () => {
+  describe("POST /api/v2/customers", () => {
     it("should create a new customer with valid data", async () => {
       const customerData = {
         firstName: "John",
@@ -43,7 +43,7 @@ describe("Customer Management Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send(customerData);
 
@@ -68,7 +68,7 @@ describe("Customer Management Routes", () => {
       };
 
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send(customerData);
 
@@ -79,7 +79,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject missing firstName", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ lastName: "Doe" });
 
@@ -89,7 +89,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject missing lastName", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({ firstName: "John" });
 
@@ -99,7 +99,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject invalid email format", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -114,7 +114,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject missing phoneNumber", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -133,7 +133,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject invalid Colombian phone number - too short", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -152,7 +152,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject invalid Colombian phone number - mobile not starting with 3", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -171,7 +171,7 @@ describe("Customer Management Routes", () => {
 
     it("should reject invalid Colombian phone number - contains letters", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -190,7 +190,7 @@ describe("Customer Management Routes", () => {
 
     it("should accept valid Colombian landline - 7 digits", async () => {
       const response = await request(app)
-        .post("/bitetrack/customers")
+        .post("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "John",
@@ -203,7 +203,7 @@ describe("Customer Management Routes", () => {
     });
   });
 
-  describe("GET /bitetrack/customers", () => {
+  describe("GET /api/v2/customers", () => {
     it("should list all customers", async () => {
       // Create test customers
       await Customer.create([
@@ -223,7 +223,7 @@ describe("Customer Management Routes", () => {
       ]);
 
       const response = await request(app)
-        .get("/bitetrack/customers")
+        .get("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -235,7 +235,7 @@ describe("Customer Management Routes", () => {
 
     it("should return empty array when no customers exist", async () => {
       const response = await request(app)
-        .get("/bitetrack/customers")
+        .get("/api/v2/customers")
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -244,7 +244,7 @@ describe("Customer Management Routes", () => {
     });
   });
 
-  describe("PATCH /bitetrack/customers/:id", () => {
+  describe("PATCH /api/v2/customers/:id", () => {
     it("should update customer information", async () => {
       const customer = await Customer.create({
         firstName: "Original",
@@ -254,7 +254,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${customer._id}`)
+        .patch(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({
           firstName: "Updated",
@@ -279,7 +279,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${customer._id}`)
+        .patch(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ phoneNumber: "3209876543" });
 
@@ -291,7 +291,7 @@ describe("Customer Management Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${fakeId}`)
+        .patch(`/api/v2/customers/${fakeId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ firstName: "Updated" });
 
@@ -306,7 +306,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${customer._id}`)
+        .patch(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ email: "invalid-email" });
 
@@ -322,7 +322,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${customer._id}`)
+        .patch(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ phoneNumber: "12345" }); // Invalid - too short
 
@@ -343,7 +343,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .patch(`/bitetrack/customers/${customer._id}`)
+        .patch(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send({ phoneNumber: "+57 315 987 6543" }); // With country code and spaces
 
@@ -352,7 +352,7 @@ describe("Customer Management Routes", () => {
     });
   });
 
-  describe("DELETE /bitetrack/customers/:id", () => {
+  describe("DELETE /api/v2/customers/:id", () => {
     it("should delete existing customer", async () => {
       const customer = await Customer.create({
         firstName: "To",
@@ -361,7 +361,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .delete(`/bitetrack/customers/${customer._id}`)
+        .delete(`/api/v2/customers/${customer._id}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(204);
@@ -375,14 +375,14 @@ describe("Customer Management Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .delete(`/bitetrack/customers/${fakeId}`)
+        .delete(`/api/v2/customers/${fakeId}`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
     });
   });
 
-  describe("GET /bitetrack/customers/:id/transactions", () => {
+  describe("GET /api/v2/customers/:id/transactions", () => {
     it("should return customer transaction history", async () => {
       // Create customer and product
       const customer = await Customer.create({
@@ -431,7 +431,7 @@ describe("Customer Management Routes", () => {
       ]);
 
       const response = await request(app)
-        .get(`/bitetrack/customers/${customer._id}/transactions`)
+        .get(`/api/v2/customers/${customer._id}/transactions`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -453,7 +453,7 @@ describe("Customer Management Routes", () => {
       });
 
       const response = await request(app)
-        .get(`/bitetrack/customers/${customer._id}/transactions`)
+        .get(`/api/v2/customers/${customer._id}/transactions`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(200);
@@ -468,7 +468,7 @@ describe("Customer Management Routes", () => {
       const fakeId = testUtils.generateObjectId();
 
       const response = await request(app)
-        .get(`/bitetrack/customers/${fakeId}/transactions`)
+        .get(`/api/v2/customers/${fakeId}/transactions`)
         .set("Authorization", `Bearer ${authToken}`);
 
       expect(response.status).toBe(404);
@@ -477,14 +477,14 @@ describe("Customer Management Routes", () => {
 
   describe("Authentication requirements", () => {
     it("should reject requests without token", async () => {
-      const response = await request(app).get("/bitetrack/customers");
+      const response = await request(app).get("/api/v2/customers");
 
       expect(response.status).toBe(401);
     });
 
     it("should reject requests with invalid token", async () => {
       const response = await request(app)
-        .get("/bitetrack/customers")
+        .get("/api/v2/customers")
         .set("Authorization", "Bearer invalid-token");
 
       expect(response.status).toBe(401);
