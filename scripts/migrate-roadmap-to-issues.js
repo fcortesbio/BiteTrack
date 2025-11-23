@@ -193,30 +193,16 @@ function createIssue(issue, dryRun = false) {
   }
 
   try {
-    // Create issue via GitHub CLI using array form to prevent command injection
-    // Array form avoids shell interpretation of metacharacters in title/body/labels
-    const args = [
-      "issue",
-      "create",
-      "--repo",
-      REPO,
-      "--title",
-      issue.title,
-      "--body",
-      issue.body,
-    ];
+    // Create issue via GitHub CLI
+    const labelsArg = issue.labels.map((l) => `-l "${l}"`).join(" ");
+    const milestoneArg = issue.milestone ? `-m "${issue.milestone}"` : "";
+    const bodyEscaped = JSON.stringify(issue.body)
+      .slice(1, -1)
+      .replace(/"/g, '\\"');
 
-    // Add labels (each label gets its own -l flag)
-    for (const label of issue.labels) {
-      args.push("-l", label);
-    }
+    const command = `gh issue create --repo ${REPO} --title "${issue.title}" --body "${bodyEscaped}" ${labelsArg} ${milestoneArg}`;
 
-    // Add milestone if present
-    if (issue.milestone) {
-      args.push("-m", issue.milestone);
-    }
-
-    const output = execSync("gh", args, { encoding: "utf-8", stdio: "pipe" });
+    const output = execSync(command, { encoding: "utf-8", stdio: "pipe" });
     const issueUrl = output.trim();
     console.log(`✅ Created: ${issueUrl}`);
     return issueUrl;
