@@ -26,7 +26,7 @@ The MCP (Model Context Protocol) server in `services/mcp` powers our AI-assisted
 
 Set through `.env.*` files or Docker Compose:
 
-- `MCP_PORT` – defaults to 3001 inside containers (mapped to `${MCP_PORT:-4000}`).
+- `MCP_PORT` – defaults to 4000 inside containers (mapped to `${MCP_PORT:-4000}`).
 - `API_URL` – where the API can be reached from the MCP container/network.
 - `JWT_SECRET` – shared secret so the MCP can generate or validate tokens alongside the API.
 - `GEMINI_API_KEY` – optional key for Gemini integrations.
@@ -40,10 +40,10 @@ npm install
 npm run dev   # nodemon index.js
 ```
 
-Hit `http://localhost:3001/health` (or the port in `.env.development`) to confirm the service is up. The SSE endpoint logs connection lifecycle events to the console.
+Hit `http://localhost:4000/health` (or the port in `.env.development`) to confirm the service is up. The SSE endpoint logs connection lifecycle events to the console.
 
 ## Deployment Notes
 
 - Compose labels register the MCP under the `/mcp` prefix via Traefik. The `mcp-stripprefix` middleware removes `/mcp` before the request reaches Express.
-- Health checks in Docker use `wget http://localhost:3001/health`.
+- Health checks in Docker use `wget http://localhost:4000/health`.
 - When adding new tools or changing execution limits, update this file and archive the previous explanation inside `legacy-docs/services/mcp/`.

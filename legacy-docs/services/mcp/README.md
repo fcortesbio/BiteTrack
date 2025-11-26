@@ -139,13 +139,13 @@ JWT_SECRET=same_as_api
 
 ```bash
 # Health check
-curl http://localhost:3001/health
+curl http://localhost:4000/health
 
 # Root info
-curl http://localhost:3001/
+curl http://localhost:4000/
 
 # Test chat (placeholder)
-curl -X POST http://localhost:3001/chat \
+curl -X POST http://localhost:4000/chat \
   -H "Content-Type: application/json" \
   -d '{"message":"Hello"}'
 ```

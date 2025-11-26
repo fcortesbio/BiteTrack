@@ -26,7 +26,7 @@ Instead of traditional MCP implementations that load all tool definitions into t
                      │ HTTP/SSE (MCP Protocol)
                      │
 ┌────────────────────▼────────────────────────────────────────┐
-│              BiteTrack MCP Server (Port 3001)               │
+│              BiteTrack MCP Server (Port 4000)               │
 │                                                              │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │         MCP Protocol Handler                        │   │
@@ -448,7 +448,7 @@ export async function callAPI(method, path, data = null) {
     // Enhanced error handling
     if (error.response) {
       throw new Error(
-        `API Error ${error.response.status}: ${error.response.data.message || error.message}`,
+        `API Error ${error.response.status}: ${error.response.data.message || error.message}`
       );
     }
     throw error;
@@ -525,7 +525,7 @@ app.get("/sse", async (req, res) => {
               codeExecution: true,
               fileSystem: true,
             },
-          })}\n\n`,
+          })}\n\n`
         );
         break;
 
